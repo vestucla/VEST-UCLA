@@ -1,4 +1,4 @@
-import { supabase } from "@/lib/supabase";
+import { createSupabaseServerClient } from "@/lib/supabase";
 import { unstable_noStore as noStore } from "next/cache";
 import {
   Card,
@@ -26,6 +26,8 @@ type LeaderboardEntry = {
 
 async function getLeaderboard(): Promise<LeaderboardEntry[]> {
   noStore();
+  const supabase = createSupabaseServerClient();
+
   const { data, error } = await supabase
     .from("leaderboard")
     .select("username, points")
@@ -94,5 +96,4 @@ export default async function LeaderboardPage() {
     </div>
   );
 }
-
 
