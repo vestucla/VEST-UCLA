@@ -29,10 +29,6 @@ export const links = [
     linkTo: "Team",
   },
   {
-    url: "/members",
-    linkTo: "Members",
-  },
-  {
     url: "/events",
     linkTo: "Events",
   },
