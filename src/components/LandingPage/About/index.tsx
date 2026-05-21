@@ -36,9 +36,9 @@ const About = () => (
           <WelcomeTitle>Welcome to VEST at UCLA.</WelcomeTitle>
           <AboutDescription>
             <p>
-              VEST at UCLA is a club that accelerates builders that want 
-              to start or join the next Unicorn company. We're hands on and 
-              love to do things rather than just plan things.
+              VEST at UCLA is a club and a 501(c)(3) nonprofit organization that accelerates
+              builders who want to start or join the next Unicorn company. We're
+              hands on and love to do things rather than just plan things.
             </p>
             <p>
               In our first quarter we hosted the founder of Zillow, a Thiel 
