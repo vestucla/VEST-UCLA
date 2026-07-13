@@ -18,9 +18,18 @@ export default function LoginPage() {
     e.preventDefault();
     setSubmitting(true);
     try {
-      await signIn(email, password);
+      const { needsPasswordReset, profileCompleted } = await signIn(
+        email,
+        password
+      );
       toast.success("Signed in.");
-      router.push("/members");
+      if (needsPasswordReset) {
+        router.push("/members/reset-password");
+      } else if (!profileCompleted) {
+        router.push("/members/onboarding");
+      } else {
+        router.push("/members");
+      }
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Sign-in failed.");
     } finally {

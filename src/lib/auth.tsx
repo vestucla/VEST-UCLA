@@ -1,9 +1,5 @@
 "use client";
 
-// Stub auth provider for v1. Persists a "logged in" flag in localStorage so
-// contact info is gated. Replace with Supabase auth (magic link / Google) in
-// v2 — keep the `useAuth()` shape so consuming components don't change.
-
 import {
   createContext,
   useCallback,
@@ -12,70 +8,183 @@ import {
   useMemo,
   useState,
 } from "react";
+import {
+  onAuthStateChanged,
+  signInWithEmailAndPassword,
+  signOut as firebaseSignOut,
+} from "firebase/auth";
+import { doc, getDoc } from "firebase/firestore";
+import { getFirebaseAuth, getFirebaseDb } from "./firebase";
+
+export type MemberRole = "admin" | "member";
+export type MemberStatus = "active" | "alumni";
+
+export interface MemberDoc {
+  uid: string;
+  email: string;
+  firstName?: string;
+  lastName?: string;
+  role?: MemberRole;
+  status?: MemberStatus;
+  mustChangePassword?: boolean;
+  profileCompleted?: boolean;
+  // Profile fields filled in by the member during onboarding.
+  bio?: string;
+  interests?: string[];
+  experiences?: ExperienceItem[];
+  currentlyWorkingOn?: string;
+  major?: string;
+  classYear?: string;
+  city?: string;
+  imageSrc?: string;
+  linkedin?: string;
+  twitter?: string;
+  github?: string;
+  website?: string;
+}
+
+export interface ExperienceItem {
+  company: string;
+  role: string;
+  startDate?: string;
+  endDate?: string;
+  description?: string;
+}
 
 interface AuthUser {
   email: string;
+  uid: string;
+  firstName?: string;
+  lastName?: string;
+  role?: MemberRole;
 }
 
 interface AuthContextValue {
   user: AuthUser | null;
   loading: boolean;
   isMember: boolean;
-  signIn: (email: string, password: string) => Promise<void>;
+  isAdmin: boolean;
+  needsPasswordReset: boolean;
+  profileCompleted: boolean;
+  signIn: (
+    email: string,
+    password: string
+  ) => Promise<{ needsPasswordReset: boolean; profileCompleted: boolean }>;
   signOut: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextValue | null>(null);
 
-const STORAGE_KEY = "vest.portal.user";
-
-// Demo gate: any email ending in one of these domains is treated as a member.
-// For v1 this is just a UX placeholder; real gating happens once we move to
-// Supabase + an authoritative members table.
 const MEMBER_DOMAINS = ["@vestucla.com", "@g.ucla.edu", "@ucla.edu"];
+
+async function loadMemberDoc(uid: string): Promise<MemberDoc | null> {
+  try {
+    const db = getFirebaseDb();
+    const snap = await getDoc(doc(db, "members", uid));
+    if (!snap.exists()) return null;
+    return { uid, ...snap.data() } as MemberDoc;
+  } catch {
+    return null;
+  }
+}
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<AuthUser | null>(null);
   const [loading, setLoading] = useState(true);
+  const [memberDoc, setMemberDoc] = useState<MemberDoc | null>(null);
 
   useEffect(() => {
-    try {
-      const raw = typeof window !== "undefined" ? window.localStorage.getItem(STORAGE_KEY) : null;
-      if (raw) setUser(JSON.parse(raw));
-    } catch {
-      // ignore parse errors
-    } finally {
+    const auth = getFirebaseAuth();
+    return onAuthStateChanged(auth, async (firebaseUser) => {
+      if (!firebaseUser) {
+        setUser(null);
+        setMemberDoc(null);
+        setLoading(false);
+        return;
+      }
+      const doc = await loadMemberDoc(firebaseUser.uid);
+      setMemberDoc(doc);
+      setUser({
+        email: firebaseUser.email ?? doc?.email ?? "",
+        uid: firebaseUser.uid,
+        firstName: doc?.firstName,
+        lastName: doc?.lastName,
+        role: doc?.role,
+      });
       setLoading(false);
-    }
+    });
   }, []);
 
-  const signIn = useCallback(async (email: string, _password: string) => {
-    // v1 stub: accept anything that looks like an email. No real password
-    // checking — make sure to replace this before exposing contact info to
-    // the public internet.
-    if (!email.includes("@")) throw new Error("Enter a valid email.");
-    const next = { email: email.trim().toLowerCase() };
-    setUser(next);
-    if (typeof window !== "undefined") {
-      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
-    }
-  }, []);
+  const signIn = useCallback(
+    async (email: string, password: string) => {
+      const auth = getFirebaseAuth();
+      const cred = await signInWithEmailAndPassword(auth, email, password);
+      const doc = await loadMemberDoc(cred.user.uid);
+      const nextUser = {
+        email: cred.user.email ?? doc?.email ?? email,
+        uid: cred.user.uid,
+        firstName: doc?.firstName,
+        lastName: doc?.lastName,
+        role: doc?.role,
+      };
+      setUser(nextUser);
+      setMemberDoc(doc);
+      const needsPasswordReset = doc?.mustChangePassword ?? false;
+      const profileCompleted = doc?.profileCompleted ?? false;
+      return { needsPasswordReset, profileCompleted };
+    },
+    [setUser, setMemberDoc]
+  );
 
   const signOut = useCallback(async () => {
+    const auth = getFirebaseAuth();
+    await firebaseSignOut(auth);
     setUser(null);
-    if (typeof window !== "undefined") {
-      window.localStorage.removeItem(STORAGE_KEY);
-    }
+    setMemberDoc(null);
   }, []);
 
-  const isMember = useMemo(
-    () => !!user && MEMBER_DOMAINS.some((d) => user.email.endsWith(d)),
-    [user]
+  const isMember = useMemo(() => {
+    if (!user) return false;
+    if (memberDoc?.role === "member" || memberDoc?.role === "admin") return true;
+    return MEMBER_DOMAINS.some((d) => user.email.endsWith(d));
+  }, [user, memberDoc]);
+
+  const isAdmin = useMemo(
+    () => memberDoc?.role === "admin",
+    [memberDoc]
+  );
+
+  const needsPasswordReset = useMemo(
+    () => memberDoc?.mustChangePassword ?? false,
+    [memberDoc]
+  );
+
+  const profileCompleted = useMemo(
+    () => memberDoc?.profileCompleted ?? false,
+    [memberDoc]
   );
 
   const value = useMemo<AuthContextValue>(
-    () => ({ user, loading, isMember, signIn, signOut }),
-    [user, loading, isMember, signIn, signOut]
+    () => ({
+      user,
+      loading,
+      isMember,
+      isAdmin,
+      needsPasswordReset,
+      profileCompleted,
+      signIn,
+      signOut,
+    }),
+    [
+      user,
+      loading,
+      isMember,
+      isAdmin,
+      needsPasswordReset,
+      profileCompleted,
+      signIn,
+      signOut,
+    ]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

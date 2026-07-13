@@ -39,6 +39,8 @@ export default function MemberProfile({ member }: Props) {
         </Name>
         <Role>{member.vestTitle}</Role>
         {member.classYear && <Meta>Class of {member.classYear}</Meta>}
+        {member.major && <Meta>Major: {member.major}</Meta>}
+        {member.city && <Meta>{member.city}</Meta>}
         {member.joinedYear && <Meta>Joined VEST {member.joinedYear}</Meta>}
 
         <SocialList>
@@ -74,17 +76,17 @@ export default function MemberProfile({ member }: Props) {
 
         <ContactBlock>
           <ContactHeader>Contact</ContactHeader>
-          {member.contact && (member.contact.email || member.contact.phone) ? (
+          {member.email || member.phone ? (
             isMember ? (
               <ContactList>
-                {member.contact.email && (
+                {member.email && (
                   <li>
-                    <a href={`mailto:${member.contact.email}`}>{member.contact.email}</a>
+                    <a href={`mailto:${member.email}`}>{member.email}</a>
                   </li>
                 )}
-                {member.contact.phone && (
+                {member.phone && (
                   <li>
-                    <a href={`tel:${member.contact.phone}`}>{member.contact.phone}</a>
+                    <a href={`tel:${member.phone}`}>{member.phone}</a>
                   </li>
                 )}
               </ContactList>
@@ -101,8 +103,14 @@ export default function MemberProfile({ member }: Props) {
       </Sidebar>
 
       <MainCol>
-        <OneLiner>{member.oneLiner}</OneLiner>
         {member.bio && <Bio>{member.bio}</Bio>}
+
+        {member.currentlyWorkingOn && (
+          <Section>
+            <SectionTitle>Currently working on</SectionTitle>
+            <p className="text-sm text-neutral-300">{member.currentlyWorkingOn}</p>
+          </Section>
+        )}
 
         {member.interests.length > 0 && (
           <Section>
@@ -283,12 +291,6 @@ const MainCol = styled.div`
   display: flex;
   flex-direction: column;
   gap: 32px;
-`;
-
-const OneLiner = styled.p`
-  font-size: var(--text-xl);
-  line-height: 1.4;
-  color: #efefef;
 `;
 
 const Bio = styled.p`

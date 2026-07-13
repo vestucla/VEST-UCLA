@@ -1,4 +1,4 @@
-import { supabase } from "@/lib/supabase";
+import { getSupabaseClient } from "@/lib/supabase";
 import { unstable_noStore as noStore } from "next/cache";
 import {
   Card,
@@ -26,7 +26,7 @@ type LeaderboardEntry = {
 
 async function getLeaderboard(): Promise<LeaderboardEntry[]> {
   noStore();
-  const { data, error } = await supabase
+  const { data, error } = await getSupabaseClient()
     .from("leaderboard")
     .select("username, points")
     .order("points", { ascending: false });
