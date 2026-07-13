@@ -142,41 +142,6 @@ export default function EditProfilePage({ params }: Params) {
     setExperiences((prev) => prev.filter((_, i) => i !== index));
   };
 
-  const compressImage = (file: File, maxSize = 200, quality = 0.6): Promise<string> => {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const img = new Image();
-        img.onload = () => {
-          const canvas = document.createElement("canvas");
-          let { width, height } = img;
-          
-          // Scale to fit within maxSize x maxSize
-          const scale = Math.min(maxSize / width, maxSize / height, 1);
-          width = Math.round(width * scale);
-          height = Math.round(height * scale);
-          
-          canvas.width = width;
-          canvas.height = height;
-          
-          const ctx = canvas.getContext("2d");
-          if (!ctx) {
-            reject(new Error("Could not get canvas context"));
-            return;
-          }
-          
-          ctx.drawImage(img, 0, 0, width, height);
-          const base64 = canvas.toDataURL("image/jpeg", quality);
-          resolve(base64);
-        };
-        img.onerror = () => reject(new Error("Failed to load image"));
-        img.src = e.target?.result as string;
-      };
-      reader.onerror = () => reject(new Error("Failed to read file"));
-      reader.readAsDataURL(file);
-    });
-  };
-
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -186,16 +151,43 @@ export default function EditProfilePage({ params }: Params) {
       return;
     }
 
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error("Image too large. Max size is 5 MB.");
+      return;
+    }
+
+    const previewUrl = URL.createObjectURL(file);
+    setImageSrc(previewUrl);
     setUploadingImage(true);
+
     try {
-      const base64 = await compressImage(file, 200, 0.6);
-      setImageSrc(base64);
-      toast.success("Photo ready");
+      const auth = getFirebaseAuth();
+      const token = await auth.currentUser?.getIdToken();
+      if (!token) throw new Error("Not authenticated");
+
+      const formData = new FormData();
+      formData.append("file", file);
+
+      const res = await fetch("/api/upload/image", {
+        method: "POST",
+        headers: { Authorization: `Bearer ${token}` },
+        body: formData,
+      });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Upload failed");
+
+      URL.revokeObjectURL(previewUrl);
+      setImageSrc(data.url as string);
+      toast.success("Photo uploaded");
     } catch (err) {
-      console.error("Compression error:", err);
-      toast.error("Failed to process photo");
+      console.error("Upload error:", err);
+      URL.revokeObjectURL(previewUrl);
+      setImageSrc("");
+      toast.error(err instanceof Error ? err.message : "Failed to upload photo");
     } finally {
       setUploadingImage(false);
+      e.target.value = "";
     }
   };
 
@@ -229,11 +221,15 @@ export default function EditProfilePage({ params }: Params) {
         vestTitle,
         phone,
         joinedYear,
-        imageSrc,
         experiences: experiences.filter(
           (exp) => exp.company.trim() || exp.role.trim()
         ),
       };
+
+      // Only write Cloudinary/CDN URLs (skip legacy base64 / blob previews)
+      if (!imageSrc || imageSrc.startsWith("https://") || imageSrc.startsWith("http://")) {
+        payload.imageSrc = imageSrc;
+      }
 
       // Include admin-only fields if admin
       if (isAdmin) {
@@ -492,10 +488,10 @@ export default function EditProfilePage({ params }: Params) {
             </button>
             <button
               type="submit"
-              disabled={saving}
+              disabled={saving || uploadingImage}
               className="h-11 flex-1 rounded-full bg-white/10 px-6 text-sm font-medium text-white transition hover:bg-white/20 disabled:opacity-50"
             >
-              {saving ? "Saving…" : "Save profile"}
+              {saving ? "Saving…" : uploadingImage ? "Uploading photo…" : "Save profile"}
             </button>
           </div>
         </form>

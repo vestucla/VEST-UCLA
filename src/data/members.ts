@@ -31,7 +31,7 @@ export interface Member {
   joinedYear?: string;   // year they joined VEST
 
   // Profile content (filled by member during onboarding)
-  imageSrc?: string;     // public Firebase Storage URL
+  imageSrc?: string;     // Cloudinary HTTPS URL
   bio?: string;          // longer paragraph for the profile page
   interests: string[];   // topical tags used by the search filters
   currentlyWorkingOn?: string;

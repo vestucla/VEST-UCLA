@@ -29,6 +29,7 @@ export default function MemberProfile({ member }: Props) {
               style={{ objectFit: "cover" }}
               sizes="320px"
               priority
+              unoptimized={member.imageSrc.startsWith("data:")}
             />
           ) : (
             <AvatarPlaceholder>

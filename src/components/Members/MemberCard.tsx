@@ -24,6 +24,7 @@ export default function MemberCard({ member, href }: Props) {
             fill
             style={{ objectFit: "cover" }}
             sizes="(max-width: 768px) 50vw, 25vw"
+            unoptimized={member.imageSrc.startsWith("data:")}
           />
         ) : (
           <Placeholder>

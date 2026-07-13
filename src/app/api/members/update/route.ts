@@ -79,6 +79,17 @@ export async function POST(req: NextRequest) {
         updateData[field] = profileData[field];
       }
     }
+
+    // Only persist remote image URLs (Cloudinary / CDN), not base64 or blob previews
+    if (typeof updateData.imageSrc === "string" && updateData.imageSrc.length > 0) {
+      const src = updateData.imageSrc as string;
+      if (!src.startsWith("https://") && !src.startsWith("http://")) {
+        return NextResponse.json(
+          { error: "imageSrc must be a public HTTPS URL (upload via /api/upload/image)" },
+          { status: 400 }
+        );
+      }
+    }
     
     // Only admins can update role/status
     if (userInfo.isAdmin) {
