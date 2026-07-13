@@ -9,7 +9,7 @@ export default function AlumniPage() {
       <PortalShell
         title={
           <>
-            VEST <span className="italic">Alumni</span>
+            Member <span className="italic">Portfolio</span>
           </>
         }
         subtitle="Where our members go after VEST. Hiring, partnering, or want to reconnect? Reach out — alumni love hearing from the next class."

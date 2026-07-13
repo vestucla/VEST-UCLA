@@ -67,11 +67,23 @@ export async function getMembersByStatus(
   return members.filter((m) => m.status === status);
 }
 
-export async function getMember(id: string): Promise<Member | null> {
+export async function getMember(idOrSlug: string): Promise<Member | null> {
   const db = getFirebaseDb();
-  const snap = await getDoc(doc(db, "members", id));
-  if (!snap.exists()) return null;
-  return docToMember(snap.id, snap.data());
+  
+  // First try by document ID
+  const snap = await getDoc(doc(db, "members", idOrSlug));
+  if (snap.exists()) {
+    return docToMember(snap.id, snap.data());
+  }
+  
+  // If not found, try by slug (firstName-lastName)
+  const allMembers = await getAllMembers();
+  const memberBySlug = allMembers.find((m) => {
+    const slug = `${m.firstName.toLowerCase()}-${m.lastName.toLowerCase()}`;
+    return slug === idOrSlug.toLowerCase();
+  });
+  
+  return memberBySlug ?? null;
 }
 
 export interface MemberSearchOptions {

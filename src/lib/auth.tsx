@@ -11,9 +11,11 @@ import {
 import {
   onAuthStateChanged,
   signInWithEmailAndPassword,
+  signInWithPopup,
+  GoogleAuthProvider,
   signOut as firebaseSignOut,
 } from "firebase/auth";
-import { doc, getDoc } from "firebase/firestore";
+import { collection, query, where, getDocs } from "firebase/firestore";
 import { getFirebaseAuth, getFirebaseDb } from "./firebase";
 
 export type MemberRole = "admin" | "member";
@@ -41,6 +43,9 @@ export interface MemberDoc {
   twitter?: string;
   github?: string;
   website?: string;
+  vestTitle?: string;
+  phone?: string;
+  joinedYear?: string;
 }
 
 export interface ExperienceItem {
@@ -70,6 +75,7 @@ interface AuthContextValue {
     email: string,
     password: string
   ) => Promise<{ needsPasswordReset: boolean; profileCompleted: boolean }>;
+  signInWithGoogle: () => Promise<{ needsPasswordReset: boolean; profileCompleted: boolean }>;
   signOut: () => Promise<void>;
 }
 
@@ -77,12 +83,16 @@ const AuthContext = createContext<AuthContextValue | null>(null);
 
 const MEMBER_DOMAINS = ["@vestucla.com", "@g.ucla.edu", "@ucla.edu"];
 
-async function loadMemberDoc(uid: string): Promise<MemberDoc | null> {
+const ALLOWED_DOMAINS = ["g.ucla.edu", "ucla.edu"];
+
+async function loadMemberDocByEmail(email: string): Promise<MemberDoc | null> {
   try {
     const db = getFirebaseDb();
-    const snap = await getDoc(doc(db, "members", uid));
-    if (!snap.exists()) return null;
-    return { uid, ...snap.data() } as MemberDoc;
+    const q = query(collection(db, "members"), where("email", "==", email));
+    const snap = await getDocs(q);
+    if (snap.empty) return null;
+    const doc = snap.docs[0];
+    return { uid: doc.id, ...doc.data() } as MemberDoc;
   } catch {
     return null;
   }
@@ -102,14 +112,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setLoading(false);
         return;
       }
-      const doc = await loadMemberDoc(firebaseUser.uid);
-      setMemberDoc(doc);
+      const email = firebaseUser.email ?? "";
+      const memberDoc = await loadMemberDocByEmail(email);
+      setMemberDoc(memberDoc);
       setUser({
-        email: firebaseUser.email ?? doc?.email ?? "",
+        email,
         uid: firebaseUser.uid,
-        firstName: doc?.firstName,
-        lastName: doc?.lastName,
-        role: doc?.role,
+        firstName: memberDoc?.firstName,
+        lastName: memberDoc?.lastName,
+        role: memberDoc?.role,
       });
       setLoading(false);
     });
@@ -117,24 +128,72 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const signIn = useCallback(
     async (email: string, password: string) => {
+      // Check if member profile exists before allowing sign-in
+      const existingMember = await loadMemberDocByEmail(email);
+      if (!existingMember) {
+        throw new Error("No member profile found. Contact an admin to create your account.");
+      }
+
       const auth = getFirebaseAuth();
       const cred = await signInWithEmailAndPassword(auth, email, password);
-      const doc = await loadMemberDoc(cred.user.uid);
+      const memberDoc = await loadMemberDocByEmail(cred.user.email ?? email);
       const nextUser = {
-        email: cred.user.email ?? doc?.email ?? email,
+        email: cred.user.email ?? memberDoc?.email ?? email,
         uid: cred.user.uid,
-        firstName: doc?.firstName,
-        lastName: doc?.lastName,
-        role: doc?.role,
+        firstName: memberDoc?.firstName,
+        lastName: memberDoc?.lastName,
+        role: memberDoc?.role,
       };
       setUser(nextUser);
-      setMemberDoc(doc);
-      const needsPasswordReset = doc?.mustChangePassword ?? false;
-      const profileCompleted = doc?.profileCompleted ?? false;
+      setMemberDoc(memberDoc);
+      const needsPasswordReset = memberDoc?.mustChangePassword ?? false;
+      const profileCompleted = memberDoc?.profileCompleted ?? false;
       return { needsPasswordReset, profileCompleted };
     },
     [setUser, setMemberDoc]
   );
+
+  const signInWithGoogle = useCallback(async () => {
+    const auth = getFirebaseAuth();
+    const provider = new GoogleAuthProvider();
+    // Restrict to UCLA domains
+    provider.setCustomParameters({ hd: "*" }); // Allow popup, we'll validate after
+
+    const result = await signInWithPopup(auth, provider);
+    const email = result.user.email;
+
+    if (!email) {
+      await firebaseSignOut(auth);
+      throw new Error("Could not get email from Google account.");
+    }
+
+    // Check UCLA domain
+    const domain = email.split("@")[1];
+    if (!ALLOWED_DOMAINS.includes(domain)) {
+      await firebaseSignOut(auth);
+      throw new Error("You must use a UCLA email (@g.ucla.edu or @ucla.edu).");
+    }
+
+    // Check if member profile exists
+    const memberDoc = await loadMemberDocByEmail(email);
+    if (!memberDoc) {
+      await firebaseSignOut(auth);
+      throw new Error("No member profile found. Contact an admin to create your account.");
+    }
+
+    const nextUser = {
+      email,
+      uid: result.user.uid,
+      firstName: memberDoc.firstName,
+      lastName: memberDoc.lastName,
+      role: memberDoc.role,
+    };
+    setUser(nextUser);
+    setMemberDoc(memberDoc);
+    const needsPasswordReset = memberDoc.mustChangePassword ?? false;
+    const profileCompleted = memberDoc.profileCompleted ?? false;
+    return { needsPasswordReset, profileCompleted };
+  }, [setUser, setMemberDoc]);
 
   const signOut = useCallback(async () => {
     const auth = getFirebaseAuth();
@@ -173,6 +232,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       needsPasswordReset,
       profileCompleted,
       signIn,
+      signInWithGoogle,
       signOut,
     }),
     [
@@ -183,6 +243,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       needsPasswordReset,
       profileCompleted,
       signIn,
+      signInWithGoogle,
       signOut,
     ]
   );

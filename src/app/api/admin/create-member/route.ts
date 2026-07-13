@@ -1,20 +1,17 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getAdminAuth, getAdminDb } from "@/lib/firebase-admin";
-
-function generateTempPassword() {
-  return (
-    Math.random().toString(36).slice(2) +
-    Math.random().toString(36).slice(2, 6)
-  );
-}
+import { sendWelcomeEmail } from "@/lib/email";
 
 async function verifyAdmin(token: string): Promise<boolean> {
   const auth = getAdminAuth();
   const decoded = await auth.verifyIdToken(token);
+  const email = decoded.email;
+  if (!email) return false;
+
   const db = getAdminDb();
-  const doc = await db.collection("members").doc(decoded.uid).get();
-  if (!doc.exists) return false;
-  return doc.data()?.role === "admin";
+  const snap = await db.collection("members").where("email", "==", email).get();
+  if (snap.empty) return false;
+  return snap.docs[0].data()?.role === "admin";
 }
 
 export async function POST(req: NextRequest) {
@@ -46,30 +43,41 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const tempPassword = generateTempPassword();
-    const auth = getAdminAuth();
-    const user = await auth.createUser({
-      email,
-      password: tempPassword,
-    });
-
+    // Check if member with this email already exists
     const db = getAdminDb();
-    await db.collection("members").doc(user.uid).set({
-      uid: user.uid,
+    const existing = await db.collection("members").where("email", "==", email).get();
+    if (!existing.empty) {
+      return NextResponse.json(
+        { error: "A member with this email already exists" },
+        { status: 400 }
+      );
+    }
+
+    // Create member profile (no Firebase Auth user - they'll sign in with Google)
+    const docRef = await db.collection("members").add({
       email,
       firstName,
       lastName,
       role,
       status,
-      mustChangePassword: true,
+      mustChangePassword: false,
       profileCompleted: false,
       createdAt: new Date().toISOString(),
     });
 
+    // Send welcome email
+    try {
+      await sendWelcomeEmail({ to: email, firstName, lastName });
+      console.log(`[create-member] Welcome email sent to ${email}`);
+    } catch (emailErr) {
+      console.error("[create-member] Failed to send welcome email:", emailErr);
+      // Don't fail the request if email fails - account is still created
+    }
+
     return NextResponse.json({
-      uid: user.uid,
+      id: docRef.id,
       email,
-      tempPassword,
+      message: "Member profile created and welcome email sent.",
     });
   } catch (err) {
     const message = err instanceof Error ? err.message : "Unknown error";

@@ -11,7 +11,11 @@ interface Props {
 }
 
 export default function MemberProfile({ member }: Props) {
-  const { isMember } = useAuth();
+  const { user, isMember, isAdmin } = useAuth();
+  
+  // Can edit if it's their own profile or if they're an admin
+  const canEdit = user && (isAdmin || user.email === member.email);
+  const memberSlug = `${member.firstName.toLowerCase()}-${member.lastName.toLowerCase()}`;
 
   return (
     <Layout>
@@ -73,6 +77,12 @@ export default function MemberProfile({ member }: Props) {
             </SocialLink>
           )}
         </SocialList>
+
+        {canEdit && (
+          <EditButton href={`/members/edit/${memberSlug}`}>
+            Edit Profile
+          </EditButton>
+        )}
 
         <ContactBlock>
           <ContactHeader>Contact</ContactHeader>
@@ -234,6 +244,29 @@ const SocialLink = styled.a`
     &:hover {
       background: rgba(173, 206, 255, 0.15);
       border-color: rgba(173, 206, 255, 0.4);
+    }
+  }
+`;
+
+const EditButton = styled(Link)`
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 12px;
+  padding: 10px 20px;
+  font-size: var(--text-sm);
+  font-weight: 500;
+  border-radius: 999px;
+  border: 1px solid rgba(173, 206, 255, 0.3);
+  color: rgba(173, 206, 255, 0.95);
+  background: rgba(173, 206, 255, 0.1);
+  text-decoration: none;
+  transition: background 200ms ease, border-color 200ms ease;
+
+  @media (hover: hover) and (pointer: fine) {
+    &:hover {
+      background: rgba(173, 206, 255, 0.2);
+      border-color: rgba(173, 206, 255, 0.5);
     }
   }
 `;

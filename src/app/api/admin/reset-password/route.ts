@@ -11,10 +11,13 @@ function generateTempPassword() {
 async function verifyAdmin(token: string): Promise<boolean> {
   const auth = getAdminAuth();
   const decoded = await auth.verifyIdToken(token);
+  const email = decoded.email;
+  if (!email) return false;
+
   const db = getAdminDb();
-  const doc = await db.collection("members").doc(decoded.uid).get();
-  if (!doc.exists) return false;
-  return doc.data()?.role === "admin";
+  const snap = await db.collection("members").where("email", "==", email).get();
+  if (snap.empty) return false;
+  return snap.docs[0].data()?.role === "admin";
 }
 
 export async function POST(req: NextRequest) {
