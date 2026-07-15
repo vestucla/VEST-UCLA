@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getAdminAuth, getAdminDb } from "@/lib/firebase-admin";
+import { getAdminAuth } from "@/lib/firebase-admin";
+import { MembersAdminOrm } from "@/lib/orm/members.admin";
+import { MemberRole } from "@/data/members";
 
 async function verifyAdmin(token: string): Promise<boolean> {
   try {
@@ -8,10 +10,8 @@ async function verifyAdmin(token: string): Promise<boolean> {
     const email = decoded.email;
     if (!email) return false;
 
-    const db = getAdminDb();
-    const snap = await db.collection("members").where("email", "==", email).get();
-    if (snap.empty) return false;
-    return snap.docs[0].data()?.role === "admin";
+    const member = await MembersAdminOrm.findByEmail(email);
+    return member?.role === MemberRole.Admin;
   } catch {
     return false;
   }
@@ -31,21 +31,25 @@ export async function POST(req: NextRequest) {
     }
 
     const body = await req.json();
-    const { email } = body;
+    const { email, uuid } = body;
 
-    if (!email) {
-      return NextResponse.json({ error: "Missing email" }, { status: 400 });
+    let member = null;
+    if (uuid) {
+      member = await MembersAdminOrm.findByUuid(uuid);
+    } else if (email) {
+      member = await MembersAdminOrm.findByEmail(email);
+    } else {
+      return NextResponse.json(
+        { error: "Missing email or uuid" },
+        { status: 400 }
+      );
     }
 
-    const db = getAdminDb();
-    const memberSnap = await db.collection("members").where("email", "==", email).get();
-    
-    if (memberSnap.empty) {
+    if (!member) {
       return NextResponse.json({ error: "Member not found" }, { status: 404 });
     }
 
-    const docId = memberSnap.docs[0].id;
-    await db.collection("members").doc(docId).delete();
+    await MembersAdminOrm.delete(member.uuid);
 
     return NextResponse.json({ success: true, message: "Member deleted" });
   } catch (err) {

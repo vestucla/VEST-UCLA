@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getAdminAuth, getAdminDb } from "@/lib/firebase-admin";
+import { getAdminAuth } from "@/lib/firebase-admin";
+import { MembersAdminOrm } from "@/lib/orm/members.admin";
+import { MemberRole, MemberStatus, VestTitle, JoinedQuarter } from "@/data/members";
 import { sendWelcomeEmail } from "@/lib/email";
 
 async function verifyAdmin(token: string): Promise<boolean> {
@@ -8,10 +10,8 @@ async function verifyAdmin(token: string): Promise<boolean> {
   const email = decoded.email;
   if (!email) return false;
 
-  const db = getAdminDb();
-  const snap = await db.collection("members").where("email", "==", email).get();
-  if (snap.empty) return false;
-  return snap.docs[0].data()?.role === "admin";
+  const member = await MembersAdminOrm.findByEmail(email);
+  return member?.role === MemberRole.Admin;
 }
 
 export async function POST(req: NextRequest) {
@@ -32,8 +32,11 @@ export async function POST(req: NextRequest) {
       email,
       firstName,
       lastName,
-      role = "member",
-      status = "active",
+      role = MemberRole.Member,
+      status = MemberStatus.Active,
+      vestTitle,
+      joinedYear,
+      joinedQuarter,
     } = body;
 
     if (!email || !firstName || !lastName) {
@@ -43,39 +46,34 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Check if member with this email already exists
-    const db = getAdminDb();
-    const existing = await db.collection("members").where("email", "==", email).get();
-    if (!existing.empty) {
+    const existing = await MembersAdminOrm.findByEmail(email);
+    if (existing) {
       return NextResponse.json(
         { error: "A member with this email already exists" },
         { status: 400 }
       );
     }
 
-    // Create member profile (no Firebase Auth user - they'll sign in with Google)
-    const docRef = await db.collection("members").add({
+    const member = await MembersAdminOrm.create({
       email,
       firstName,
       lastName,
       role,
       status,
-      mustChangePassword: false,
-      profileCompleted: false,
-      createdAt: new Date().toISOString(),
+      vestTitle: vestTitle as VestTitle | undefined,
+      joinedYear,
+      joinedQuarter: joinedQuarter as JoinedQuarter | undefined,
     });
 
-    // Send welcome email
     try {
       await sendWelcomeEmail({ to: email, firstName, lastName });
       console.log(`[create-member] Welcome email sent to ${email}`);
     } catch (emailErr) {
       console.error("[create-member] Failed to send welcome email:", emailErr);
-      // Don't fail the request if email fails - account is still created
     }
 
     return NextResponse.json({
-      id: docRef.id,
+      uuid: member.uuid,
       email,
       message: "Member profile created and welcome email sent.",
     });

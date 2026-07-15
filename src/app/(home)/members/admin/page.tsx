@@ -2,50 +2,36 @@
 
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
-import { collection, getDocs } from "firebase/firestore";
 import Link from "next/link";
 import PortalShell from "@/components/Members/PortalShell";
 import { useAuth } from "@/lib/auth";
-import { getFirebaseAuth, getFirebaseDb } from "@/lib/firebase";
-
-interface MemberListItem {
-  uid: string;
-  email: string;
-  firstName: string;
-  lastName: string;
-  role: string;
-  status: string;
-}
+import { getFirebaseAuth } from "@/lib/firebase";
+import { MembersOrm } from "@/lib/orm/members";
+import {
+  MemberRole,
+  MemberStatus,
+  memberSlug,
+  type MemberDoc,
+} from "@/data/members";
 
 export default function AdminPage() {
   const { isAdmin, loading } = useAuth();
   const [email, setEmail] = useState("");
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
-  const [role, setRole] = useState<"admin" | "member">("member");
-  const [status, setStatus] = useState<"active" | "alumni">("active");
+  const [role, setRole] = useState<MemberRole>(MemberRole.Member);
+  const [status, setStatus] = useState<MemberStatus>(MemberStatus.Active);
   const [submitting, setSubmitting] = useState(false);
   const [created, setCreated] = useState<{ email: string } | null>(null);
 
-  const [members, setMembers] = useState<MemberListItem[]>([]);
+  const [members, setMembers] = useState<MemberDoc[]>([]);
   const [deletingEmail, setDeletingEmail] = useState<string | null>(null);
 
   const loadMembers = async () => {
-    const db = getFirebaseDb();
-    const snap = await getDocs(collection(db, "members"));
-    const list: MemberListItem[] = [];
-    snap.forEach((doc) => {
-      const d = doc.data();
-      list.push({
-        uid: doc.id,
-        email: d.email ?? "",
-        firstName: d.firstName ?? "",
-        lastName: d.lastName ?? "",
-        role: d.role ?? "member",
-        status: d.status ?? "active",
-      });
-    });
-    list.sort((a, b) => a.lastName.localeCompare(b.lastName));
+    const list = await MembersOrm.findAll();
+    list.sort((a, b) =>
+      (a.lastName ?? "").localeCompare(b.lastName ?? "")
+    );
     setMembers(list);
   };
 
@@ -106,7 +92,11 @@ export default function AdminPage() {
   };
 
   const onDeleteMember = async (memberEmail: string) => {
-    if (!confirm(`Are you sure you want to delete ${memberEmail}? This cannot be undone.`)) {
+    if (
+      !confirm(
+        `Are you sure you want to delete ${memberEmail}? This cannot be undone.`
+      )
+    ) {
       return;
     }
     setDeletingEmail(memberEmail);
@@ -137,16 +127,16 @@ export default function AdminPage() {
     }
   };
 
-  const getMemberSlug = (m: MemberListItem) => 
-    `${m.firstName.toLowerCase()}-${m.lastName.toLowerCase()}`;
-
   return (
     <main>
       <PortalShell
-        title={<>Manage <span className="italic">Users</span></>}
+        title={
+          <>
+            Manage <span className="italic">Users</span>
+          </>
+        }
         subtitle="Create, edit, and manage member profiles."
       >
-        {/* Create Member Form */}
         <div className="mx-auto max-w-4xl">
           <h2 className="mb-4 text-lg font-medium text-white">Create New Member</h2>
           <form
@@ -200,11 +190,11 @@ export default function AdminPage() {
                   </label>
                   <select
                     value={role}
-                    onChange={(e) => setRole(e.target.value as "admin" | "member")}
+                    onChange={(e) => setRole(e.target.value as MemberRole)}
                     className="h-10 rounded-lg border border-white/15 bg-white/5 px-2 text-sm text-white outline-none focus:border-white/30"
                   >
-                    <option value="member">Member</option>
-                    <option value="admin">Admin</option>
+                    <option value={MemberRole.Member}>Member</option>
+                    <option value={MemberRole.Admin}>Admin</option>
                   </select>
                 </div>
                 <div className="flex flex-col gap-1">
@@ -213,11 +203,11 @@ export default function AdminPage() {
                   </label>
                   <select
                     value={status}
-                    onChange={(e) => setStatus(e.target.value as "active" | "alumni")}
+                    onChange={(e) => setStatus(e.target.value as MemberStatus)}
                     className="h-10 rounded-lg border border-white/15 bg-white/5 px-2 text-sm text-white outline-none focus:border-white/30"
                   >
-                    <option value="active">Active</option>
-                    <option value="alumni">Alumni</option>
+                    <option value={MemberStatus.Active}>Active</option>
+                    <option value={MemberStatus.Alumni}>Alumni</option>
                   </select>
                 </div>
               </div>
@@ -238,7 +228,6 @@ export default function AdminPage() {
             </div>
           </form>
 
-          {/* Member List */}
           <div className="mt-10">
             <h2 className="mb-4 text-lg font-medium text-white">
               All Members ({members.length})
@@ -266,7 +255,10 @@ export default function AdminPage() {
                 </thead>
                 <tbody>
                   {members.map((m) => (
-                    <tr key={m.uid} className="border-b border-white/5 hover:bg-white/5">
+                    <tr
+                      key={m.uuid}
+                      className="border-b border-white/5 hover:bg-white/5"
+                    >
                       <td className="px-4 py-3 text-sm text-white">
                         {m.firstName} {m.lastName}
                       </td>
@@ -274,27 +266,34 @@ export default function AdminPage() {
                         {m.email}
                       </td>
                       <td className="px-4 py-3">
-                        <span className={`inline-block rounded-full px-2 py-0.5 text-xs font-medium ${
-                          m.role === "admin" 
-                            ? "bg-amber-500/20 text-amber-300" 
-                            : "bg-blue-500/20 text-blue-300"
-                        }`}>
+                        <span
+                          className={`inline-block rounded-full px-2 py-0.5 text-xs font-medium ${
+                            m.role === MemberRole.Admin
+                              ? "bg-amber-500/20 text-amber-300"
+                              : "bg-blue-500/20 text-blue-300"
+                          }`}
+                        >
                           {m.role}
                         </span>
                       </td>
                       <td className="px-4 py-3">
-                        <span className={`inline-block rounded-full px-2 py-0.5 text-xs font-medium ${
-                          m.status === "active" 
-                            ? "bg-emerald-500/20 text-emerald-300" 
-                            : "bg-purple-500/20 text-purple-300"
-                        }`}>
+                        <span
+                          className={`inline-block rounded-full px-2 py-0.5 text-xs font-medium ${
+                            m.status === MemberStatus.Active
+                              ? "bg-emerald-500/20 text-emerald-300"
+                              : "bg-purple-500/20 text-purple-300"
+                          }`}
+                        >
                           {m.status}
                         </span>
                       </td>
                       <td className="px-4 py-3 text-right">
                         <div className="flex items-center justify-end gap-2">
                           <Link
-                            href={`/members/edit/${getMemberSlug(m)}`}
+                            href={`/members/edit/${memberSlug(
+                              m.firstName ?? "",
+                              m.lastName ?? ""
+                            )}`}
                             className="rounded-lg px-3 py-1.5 text-xs font-medium text-blue-300 transition hover:bg-blue-500/20"
                           >
                             Edit
@@ -312,7 +311,10 @@ export default function AdminPage() {
                   ))}
                   {members.length === 0 && (
                     <tr>
-                      <td colSpan={5} className="px-4 py-8 text-center text-sm text-neutral-400">
+                      <td
+                        colSpan={5}
+                        className="px-4 py-8 text-center text-sm text-neutral-400"
+                      >
                         No members found.
                       </td>
                     </tr>

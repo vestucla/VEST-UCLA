@@ -3,10 +3,9 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { doc, getDoc, updateDoc } from "firebase/firestore";
 import PortalShell from "@/components/Members/PortalShell";
-import { useAuth, MemberDoc, ExperienceItem } from "@/lib/auth";
-import { getFirebaseDb } from "@/lib/firebase";
+import { useAuth, ExperienceItem } from "@/lib/auth";
+import { MembersOrm } from "@/lib/orm/members";
 
 const emptyExperience: ExperienceItem = {
   company: "",
@@ -21,7 +20,6 @@ export default function OnboardingPage() {
   const router = useRouter();
   const [saving, setSaving] = useState(false);
 
-  // Profile fields
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [bio, setBio] = useState("");
@@ -39,12 +37,10 @@ export default function OnboardingPage() {
   ]);
 
   useEffect(() => {
-    if (!user) return;
-    const db = getFirebaseDb();
-    getDoc(doc(db, "members", user.uid))
-      .then((snap) => {
-        if (!snap.exists()) return;
-        const data = snap.data() as MemberDoc;
+    if (!user?.uuid) return;
+    MembersOrm.findByUuid(user.uuid)
+      .then((data) => {
+        if (!data) return;
         setFirstName(data.firstName ?? "");
         setLastName(data.lastName ?? "");
         setBio(data.bio ?? "");
@@ -100,10 +96,10 @@ export default function OnboardingPage() {
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!user.uuid) return;
     setSaving(true);
     try {
-      const db = getFirebaseDb();
-      await updateDoc(doc(db, "members", user.uid), {
+      await MembersOrm.update(user.uuid, {
         firstName,
         lastName,
         bio,
@@ -195,7 +191,6 @@ export default function OnboardingPage() {
             />
           </div>
 
-          {/* Experiences */}
           <div className="flex flex-col gap-3">
             <h3 className="text-xs uppercase tracking-wider text-neutral-400">
               Experience

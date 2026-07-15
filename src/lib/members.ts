@@ -1,63 +1,14 @@
-// Data access layer for the member portal.
-// Reads from Firebase Firestore. The function signatures are kept stable so
-// the UI components (MemberDirectory, MemberProfile) don't need to change.
+// Data access layer for the member portal (read helpers for UI).
+// Mutations go through MembersOrm / MembersAdminOrm.
 
-import { collection, getDocs, doc, getDoc } from "firebase/firestore";
-import { getFirebaseDb } from "./firebase";
 import type { Member, MemberStatus } from "@/data/members";
+import { MembersOrm, toMember } from "@/lib/orm/members";
 
 export type { Member, MemberStatus } from "@/data/members";
 
-function computeCompanies(experiences: Member["experiences"]): string[] {
-  return Array.from(
-    new Set(
-      experiences
-        .map((e) => e.company)
-        .filter((c): c is string => Boolean(c))
-    )
-  );
-}
-
-function docToMember(id: string, data: any): Member {
-  const experiences = (data.experiences ?? []).map((e: any) => ({
-    company: e.company ?? "",
-    role: e.role ?? "",
-    startDate: e.startDate,
-    endDate: e.endDate,
-    description: e.description,
-  }));
-
-  return {
-    id,
-    uid: data.uid ?? id,
-    firstName: data.firstName ?? "",
-    lastName: data.lastName ?? "",
-    email: data.email ?? "",
-    status: data.status ?? "active",
-    role: data.role ?? "member",
-    vestTitle: data.vestTitle,
-    classYear: data.classYear,
-    joinedYear: data.joinedYear,
-    imageSrc: data.imageSrc,
-    bio: data.bio,
-    interests: data.interests ?? [],
-    currentlyWorkingOn: data.currentlyWorkingOn,
-    major: data.major,
-    city: data.city,
-    experiences,
-    companies: computeCompanies(experiences),
-    linkedin: data.linkedin,
-    twitter: data.twitter,
-    github: data.github,
-    website: data.website,
-    phone: data.phone,
-  };
-}
-
 export async function getAllMembers(): Promise<Member[]> {
-  const db = getFirebaseDb();
-  const snap = await getDocs(collection(db, "members"));
-  return snap.docs.map((d) => docToMember(d.id, d.data()));
+  const docs = await MembersOrm.findAll();
+  return docs.map(toMember);
 }
 
 export async function getMembersByStatus(
@@ -68,28 +19,20 @@ export async function getMembersByStatus(
 }
 
 export async function getMember(idOrSlug: string): Promise<Member | null> {
-  const db = getFirebaseDb();
-  
-  // First try by document ID
-  const snap = await getDoc(doc(db, "members", idOrSlug));
-  if (snap.exists()) {
-    return docToMember(snap.id, snap.data());
-  }
-  
-  // If not found, try by slug (firstName-lastName)
+  const byUuid = await MembersOrm.findByUuid(idOrSlug);
+  if (byUuid) return toMember(byUuid);
+
   const allMembers = await getAllMembers();
-  const memberBySlug = allMembers.find((m) => {
-    const slug = `${m.firstName.toLowerCase()}-${m.lastName.toLowerCase()}`;
-    return slug === idOrSlug.toLowerCase();
-  });
-  
-  return memberBySlug ?? null;
+  return (
+    allMembers.find((m) => m.id.toLowerCase() === idOrSlug.toLowerCase()) ??
+    null
+  );
 }
 
 export interface MemberSearchOptions {
-  query?: string;       // free text
-  companies?: string[]; // any-of
-  interests?: string[]; // any-of
+  query?: string;
+  companies?: string[];
+  interests?: string[];
   status?: MemberStatus;
 }
 

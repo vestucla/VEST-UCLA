@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getAdminAuth, getAdminDb } from "@/lib/firebase-admin";
+import { getAdminAuth } from "@/lib/firebase-admin";
 import { getCloudinary } from "@/lib/cloudinary";
+import { MembersAdminOrm } from "@/lib/orm/members.admin";
 
 const MAX_BYTES = 5 * 1024 * 1024; // 5 MB
 const ALLOWED_TYPES = new Set([
@@ -17,9 +18,8 @@ async function verifyMember(token: string): Promise<{ email: string } | null> {
     const email = decoded.email;
     if (!email) return null;
 
-    const db = getAdminDb();
-    const snap = await db.collection("members").where("email", "==", email).get();
-    if (snap.empty) return null;
+    const member = await MembersAdminOrm.findByEmail(email);
+    if (!member) return null;
 
     return { email };
   } catch {

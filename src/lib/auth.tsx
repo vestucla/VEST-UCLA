@@ -15,50 +15,28 @@ import {
   GoogleAuthProvider,
   signOut as firebaseSignOut,
 } from "firebase/auth";
-import { collection, query, where, getDocs } from "firebase/firestore";
-import { getFirebaseAuth, getFirebaseDb } from "./firebase";
+import { getFirebaseAuth } from "./firebase";
+import { MembersOrm } from "@/lib/orm/members";
+import {
+  MemberDoc,
+  MemberRole,
+  type ExperienceItem,
+} from "@/data/members";
 
-export type MemberRole = "admin" | "member";
-export type MemberStatus = "active" | "alumni";
-
-export interface MemberDoc {
-  uid: string;
-  email: string;
-  firstName?: string;
-  lastName?: string;
-  role?: MemberRole;
-  status?: MemberStatus;
-  mustChangePassword?: boolean;
-  profileCompleted?: boolean;
-  // Profile fields filled in by the member during onboarding.
-  bio?: string;
-  interests?: string[];
-  experiences?: ExperienceItem[];
-  currentlyWorkingOn?: string;
-  major?: string;
-  classYear?: string;
-  city?: string;
-  imageSrc?: string;
-  linkedin?: string;
-  twitter?: string;
-  github?: string;
-  website?: string;
-  vestTitle?: string;
-  phone?: string;
-  joinedYear?: string;
-}
-
-export interface ExperienceItem {
-  company: string;
-  role: string;
-  startDate?: string;
-  endDate?: string;
-  description?: string;
-}
+export type { MemberDoc, ExperienceItem };
+export {
+  MemberRole,
+  MemberStatus,
+  VestTitle,
+  JoinedQuarter,
+} from "@/data/members";
 
 interface AuthUser {
   email: string;
-  uid: string;
+  /** Firebase Auth uid (for auth APIs only). */
+  authUid: string;
+  /** Firestore members document id. */
+  uuid: string;
   firstName?: string;
   lastName?: string;
   role?: MemberRole;
@@ -75,27 +53,31 @@ interface AuthContextValue {
     email: string,
     password: string
   ) => Promise<{ needsPasswordReset: boolean; profileCompleted: boolean }>;
-  signInWithGoogle: () => Promise<{ needsPasswordReset: boolean; profileCompleted: boolean }>;
+  signInWithGoogle: () => Promise<{
+    needsPasswordReset: boolean;
+    profileCompleted: boolean;
+  }>;
   signOut: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextValue | null>(null);
 
 const MEMBER_DOMAINS = ["@vestucla.com", "@g.ucla.edu", "@ucla.edu"];
-
 const ALLOWED_DOMAINS = ["g.ucla.edu", "ucla.edu"];
 
-async function loadMemberDocByEmail(email: string): Promise<MemberDoc | null> {
-  try {
-    const db = getFirebaseDb();
-    const q = query(collection(db, "members"), where("email", "==", email));
-    const snap = await getDocs(q);
-    if (snap.empty) return null;
-    const doc = snap.docs[0];
-    return { uid: doc.id, ...doc.data() } as MemberDoc;
-  } catch {
-    return null;
-  }
+function toAuthUser(
+  email: string,
+  authUid: string,
+  memberDoc: MemberDoc
+): AuthUser {
+  return {
+    email,
+    authUid,
+    uuid: memberDoc.uuid,
+    firstName: memberDoc.firstName,
+    lastName: memberDoc.lastName,
+    role: memberDoc.role,
+  };
 }
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
@@ -113,51 +95,41 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         return;
       }
       const email = firebaseUser.email ?? "";
-      const memberDoc = await loadMemberDocByEmail(email);
-      setMemberDoc(memberDoc);
-      setUser({
-        email,
-        uid: firebaseUser.uid,
-        firstName: memberDoc?.firstName,
-        lastName: memberDoc?.lastName,
-        role: memberDoc?.role,
-      });
+      const doc = await MembersOrm.findByEmail(email);
+      setMemberDoc(doc);
+      if (doc) {
+        setUser(toAuthUser(email, firebaseUser.uid, doc));
+      } else {
+        setUser(null);
+      }
       setLoading(false);
     });
   }, []);
 
-  const signIn = useCallback(
-    async (email: string, password: string) => {
-      // Check if member profile exists before allowing sign-in
-      const existingMember = await loadMemberDocByEmail(email);
-      if (!existingMember) {
-        throw new Error("No member profile found. Contact an admin to create your account.");
-      }
+  const signIn = useCallback(async (email: string, password: string) => {
+    const existingMember = await MembersOrm.findByEmail(email);
+    if (!existingMember) {
+      throw new Error(
+        "No member profile found. Contact an admin to create your account."
+      );
+    }
 
-      const auth = getFirebaseAuth();
-      const cred = await signInWithEmailAndPassword(auth, email, password);
-      const memberDoc = await loadMemberDocByEmail(cred.user.email ?? email);
-      const nextUser = {
-        email: cred.user.email ?? memberDoc?.email ?? email,
-        uid: cred.user.uid,
-        firstName: memberDoc?.firstName,
-        lastName: memberDoc?.lastName,
-        role: memberDoc?.role,
-      };
-      setUser(nextUser);
-      setMemberDoc(memberDoc);
-      const needsPasswordReset = memberDoc?.mustChangePassword ?? false;
-      const profileCompleted = memberDoc?.profileCompleted ?? false;
-      return { needsPasswordReset, profileCompleted };
-    },
-    [setUser, setMemberDoc]
-  );
+    const auth = getFirebaseAuth();
+    const cred = await signInWithEmailAndPassword(auth, email, password);
+    const doc =
+      (await MembersOrm.findByEmail(cred.user.email ?? email)) ?? existingMember;
+    setUser(toAuthUser(cred.user.email ?? email, cred.user.uid, doc));
+    setMemberDoc(doc);
+    return {
+      needsPasswordReset: doc.mustChangePassword ?? false,
+      profileCompleted: doc.profileCompleted ?? false,
+    };
+  }, []);
 
   const signInWithGoogle = useCallback(async () => {
     const auth = getFirebaseAuth();
     const provider = new GoogleAuthProvider();
-    // Restrict to UCLA domains
-    provider.setCustomParameters({ hd: "*" }); // Allow popup, we'll validate after
+    provider.setCustomParameters({ hd: "*" });
 
     const result = await signInWithPopup(auth, provider);
     const email = result.user.email;
@@ -167,33 +139,27 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       throw new Error("Could not get email from Google account.");
     }
 
-    // Check UCLA domain
     const domain = email.split("@")[1];
     if (!ALLOWED_DOMAINS.includes(domain)) {
       await firebaseSignOut(auth);
       throw new Error("You must use a UCLA email (@g.ucla.edu or @ucla.edu).");
     }
 
-    // Check if member profile exists
-    const memberDoc = await loadMemberDocByEmail(email);
-    if (!memberDoc) {
+    const doc = await MembersOrm.findByEmail(email);
+    if (!doc) {
       await firebaseSignOut(auth);
-      throw new Error("No member profile found. Contact an admin to create your account.");
+      throw new Error(
+        "No member profile found. Contact an admin to create your account."
+      );
     }
 
-    const nextUser = {
-      email,
-      uid: result.user.uid,
-      firstName: memberDoc.firstName,
-      lastName: memberDoc.lastName,
-      role: memberDoc.role,
+    setUser(toAuthUser(email, result.user.uid, doc));
+    setMemberDoc(doc);
+    return {
+      needsPasswordReset: doc.mustChangePassword ?? false,
+      profileCompleted: doc.profileCompleted ?? false,
     };
-    setUser(nextUser);
-    setMemberDoc(memberDoc);
-    const needsPasswordReset = memberDoc.mustChangePassword ?? false;
-    const profileCompleted = memberDoc.profileCompleted ?? false;
-    return { needsPasswordReset, profileCompleted };
-  }, [setUser, setMemberDoc]);
+  }, []);
 
   const signOut = useCallback(async () => {
     const auth = getFirebaseAuth();
@@ -204,12 +170,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const isMember = useMemo(() => {
     if (!user) return false;
-    if (memberDoc?.role === "member" || memberDoc?.role === "admin") return true;
+    if (memberDoc?.role === MemberRole.Member || memberDoc?.role === MemberRole.Admin)
+      return true;
     return MEMBER_DOMAINS.some((d) => user.email.endsWith(d));
   }, [user, memberDoc]);
 
   const isAdmin = useMemo(
-    () => memberDoc?.role === "admin",
+    () => memberDoc?.role === MemberRole.Admin,
     [memberDoc]
   );
 

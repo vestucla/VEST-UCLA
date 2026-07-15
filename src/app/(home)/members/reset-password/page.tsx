@@ -4,10 +4,10 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { updatePassword } from "firebase/auth";
-import { doc, updateDoc } from "firebase/firestore";
 import PortalShell from "@/components/Members/PortalShell";
 import { useAuth } from "@/lib/auth";
-import { getFirebaseAuth, getFirebaseDb } from "@/lib/firebase";
+import { getFirebaseAuth } from "@/lib/firebase";
+import { MembersOrm } from "@/lib/orm/members";
 
 export default function ResetPasswordPage() {
   const { user, loading } = useAuth();
@@ -50,9 +50,8 @@ export default function ResetPasswordPage() {
       if (!currentUser) throw new Error("Not signed in");
 
       await updatePassword(currentUser, password);
-      await updateDoc(doc(getFirebaseDb(), "members", currentUser.uid), {
-        mustChangePassword: false,
-      });
+      if (!user.uuid) throw new Error("Missing member profile");
+      await MembersOrm.update(user.uuid, { mustChangePassword: false });
 
       toast.success("Password updated");
       router.push("/members/onboarding");

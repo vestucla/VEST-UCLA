@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getAdminAuth, getAdminDb } from "@/lib/firebase-admin";
+import { getAdminAuth } from "@/lib/firebase-admin";
+import { MembersAdminOrm } from "@/lib/orm/members.admin";
+import { MemberRole } from "@/data/members";
 
 function generateTempPassword() {
   return (
@@ -14,10 +16,8 @@ async function verifyAdmin(token: string): Promise<boolean> {
   const email = decoded.email;
   if (!email) return false;
 
-  const db = getAdminDb();
-  const snap = await db.collection("members").where("email", "==", email).get();
-  if (snap.empty) return false;
-  return snap.docs[0].data()?.role === "admin";
+  const member = await MembersAdminOrm.findByEmail(email);
+  return member?.role === MemberRole.Admin;
 }
 
 export async function POST(req: NextRequest) {
@@ -34,25 +34,42 @@ export async function POST(req: NextRequest) {
     }
 
     const body = await req.json();
-    const { uid } = body;
+    const { uuid, email } = body;
 
-    if (!uid) {
+    const member = uuid
+      ? await MembersAdminOrm.findByUuid(uuid)
+      : email
+        ? await MembersAdminOrm.findByEmail(email)
+        : null;
+
+    if (!member) {
       return NextResponse.json(
-        { error: "Missing uid" },
+        { error: "Missing uuid/email or member not found" },
+        { status: 400 }
+      );
+    }
+
+    // Password reset only applies when a Firebase Auth user exists with this email.
+    // Member docs use Firestore uuid (not auth uid).
+    const auth = getAdminAuth();
+    let authUser;
+    try {
+      authUser = await auth.getUserByEmail(member.email);
+    } catch {
+      return NextResponse.json(
+        {
+          error:
+            "No Firebase Auth account for this member yet (Google sign-in only).",
+        },
         { status: 400 }
       );
     }
 
     const tempPassword = generateTempPassword();
-    const auth = getAdminAuth();
-    await auth.updateUser(uid, { password: tempPassword });
+    await auth.updateUser(authUser.uid, { password: tempPassword });
+    await MembersAdminOrm.update(member.uuid, { mustChangePassword: true });
 
-    const db = getAdminDb();
-    await db.collection("members").doc(uid).update({
-      mustChangePassword: true,
-    });
-
-    return NextResponse.json({ tempPassword });
+    return NextResponse.json({ tempPassword, uuid: member.uuid });
   } catch (err) {
     const message = err instanceof Error ? err.message : "Unknown error";
     return NextResponse.json({ error: message }, { status: 500 });

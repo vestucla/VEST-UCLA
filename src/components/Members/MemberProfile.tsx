@@ -46,7 +46,12 @@ export default function MemberProfile({ member }: Props) {
         {member.classYear && <Meta>Class of {member.classYear}</Meta>}
         {member.major && <Meta>Major: {member.major}</Meta>}
         {member.city && <Meta>{member.city}</Meta>}
-        {member.joinedYear && <Meta>Joined VEST {member.joinedYear}</Meta>}
+        {member.joinedYear && (
+          <Meta>
+            Joined VEST {member.joinedQuarter ? `${member.joinedQuarter} ` : ""}
+            {member.joinedYear}
+          </Meta>
+        )}
 
         <SocialList>
           {member.linkedin && (

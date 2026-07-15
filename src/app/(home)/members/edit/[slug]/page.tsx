@@ -3,10 +3,19 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { collection, query, where, getDocs } from "firebase/firestore";
 import PortalShell from "@/components/Members/PortalShell";
-import { useAuth, MemberDoc, ExperienceItem } from "@/lib/auth";
-import { getFirebaseDb, getFirebaseAuth } from "@/lib/firebase";
+import { useAuth, ExperienceItem } from "@/lib/auth";
+import { getFirebaseAuth } from "@/lib/firebase";
+import { MembersOrm } from "@/lib/orm/members";
+import {
+  MemberRole,
+  MemberStatus,
+  VestTitle,
+  JoinedQuarter,
+  VEST_TITLE_OPTIONS,
+  JOINED_QUARTER_OPTIONS,
+  memberSlug,
+} from "@/data/members";
 
 interface Params {
   params: { slug: string };
@@ -41,11 +50,12 @@ export default function EditProfilePage({ params }: Params) {
   const [twitter, setTwitter] = useState("");
   const [github, setGithub] = useState("");
   const [website, setWebsite] = useState("");
-  const [vestTitle, setVestTitle] = useState("");
+  const [vestTitle, setVestTitle] = useState<VestTitle | "">("");
+  const [joinedQuarter, setJoinedQuarter] = useState<JoinedQuarter | "">("");
   const [phone, setPhone] = useState("");
   const [joinedYear, setJoinedYear] = useState("");
-  const [role, setRole] = useState<"admin" | "member">("member");
-  const [status, setStatus] = useState<"active" | "alumni">("active");
+  const [role, setRole] = useState<MemberRole>(MemberRole.Member);
+  const [status, setStatus] = useState<MemberStatus>(MemberStatus.Active);
   const [experiences, setExperiences] = useState<ExperienceItem[]>([
     { ...emptyExperience },
   ]);
@@ -61,21 +71,11 @@ export default function EditProfilePage({ params }: Params) {
 
     const loadMember = async () => {
       try {
-        const db = getFirebaseDb();
         const slug = params.slug;
-        
-        // Find member by slug (firstName-lastName format)
-        const membersSnap = await getDocs(collection(db, "members"));
-        let foundMember: MemberDoc | null = null;
-        
-        for (const doc of membersSnap.docs) {
-          const data = doc.data() as MemberDoc;
-          const memberSlug = `${data.firstName?.toLowerCase() ?? ""}-${data.lastName?.toLowerCase() ?? ""}`;
-          if (memberSlug === slug) {
-            foundMember = { ...data, uid: doc.id };
-            break;
-          }
-        }
+        const docs = await MembersOrm.findAll();
+        const foundMember =
+          docs.find((d) => memberSlug(d.firstName ?? "", d.lastName ?? "") === slug) ??
+          null;
 
         if (!foundMember) {
           toast.error("Member not found");
@@ -83,7 +83,6 @@ export default function EditProfilePage({ params }: Params) {
           return;
         }
 
-        // Check permissions
         const isOwnProfile = user.email === foundMember.email;
         if (!isOwnProfile && !isAdmin) {
           toast.error("You can only edit your own profile");
@@ -106,10 +105,11 @@ export default function EditProfilePage({ params }: Params) {
         setGithub(foundMember.github ?? "");
         setWebsite(foundMember.website ?? "");
         setVestTitle(foundMember.vestTitle ?? "");
+        setJoinedQuarter(foundMember.joinedQuarter ?? "");
         setPhone(foundMember.phone ?? "");
         setJoinedYear(foundMember.joinedYear ?? "");
-        setRole(foundMember.role ?? "member");
-        setStatus(foundMember.status ?? "active");
+        setRole(foundMember.role ?? MemberRole.Member);
+        setStatus(foundMember.status ?? MemberStatus.Active);
         setImageSrc(foundMember.imageSrc ?? "");
         if (foundMember.experiences && foundMember.experiences.length > 0) {
           setExperiences(foundMember.experiences);
@@ -218,7 +218,8 @@ export default function EditProfilePage({ params }: Params) {
         twitter,
         github,
         website,
-        vestTitle,
+        vestTitle: vestTitle || undefined,
+        joinedQuarter: joinedQuarter || undefined,
         phone,
         joinedYear,
         experiences: experiences.filter(
@@ -330,8 +331,53 @@ export default function EditProfilePage({ params }: Params) {
           </div>
 
           <div className="grid grid-cols-2 gap-4">
-            <Field label="VEST Title" value={vestTitle} onChange={setVestTitle} placeholder="e.g. Director of Recruitment" />
-            <Field label="Joined Year" value={joinedYear} onChange={setJoinedYear} placeholder="e.g. 2024" />
+            <div className="flex flex-col gap-1">
+              <label className="text-xs uppercase tracking-wider text-neutral-400">
+                VEST Title
+              </label>
+              <select
+                value={vestTitle}
+                onChange={(e) =>
+                  setVestTitle((e.target.value as VestTitle) || "")
+                }
+                className="h-11 rounded-xl border border-white/15 bg-white/5 px-3 text-sm text-white outline-none focus:border-white/30"
+              >
+                <option value="">None</option>
+                {VEST_TITLE_OPTIONS.map((title) => (
+                  <option key={title} value={title}>
+                    {title}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <Field
+              label="Joined Year"
+              value={joinedYear}
+              onChange={setJoinedYear}
+              placeholder="e.g. 2024"
+            />
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div className="flex flex-col gap-1">
+              <label className="text-xs uppercase tracking-wider text-neutral-400">
+                Joined Quarter
+              </label>
+              <select
+                value={joinedQuarter}
+                onChange={(e) =>
+                  setJoinedQuarter((e.target.value as JoinedQuarter) || "")
+                }
+                className="h-11 rounded-xl border border-white/15 bg-white/5 px-3 text-sm text-white outline-none focus:border-white/30"
+              >
+                <option value="">None</option>
+                {JOINED_QUARTER_OPTIONS.map((q) => (
+                  <option key={q} value={q}>
+                    {q}
+                  </option>
+                ))}
+              </select>
+            </div>
           </div>
 
           <Field label="Bio" value={bio} onChange={setBio} textarea />
@@ -394,11 +440,11 @@ export default function EditProfilePage({ params }: Params) {
                   </label>
                   <select
                     value={role}
-                    onChange={(e) => setRole(e.target.value as "admin" | "member")}
+                    onChange={(e) => setRole(e.target.value as MemberRole)}
                     className="h-11 rounded-xl border border-white/15 bg-white/5 px-3 text-sm text-white outline-none focus:border-white/30"
                   >
-                    <option value="member">Member</option>
-                    <option value="admin">Admin</option>
+                    <option value={MemberRole.Member}>Member</option>
+                    <option value={MemberRole.Admin}>Admin</option>
                   </select>
                 </div>
                 <div className="flex flex-col gap-1">
@@ -407,11 +453,11 @@ export default function EditProfilePage({ params }: Params) {
                   </label>
                   <select
                     value={status}
-                    onChange={(e) => setStatus(e.target.value as "active" | "alumni")}
+                    onChange={(e) => setStatus(e.target.value as MemberStatus)}
                     className="h-11 rounded-xl border border-white/15 bg-white/5 px-3 text-sm text-white outline-none focus:border-white/30"
                   >
-                    <option value="active">Active</option>
-                    <option value="alumni">Alumni</option>
+                    <option value={MemberStatus.Active}>Active</option>
+                    <option value={MemberStatus.Alumni}>Alumni</option>
                   </select>
                 </div>
               </div>
