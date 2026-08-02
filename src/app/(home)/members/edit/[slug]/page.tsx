@@ -7,6 +7,7 @@ import PortalShell from "@/components/Members/PortalShell";
 import { useAuth, ExperienceItem } from "@/lib/auth";
 import { getFirebaseAuth } from "@/lib/firebase";
 import { MembersOrm } from "@/lib/orm/members";
+import { invalidateMembersCache } from "@/lib/members";
 import {
   MemberRole,
   MemberStatus,
@@ -156,6 +157,7 @@ export default function EditProfilePage({ params }: Params) {
       return;
     }
 
+    const previousImageSrc = imageSrc;
     const previewUrl = URL.createObjectURL(file);
     setImageSrc(previewUrl);
     setUploadingImage(true);
@@ -183,7 +185,7 @@ export default function EditProfilePage({ params }: Params) {
     } catch (err) {
       console.error("Upload error:", err);
       URL.revokeObjectURL(previewUrl);
-      setImageSrc("");
+      setImageSrc(previousImageSrc);
       toast.error(err instanceof Error ? err.message : "Failed to upload photo");
     } finally {
       setUploadingImage(false);
@@ -218,8 +220,8 @@ export default function EditProfilePage({ params }: Params) {
         twitter,
         github,
         website,
-        vestTitle: vestTitle || undefined,
-        joinedQuarter: joinedQuarter || undefined,
+        vestTitle,
+        joinedQuarter,
         phone,
         joinedYear,
         experiences: experiences.filter(
@@ -256,8 +258,9 @@ export default function EditProfilePage({ params }: Params) {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Failed to save");
 
+      invalidateMembersCache();
       toast.success("Profile saved!");
-      router.push(`/members/${params.slug}`);
+      router.push(`/members/${memberSlug(firstName, lastName)}`);
     } catch (err) {
       if (err instanceof Error && err.name === "AbortError") {
         toast.error("Save timed out - please try again");

@@ -26,6 +26,99 @@ async function verifyUserAndGetEmail(
   }
 }
 
+const MAX_SHORT_TEXT = 200;
+const MAX_LONG_TEXT = 2000;
+const MAX_URL = 500;
+const MAX_LIST_ITEMS = 50;
+
+function isHttpUrl(value: string): boolean {
+  try {
+    const url = new URL(value);
+    return url.protocol === "https:" || url.protocol === "http:";
+  } catch {
+    return false;
+  }
+}
+
+function text(max: number) {
+  return (value: unknown) =>
+    typeof value === "string" && value.length <= max
+      ? null
+      : `must be a string of at most ${max} characters`;
+}
+
+function url(value: unknown) {
+  if (typeof value !== "string") return "must be a string";
+  if (value.length === 0) return null;
+  if (value.length > MAX_URL) return `must be at most ${MAX_URL} characters`;
+  return isHttpUrl(value) ? null : "must be an http(s) URL";
+}
+
+function stringList(value: unknown) {
+  if (!Array.isArray(value)) return "must be an array";
+  if (value.length > MAX_LIST_ITEMS)
+    return `must contain at most ${MAX_LIST_ITEMS} items`;
+  const ok = value.every(
+    (item) => typeof item === "string" && item.length <= MAX_SHORT_TEXT
+  );
+  return ok ? null : "must contain short strings only";
+}
+
+function experienceList(value: unknown) {
+  if (!Array.isArray(value)) return "must be an array";
+  if (value.length > MAX_LIST_ITEMS)
+    return `must contain at most ${MAX_LIST_ITEMS} items`;
+
+  const shortKeys = ["company", "role", "startDate", "endDate"] as const;
+  return value.every((item) => {
+    if (typeof item !== "object" || item === null || Array.isArray(item))
+      return false;
+    const entry = item as Record<string, unknown>;
+    const keys = Object.keys(entry);
+    if (keys.some((k) => ![...shortKeys, "description"].includes(k)))
+      return false;
+    if (
+      shortKeys.some(
+        (k) =>
+          k in entry &&
+          (typeof entry[k] !== "string" ||
+            (entry[k] as string).length > MAX_SHORT_TEXT)
+      )
+    )
+      return false;
+    return (
+      !("description" in entry) ||
+      (typeof entry.description === "string" &&
+        entry.description.length <= MAX_LONG_TEXT)
+    );
+  })
+    ? null
+    : "must contain valid experience entries";
+}
+
+const validators: Record<string, (value: unknown) => string | null> = {
+  firstName: text(MAX_SHORT_TEXT),
+  lastName: text(MAX_SHORT_TEXT),
+  bio: text(MAX_LONG_TEXT),
+  interests: stringList,
+  currentlyWorkingOn: text(MAX_SHORT_TEXT),
+  major: text(MAX_SHORT_TEXT),
+  classYear: text(MAX_SHORT_TEXT),
+  city: text(MAX_SHORT_TEXT),
+  linkedin: url,
+  twitter: text(MAX_SHORT_TEXT),
+  github: url,
+  website: url,
+  experiences: experienceList,
+  vestTitle: text(MAX_SHORT_TEXT),
+  phone: text(MAX_SHORT_TEXT),
+  imageSrc: text(MAX_URL),
+  joinedYear: text(MAX_SHORT_TEXT),
+  joinedQuarter: text(MAX_SHORT_TEXT),
+  profileCompleted: (value: unknown) =>
+    typeof value === "boolean" ? null : "must be a boolean",
+};
+
 export async function POST(req: NextRequest) {
   console.log("[update] Starting profile update...");
   try {
@@ -90,9 +183,15 @@ export async function POST(req: NextRequest) {
 
     const updateData: Record<string, unknown> = {};
     for (const field of allowedFields) {
-      if (field in profileData) {
-        updateData[field] = profileData[field];
+      if (!(field in profileData)) continue;
+      const problem = validators[field](profileData[field]);
+      if (problem) {
+        return NextResponse.json(
+          { error: `Invalid ${field}: it ${problem}` },
+          { status: 400 }
+        );
       }
+      updateData[field] = profileData[field];
     }
 
     if (typeof updateData.vestTitle === "string" && updateData.vestTitle.length > 0) {

@@ -86,7 +86,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [memberDoc, setMemberDoc] = useState<MemberDoc | null>(null);
 
   useEffect(() => {
-    const auth = getFirebaseAuth();
+    let auth;
+    try {
+      auth = getFirebaseAuth();
+    } catch (err) {
+      console.error("Firebase auth unavailable:", err);
+      setUser(null);
+      setMemberDoc(null);
+      setLoading(false);
+      return;
+    }
+
     return onAuthStateChanged(auth, async (firebaseUser) => {
       if (!firebaseUser) {
         setUser(null);
@@ -95,14 +105,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         return;
       }
       const email = firebaseUser.email ?? "";
-      const doc = await MembersOrm.findByEmail(email);
-      setMemberDoc(doc);
-      if (doc) {
-        setUser(toAuthUser(email, firebaseUser.uid, doc));
-      } else {
+      try {
+        const doc = await MembersOrm.findByEmail(email);
+        setMemberDoc(doc);
+        setUser(doc ? toAuthUser(email, firebaseUser.uid, doc) : null);
+      } catch (err) {
+        console.error("Failed to load member profile:", err);
+        setMemberDoc(null);
         setUser(null);
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
     });
   }, []);
 

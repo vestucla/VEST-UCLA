@@ -13,6 +13,7 @@ interface Props {
 
 export default function MemberDirectory({ status, emptyHint }: Props) {
   const [query, setQuery] = useState("");
+  const [debouncedQuery, setDebouncedQuery] = useState("");
   const [companies, setCompanies] = useState<string[]>([]);
   const [interests, setInterests] = useState<string[]>([]);
 
@@ -34,17 +35,24 @@ export default function MemberDirectory({ status, emptyHint }: Props) {
   }, []);
 
   useEffect(() => {
+    const timeout = setTimeout(() => setDebouncedQuery(query), 200);
+    return () => clearTimeout(timeout);
+  }, [query]);
+
+  useEffect(() => {
     let cancelled = false;
     setLoading(true);
-    searchMembers({ query, companies, interests, status }).then((r) => {
-      if (cancelled) return;
-      setResults(r);
-      setLoading(false);
-    });
+    searchMembers({ query: debouncedQuery, companies, interests, status }).then(
+      (r) => {
+        if (cancelled) return;
+        setResults(r);
+        setLoading(false);
+      }
+    );
     return () => {
       cancelled = true;
     };
-  }, [query, companies, interests, status]);
+  }, [debouncedQuery, companies, interests, status]);
 
   const toggle = (list: string[], setList: (v: string[]) => void, value: string) => {
     setList(list.includes(value) ? list.filter((v) => v !== value) : [...list, value]);
