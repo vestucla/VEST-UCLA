@@ -6,9 +6,27 @@ import { MembersOrm, toMember } from "@/lib/orm/members";
 
 export type { Member, MemberStatus } from "@/data/members";
 
+const MEMBERS_CACHE_TTL_MS = 30_000;
+
+let membersCache: { fetchedAt: number; members: Promise<Member[]> } | null =
+  null;
+
+/** Drop the cached directory so the next read hits Firestore again. */
+export function invalidateMembersCache(): void {
+  membersCache = null;
+}
+
 export async function getAllMembers(): Promise<Member[]> {
-  const docs = await MembersOrm.findAll();
-  return docs.map(toMember);
+  if (membersCache && Date.now() - membersCache.fetchedAt < MEMBERS_CACHE_TTL_MS) {
+    return membersCache.members;
+  }
+
+  const members = MembersOrm.findAll().then((docs) => docs.map(toMember));
+  membersCache = { fetchedAt: Date.now(), members };
+  members.catch(() => {
+    membersCache = null;
+  });
+  return members;
 }
 
 export async function getMembersByStatus(

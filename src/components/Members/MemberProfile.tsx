@@ -5,6 +5,7 @@ import Link from "next/link";
 import styled from "styled-components";
 import type { Member } from "@/lib/members";
 import { useAuth } from "@/lib/auth";
+import { safeExternalHref } from "@/lib/url";
 
 interface Props {
   member: Member;
@@ -16,6 +17,15 @@ export default function MemberProfile({ member }: Props) {
   // Can edit if it's their own profile or if they're an admin
   const canEdit = user && (isAdmin || user.email === member.email);
   const memberSlug = `${member.firstName.toLowerCase()}-${member.lastName.toLowerCase()}`;
+
+  const linkedinHref = safeExternalHref(member.linkedin);
+  const githubHref = safeExternalHref(member.github);
+  const websiteHref = safeExternalHref(member.website);
+  const twitterHref = member.twitter
+    ? member.twitter.startsWith("http")
+      ? safeExternalHref(member.twitter)
+      : `https://x.com/${encodeURIComponent(member.twitter)}`
+    : null;
 
   return (
     <Layout>
@@ -54,31 +64,23 @@ export default function MemberProfile({ member }: Props) {
         )}
 
         <SocialList>
-          {member.linkedin && (
-            <SocialLink href={member.linkedin} target="_blank" rel="noreferrer">
+          {linkedinHref && (
+            <SocialLink href={linkedinHref} target="_blank" rel="noreferrer">
               LinkedIn
             </SocialLink>
           )}
-          {member.twitter && (
-            <SocialLink
-              href={
-                member.twitter.startsWith("http")
-                  ? member.twitter
-                  : `https://x.com/${member.twitter}`
-              }
-              target="_blank"
-              rel="noreferrer"
-            >
+          {twitterHref && (
+            <SocialLink href={twitterHref} target="_blank" rel="noreferrer">
               X / Twitter
             </SocialLink>
           )}
-          {member.github && (
-            <SocialLink href={member.github} target="_blank" rel="noreferrer">
+          {githubHref && (
+            <SocialLink href={githubHref} target="_blank" rel="noreferrer">
               GitHub
             </SocialLink>
           )}
-          {member.website && (
-            <SocialLink href={member.website} target="_blank" rel="noreferrer">
+          {websiteHref && (
+            <SocialLink href={websiteHref} target="_blank" rel="noreferrer">
               Website
             </SocialLink>
           )}

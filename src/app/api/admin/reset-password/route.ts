@@ -11,13 +11,17 @@ function generateTempPassword() {
 }
 
 async function verifyAdmin(token: string): Promise<boolean> {
-  const auth = getAdminAuth();
-  const decoded = await auth.verifyIdToken(token);
-  const email = decoded.email;
-  if (!email) return false;
+  try {
+    const auth = getAdminAuth();
+    const decoded = await auth.verifyIdToken(token);
+    const email = decoded.email;
+    if (!email) return false;
 
-  const member = await MembersAdminOrm.findByEmail(email);
-  return member?.role === MemberRole.Admin;
+    const member = await MembersAdminOrm.findByEmail(email);
+    return member?.role === MemberRole.Admin;
+  } catch {
+    return false;
+  }
 }
 
 export async function POST(req: NextRequest) {

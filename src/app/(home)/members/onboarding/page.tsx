@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import PortalShell from "@/components/Members/PortalShell";
 import { useAuth, ExperienceItem } from "@/lib/auth";
 import { MembersOrm } from "@/lib/orm/members";
+import { invalidateMembersCache } from "@/lib/members";
 
 const emptyExperience: ExperienceItem = {
   company: "",
@@ -121,6 +122,7 @@ export default function OnboardingPage() {
         profileCompleted: true,
       });
 
+      invalidateMembersCache();
       toast.success("Profile saved");
       router.push("/members");
     } catch (err) {
