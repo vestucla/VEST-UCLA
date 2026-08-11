@@ -1,5 +1,5 @@
 import { LinkTo } from "./styles";
-import { ChevronRight } from "lucide-react";
+import { CaretRight } from "@phosphor-icons/react";
 import { useIsMobile } from "../../../../libs/useIsMobile";
 
 type GetStartedButtonProps = {
@@ -44,7 +44,7 @@ const GetStartedButton = ({
         }}
       >
         {label}
-        <ChevronRight size={isMobile ? 16 : 24} />
+        <CaretRight size={isMobile ? 16 : 24} />
       </div>
     </LinkTo>
   );

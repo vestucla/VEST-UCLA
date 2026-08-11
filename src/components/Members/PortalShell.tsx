@@ -11,15 +11,18 @@ interface Props {
   children: React.ReactNode;
 }
 
-const TABS = [
+const BASE_TABS = [
   { href: "/members", label: "Members" },
   { href: "/members/alumni", label: "Alumni" },
-  { href: "/members/accolades", label: "Accolades" },
 ];
+
+const ADMIN_TAB = { href: "/members/admin", label: "Manage" };
 
 export default function PortalShell({ title, subtitle, children }: Props) {
   const pathname = usePathname();
-  const { user, signOut } = useAuth();
+  const { user, isAdmin, signOut } = useAuth();
+  
+  const tabs = isAdmin ? [...BASE_TABS, ADMIN_TAB] : BASE_TABS;
 
   return (
     <Wrapper>
@@ -30,7 +33,7 @@ export default function PortalShell({ title, subtitle, children }: Props) {
 
         <TabsRow>
           <Tabs>
-            {TABS.map((t) => {
+            {tabs.map((t) => {
               const active = pathname === t.href;
               return (
                 <TabLink key={t.href} href={t.href} $active={active}>

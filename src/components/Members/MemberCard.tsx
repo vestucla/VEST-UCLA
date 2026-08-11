@@ -24,6 +24,7 @@ export default function MemberCard({ member, href }: Props) {
             fill
             style={{ objectFit: "cover" }}
             sizes="(max-width: 768px) 50vw, 25vw"
+            unoptimized={member.imageSrc.startsWith("data:")}
           />
         ) : (
           <Placeholder>
@@ -38,7 +39,6 @@ export default function MemberCard({ member, href }: Props) {
           {member.firstName} {member.lastName}
         </Name>
         <Role>{member.vestTitle}</Role>
-        <OneLiner>{member.oneLiner}</OneLiner>
 
         {topCompanies.length > 0 && (
           <Tags>
@@ -120,17 +120,6 @@ const Name = styled.h3`
 const Role = styled.p`
   font-size: var(--text-sm);
   color: rgba(239, 239, 239, 0.7);
-`;
-
-const OneLiner = styled.p`
-  font-size: var(--text-sm);
-  color: rgba(239, 239, 239, 0.85);
-  line-height: 1.45;
-  margin-top: 4px;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
 `;
 
 const Tags = styled.div`

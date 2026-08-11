@@ -11,7 +11,11 @@ interface Props {
 }
 
 export default function MemberProfile({ member }: Props) {
-  const { isMember } = useAuth();
+  const { user, isMember, isAdmin } = useAuth();
+  
+  // Can edit if it's their own profile or if they're an admin
+  const canEdit = user && (isAdmin || user.email === member.email);
+  const memberSlug = `${member.firstName.toLowerCase()}-${member.lastName.toLowerCase()}`;
 
   return (
     <Layout>
@@ -25,6 +29,7 @@ export default function MemberProfile({ member }: Props) {
               style={{ objectFit: "cover" }}
               sizes="320px"
               priority
+              unoptimized={member.imageSrc.startsWith("data:")}
             />
           ) : (
             <AvatarPlaceholder>
@@ -39,7 +44,14 @@ export default function MemberProfile({ member }: Props) {
         </Name>
         <Role>{member.vestTitle}</Role>
         {member.classYear && <Meta>Class of {member.classYear}</Meta>}
-        {member.joinedYear && <Meta>Joined VEST {member.joinedYear}</Meta>}
+        {member.major && <Meta>Major: {member.major}</Meta>}
+        {member.city && <Meta>{member.city}</Meta>}
+        {member.joinedYear && (
+          <Meta>
+            Joined VEST {member.joinedQuarter ? `${member.joinedQuarter} ` : ""}
+            {member.joinedYear}
+          </Meta>
+        )}
 
         <SocialList>
           {member.linkedin && (
@@ -72,19 +84,25 @@ export default function MemberProfile({ member }: Props) {
           )}
         </SocialList>
 
+        {canEdit && (
+          <EditButton href={`/members/edit/${memberSlug}`}>
+            Edit Profile
+          </EditButton>
+        )}
+
         <ContactBlock>
           <ContactHeader>Contact</ContactHeader>
-          {member.contact && (member.contact.email || member.contact.phone) ? (
+          {member.email || member.phone ? (
             isMember ? (
               <ContactList>
-                {member.contact.email && (
+                {member.email && (
                   <li>
-                    <a href={`mailto:${member.contact.email}`}>{member.contact.email}</a>
+                    <a href={`mailto:${member.email}`}>{member.email}</a>
                   </li>
                 )}
-                {member.contact.phone && (
+                {member.phone && (
                   <li>
-                    <a href={`tel:${member.contact.phone}`}>{member.contact.phone}</a>
+                    <a href={`tel:${member.phone}`}>{member.phone}</a>
                   </li>
                 )}
               </ContactList>
@@ -101,8 +119,14 @@ export default function MemberProfile({ member }: Props) {
       </Sidebar>
 
       <MainCol>
-        <OneLiner>{member.oneLiner}</OneLiner>
         {member.bio && <Bio>{member.bio}</Bio>}
+
+        {member.currentlyWorkingOn && (
+          <Section>
+            <SectionTitle>Currently working on</SectionTitle>
+            <p className="text-sm text-neutral-300">{member.currentlyWorkingOn}</p>
+          </Section>
+        )}
 
         {member.interests.length > 0 && (
           <Section>
@@ -230,6 +254,29 @@ const SocialLink = styled.a`
   }
 `;
 
+const EditButton = styled(Link)`
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 12px;
+  padding: 10px 20px;
+  font-size: var(--text-sm);
+  font-weight: 500;
+  border-radius: 999px;
+  border: 1px solid rgba(173, 206, 255, 0.3);
+  color: rgba(173, 206, 255, 0.95);
+  background: rgba(173, 206, 255, 0.1);
+  text-decoration: none;
+  transition: background 200ms ease, border-color 200ms ease;
+
+  @media (hover: hover) and (pointer: fine) {
+    &:hover {
+      background: rgba(173, 206, 255, 0.2);
+      border-color: rgba(173, 206, 255, 0.5);
+    }
+  }
+`;
+
 const ContactBlock = styled.div`
   margin-top: 16px;
   padding: 16px;
@@ -283,12 +330,6 @@ const MainCol = styled.div`
   display: flex;
   flex-direction: column;
   gap: 32px;
-`;
-
-const OneLiner = styled.p`
-  font-size: var(--text-xl);
-  line-height: 1.4;
-  color: #efefef;
 `;
 
 const Bio = styled.p`
