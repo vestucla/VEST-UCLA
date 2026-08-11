@@ -50,11 +50,11 @@ export default function PortalShell({ title, subtitle, children }: Props) {
                   Sign out
                 </TextButton>
               </>
-            ) : (
-              <TabLink href="/members/login" $active={pathname === "/members/login"}>
+            ) : pathname !== "/members/login" ? (
+              <TabLink href="/members/login" $active={false}>
                 Member login
               </TabLink>
-            )}
+            ) : null}
           </AuthSlot>
         </TabsRow>
 

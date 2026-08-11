@@ -3,17 +3,58 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // This rule allows anyone with your Firestore database reference to view, edit,
-    // and delete all data in your Firestore database. It is useful for getting
-    // started, but it is configured to expire after 30 days because it
-    // leaves your app open to attackers. At that time, all client
-    // requests to your Firestore database will be denied.
-    //
-    // Make sure to write security rules for your app before that time, or else
-    // all client requests to your Firestore database will be denied until you Update
-    // your rules
+    // Helper: check if user is authenticated
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    // Helper: get the requesting user's member document by email
+    function getMemberByEmail() {
+      return get(/databases/$(database)/documents/members/$(request.auth.uid));
+    }
+
+    // Helper: check if requesting user is an admin
+    // Looks up admin status from the config/admins document which stores admin emails
+    function isAdmin() {
+      return isAuthenticated() && 
+        exists(/databases/$(database)/documents/config/admins) &&
+        request.auth.token.email in get(/databases/$(database)/documents/config/admins).data.emails;
+    }
+
+    // Helper: check if user owns this member document (email matches)
+    function isOwner() {
+      return isAuthenticated() && resource.data.email == request.auth.token.email;
+    }
+
+    // Helper: check if user is creating their own document
+    function isCreatingOwn() {
+      return isAuthenticated() && request.resource.data.email == request.auth.token.email;
+    }
+
+    // Members collection rules
+    match /members/{memberId} {
+      // Anyone can read member profiles (public)
+      allow read: if true;
+
+      // Can create if admin or creating own profile
+      allow create: if isAdmin() || isCreatingOwn();
+
+      // Can update if admin or owner of the document
+      allow update: if isAdmin() || isOwner();
+
+      // Only admins can delete
+      allow delete: if isAdmin();
+    }
+
+    // Config collection (admin emails list, etc.)
+    match /config/{configId} {
+      allow read: if isAuthenticated();
+      allow write: if isAdmin();
+    }
+
+    // Allow admins full access to any other collections
     match /{document=**} {
-      allow read, write: if request.time < timestamp.date(2026, 8, 11);
+      allow read, write: if isAdmin();
     }
   }
 }

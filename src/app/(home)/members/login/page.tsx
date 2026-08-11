@@ -9,9 +9,7 @@ import { useAuth } from "@/lib/auth";
 
 export default function LoginPage() {
   const router = useRouter();
-  const { user, signIn, signInWithGoogle, signOut } = useAuth();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const { user, signInWithGoogle, signOut } = useAuth();
   const [submitting, setSubmitting] = useState(false);
 
   const handleGoogleSignIn = async () => {
@@ -33,29 +31,6 @@ export default function LoginPage() {
     }
   };
 
-  const onSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setSubmitting(true);
-    try {
-      const { needsPasswordReset, profileCompleted } = await signIn(
-        email,
-        password
-      );
-      toast.success("Signed in.");
-      if (needsPasswordReset) {
-        router.push("/members/reset-password");
-      } else if (!profileCompleted) {
-        router.push("/members/onboarding");
-      } else {
-        router.push("/members");
-      }
-    } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Sign-in failed.");
-    } finally {
-      setSubmitting(false);
-    }
-  };
-
   return (
     <main>
       <PortalShell
@@ -64,7 +39,7 @@ export default function LoginPage() {
             Member <span className="italic">Login</span>
           </>
         }
-        subtitle="Sign in with your VEST email to view contact info (email + phone) on every member profile."
+        subtitle="Sign in with your UCLA account to view member details."
       >
         {user ? (
           <Card>
@@ -80,43 +55,10 @@ export default function LoginPage() {
             </Row>
           </Card>
         ) : (
-          <Card as="form" onSubmit={onSubmit}>
-            <Field>
-              <Label htmlFor="email">Email</Label>
-              <Input
-                id="email"
-                type="email"
-                autoComplete="email"
-                placeholder="you@vestucla.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-              />
-            </Field>
-            <Field>
-              <Label htmlFor="password">Password</Label>
-              <Input
-                id="password"
-                type="password"
-                autoComplete="current-password"
-                placeholder="••••••••"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-              />
-            </Field>
-            <PrimaryButton type="submit" disabled={submitting}>
-              {submitting ? "Signing in…" : "Sign in with email"}
-            </PrimaryButton>
-
-            <Divider>
-              <DividerLine />
-              <DividerText>or</DividerText>
-              <DividerLine />
-            </Divider>
-
+          <Card>
             <GoogleButton type="button" disabled={submitting} onClick={handleGoogleSignIn}>
               <GoogleIcon />
-              Sign in with UCLA Google
+              {submitting ? "Signing in…" : "Sign in with UCLA Google"}
             </GoogleButton>
 
             <Hint>Only @g.ucla.edu and @ucla.edu accounts are allowed.</Hint>
@@ -152,39 +94,6 @@ const Card = styled.div`
   }
 `;
 
-const Field = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-`;
-
-const Label = styled.label`
-  font-size: var(--text-xs);
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: rgba(239, 239, 239, 0.6);
-`;
-
-const Input = styled.input`
-  height: 44px;
-  padding: 0 14px;
-  border-radius: 12px;
-  border: 1px solid rgba(239, 239, 239, 0.15);
-  background: rgba(239, 239, 239, 0.06);
-  color: #efefef;
-  font-size: var(--text-base);
-  outline: none;
-  transition: border-color 200ms ease, background 200ms ease;
-
-  &::placeholder {
-    color: rgba(239, 239, 239, 0.4);
-  }
-  &:focus {
-    border-color: rgba(173, 206, 255, 0.6);
-    background: rgba(239, 239, 239, 0.1);
-  }
-`;
-
 const Row = styled.div`
   display: flex;
   gap: 12px;
@@ -200,15 +109,10 @@ const PrimaryButton = styled.button`
   color: #fff;
   font-size: var(--text-sm);
   cursor: pointer;
-  transition: background 200ms ease, transform 200ms ease;
-
-  &:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-  }
+  transition: background 200ms ease;
 
   @media (hover: hover) and (pointer: fine) {
-    &:hover:not(:disabled) {
+    &:hover {
       background: rgba(173, 206, 255, 0.28);
     }
   }
@@ -230,25 +134,6 @@ const GhostButton = styled.button`
       background: rgba(239, 239, 239, 0.08);
     }
   }
-`;
-
-const Divider = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 12px;
-`;
-
-const DividerLine = styled.div`
-  flex: 1;
-  height: 1px;
-  background: rgba(239, 239, 239, 0.15);
-`;
-
-const DividerText = styled.span`
-  font-size: var(--text-xs);
-  color: rgba(239, 239, 239, 0.5);
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
 `;
 
 const GoogleButton = styled.button`
