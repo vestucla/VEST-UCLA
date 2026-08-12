@@ -24,13 +24,15 @@ import {
 // Board members data
 const boardMembers = [
   { id: 1, firstName: "Kiersten", lastName: "Roth", role: "President", imageSrc: "/images/Headshots/Kiersten-Roth.jpg" },
-  { id: 2, firstName: "Shloak", lastName: "Rathod", role: "Vice President", imageSrc: "/images/Headshots/Shloak-Rathod.jpg" },
-  { id: 3, firstName: "Tyler", lastName: "Xiao", role: "Head of Finance", imageSrc: "" },
-  { id: 4, firstName: "Angelina", lastName: "Wu", role: "Head of Design & Media", imageSrc: "/images/Headshots/Angelina-Wu.PNG" },
-  { id: 5, firstName: "Kevin", lastName: "Taylor", role: "Head of Meetings", imageSrc: "" },
-  { id: 6, firstName: "Vijay", lastName: "Karthikeyan", role: "Head of Engagement", imageSrc: "" },
-  { id: 7, firstName: "Raman", lastName: "Arora", role: "Head of Recruitment", imageSrc: "" },
-  { id: 8, firstName: "Danny", lastName: "Chmaytelli", role: "Director of Recruitment", imageSrc: "/images/Headshots/Danny-Chmaytelli.jpeg" },
+  { id: 2, firstName: "Shloak", lastName: "Rathod", role: "External Vice President", imageSrc: "/images/Headshots/Shloak-Rathod.jpg" },
+  { id: 3, firstName: "Vijay", lastName: "Karthikeyan", role: "Internal Vice President", imageSrc: "/images/Headshots/Vijay-Karthikeyan.png" },
+  { id: 4, firstName: "Kevin", lastName: "Taylor", role: "Head of Membership", imageSrc: "/images/Headshots/Kevin-Taylor.png" },
+  { id: 5, firstName: "Raman", lastName: "Arora", role: "Head of Membership", imageSrc: "/images/Headshots/Raman-Arora.png" },
+  { id: 6, firstName: "Angelina", lastName: "Wu", role: "Head of Media", imageSrc: "/images/Headshots/Angelina-Wu.PNG" },
+  { id: 7, firstName: "Ashley", lastName: "Varghese", role: "Director of Outreach", imageSrc: "/images/Headshots/Ashley-Varghese.png" },
+  { id: 8, firstName: "Samuel", lastName: "Zhang", role: "Video Intern", imageSrc: "/images/Headshots/Samuel-Zhang.png" },
+  { id: 9, firstName: "Tyler", lastName: "Xiao", role: "Director of Finance", imageSrc: "/images/Headshots/Tyler-Xiao.png" },
+  { id: 10, firstName: "Mahesh", lastName: "Karthikeyan", role: "Finance Intern", imageSrc: "/images/Headshots/Mahesh-Karthikeyan.png" }
 ];
 
 // Sample class members data
@@ -77,7 +79,7 @@ const Team = () => {
             {/* Placeholder for group photo */}
             <div className="w-full h-full bg-gray-200 flex items-center justify-center text-gray-500">
               <Image 
-                src="/images/Board-headshot.jpg" 
+                src="/images/Group-2.jpg" 
                 alt="VEST Board" 
                 width={1200}
                 height={800}

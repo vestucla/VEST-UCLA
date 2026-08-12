@@ -24,7 +24,6 @@
     "framer-motion": "^10.16.16",
     "geist": "^1.5.1",
     "next": "^14.2.35",
-    "nodemailer": "^9.0.3",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-use-measure": "^2.1.1",
@@ -36,7 +35,6 @@
   },
   "devDependencies": {
     "@types/node": "^20.10.5",
-    "@types/nodemailer": "^8.0.1",
     "@types/react": "^18.2.45",
     "@types/react-dom": "^18.2.18",
     "@types/styled-components": "^5.1.34",

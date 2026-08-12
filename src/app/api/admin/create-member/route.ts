@@ -1,8 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getAdminAuth } from "@/lib/firebase-admin";
 import { MembersAdminOrm } from "@/lib/orm/members.admin";
-import { MemberRole, MemberStatus, VestTitle, JoinedQuarter } from "@/data/members";
-import { sendWelcomeEmail } from "@/lib/email";
+import {
+  MemberRole,
+  MemberStatus,
+  VestTitle,
+  JoinedQuarter,
+} from "@/data/members";
 
 async function verifyAdmin(token: string): Promise<boolean> {
   const auth = getAdminAuth();
@@ -65,17 +69,10 @@ export async function POST(req: NextRequest) {
       joinedQuarter: joinedQuarter as JoinedQuarter | undefined,
     });
 
-    try {
-      await sendWelcomeEmail({ to: email, firstName, lastName });
-      console.log(`[create-member] Welcome email sent to ${email}`);
-    } catch (emailErr) {
-      console.error("[create-member] Failed to send welcome email:", emailErr);
-    }
-
     return NextResponse.json({
       uuid: member.uuid,
       email,
-      message: "Member profile created and welcome email sent.",
+      message: "Member profile created.",
     });
   } catch (err) {
     const message = err instanceof Error ? err.message : "Unknown error";

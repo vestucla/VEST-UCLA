@@ -29,7 +29,6 @@ export type UpdateMemberInput = Partial<
   interests?: string[];
 };
 
-/** Admin SDK members ORM for API routes. */
 export const MembersAdminOrm = {
   async findByUuid(uuid: string): Promise<MemberDoc | null> {
     const snap = await getAdminDb().collection(COLLECTION).doc(uuid).get();
@@ -64,7 +63,6 @@ export const MembersAdminOrm = {
       vestTitle: input.vestTitle ?? null,
       joinedYear: input.joinedYear ?? null,
       joinedQuarter: input.joinedQuarter ?? null,
-      mustChangePassword: false,
       profileCompleted: false,
       createdAt: new Date().toISOString(),
     };
@@ -74,7 +72,15 @@ export const MembersAdminOrm = {
   },
 
   async update(uuid: string, data: UpdateMemberInput): Promise<void> {
-    await getAdminDb().collection(COLLECTION).doc(uuid).update(data);
+    const { phone, ...rest } = data as UpdateMemberInput & { phone?: string };
+    const db = getAdminDb();
+
+    if (Object.keys(rest).length > 0) {
+      await db.collection(COLLECTION).doc(uuid).update(rest);
+    }
+    if (phone !== undefined) {
+      await db.collection("memberContacts").doc(uuid).set({ phone }, { merge: true });
+    }
   },
 
   async delete(uuid: string): Promise<void> {

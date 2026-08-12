@@ -10,7 +10,6 @@ import {
 } from "react";
 import {
   onAuthStateChanged,
-  signInWithEmailAndPassword,
   signInWithPopup,
   GoogleAuthProvider,
   signOut as firebaseSignOut,
@@ -47,23 +46,12 @@ interface AuthContextValue {
   loading: boolean;
   isMember: boolean;
   isAdmin: boolean;
-  needsPasswordReset: boolean;
   profileCompleted: boolean;
-  signIn: (
-    email: string,
-    password: string
-  ) => Promise<{ needsPasswordReset: boolean; profileCompleted: boolean }>;
-  signInWithGoogle: () => Promise<{
-    needsPasswordReset: boolean;
-    profileCompleted: boolean;
-  }>;
+  signInWithGoogle: () => Promise<{ profileCompleted: boolean }>;
   signOut: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextValue | null>(null);
-
-const MEMBER_DOMAINS = ["@vestucla.com", "@g.ucla.edu", "@ucla.edu"];
-const ALLOWED_DOMAINS = ["g.ucla.edu", "ucla.edu"];
 
 function toAuthUser(
   email: string,
@@ -100,31 +88,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (doc) {
         setUser(toAuthUser(email, firebaseUser.uid, doc));
       } else {
+        await firebaseSignOut(auth);
         setUser(null);
       }
       setLoading(false);
     });
   }, []);
 
-  const signIn = useCallback(async (email: string, password: string) => {
-    const existingMember = await MembersOrm.findByEmail(email);
-    if (!existingMember) {
-      throw new Error(
-        "No member profile found. Contact an admin to create your account."
-      );
-    }
-
-    const auth = getFirebaseAuth();
-    const cred = await signInWithEmailAndPassword(auth, email, password);
-    const doc =
-      (await MembersOrm.findByEmail(cred.user.email ?? email)) ?? existingMember;
-    setUser(toAuthUser(cred.user.email ?? email, cred.user.uid, doc));
-    setMemberDoc(doc);
-    return {
-      needsPasswordReset: doc.mustChangePassword ?? false,
-      profileCompleted: doc.profileCompleted ?? false,
-    };
-  }, []);
 
   const signInWithGoogle = useCallback(async () => {
     const auth = getFirebaseAuth();
@@ -139,24 +109,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       throw new Error("Could not get email from Google account.");
     }
 
-    const domain = email.split("@")[1];
-    if (!ALLOWED_DOMAINS.includes(domain)) {
-      await firebaseSignOut(auth);
-      throw new Error("You must use a UCLA email (@g.ucla.edu or @ucla.edu).");
-    }
-
     const doc = await MembersOrm.findByEmail(email);
     if (!doc) {
       await firebaseSignOut(auth);
       throw new Error(
-        "No member profile found. Contact an admin to create your account."
+        "No account is associated with that email. Contact your admin."
       );
     }
 
     setUser(toAuthUser(email, result.user.uid, doc));
     setMemberDoc(doc);
     return {
-      needsPasswordReset: doc.mustChangePassword ?? false,
       profileCompleted: doc.profileCompleted ?? false,
     };
   }, []);
@@ -170,9 +133,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const isMember = useMemo(() => {
     if (!user) return false;
-    if (memberDoc?.role === MemberRole.Member || memberDoc?.role === MemberRole.Admin)
-      return true;
-    return MEMBER_DOMAINS.some((d) => user.email.endsWith(d));
+    return (
+      memberDoc?.role === MemberRole.Member || memberDoc?.role === MemberRole.Admin
+    );
   }, [user, memberDoc]);
 
   const isAdmin = useMemo(
@@ -180,10 +143,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     [memberDoc]
   );
 
-  const needsPasswordReset = useMemo(
-    () => memberDoc?.mustChangePassword ?? false,
-    [memberDoc]
-  );
 
   const profileCompleted = useMemo(
     () => memberDoc?.profileCompleted ?? false,
@@ -196,9 +155,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       loading,
       isMember,
       isAdmin,
-      needsPasswordReset,
       profileCompleted,
-      signIn,
       signInWithGoogle,
       signOut,
     }),
@@ -207,9 +164,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       loading,
       isMember,
       isAdmin,
-      needsPasswordReset,
       profileCompleted,
-      signIn,
       signInWithGoogle,
       signOut,
     ]

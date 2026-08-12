@@ -106,7 +106,8 @@ export default function EditProfilePage({ params }: Params) {
         setWebsite(foundMember.website ?? "");
         setVestTitle(foundMember.vestTitle ?? "");
         setJoinedQuarter(foundMember.joinedQuarter ?? "");
-        setPhone(foundMember.phone ?? "");
+        const contact = await MembersOrm.findContactByUuid(foundMember.uuid);
+        setPhone(contact?.phone ?? "");
         setJoinedYear(foundMember.joinedYear ?? "");
         setRole(foundMember.role ?? MemberRole.Member);
         setStatus(foundMember.status ?? MemberStatus.Active);
@@ -194,7 +195,6 @@ export default function EditProfilePage({ params }: Params) {
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!memberEmail) return;
-    
     setSaving(true);
     try {
       const auth = getFirebaseAuth();

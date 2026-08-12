@@ -14,7 +14,6 @@ import { toMemberDoc } from "@/lib/orm/mappers";
 
 const COLLECTION = "members";
 
-/** Client-side members ORM over Firestore. */
 export const MembersOrm = {
   async findByUuid(uuid: string): Promise<MemberDoc | null> {
     const snap = await getDoc(doc(getFirebaseDb(), COLLECTION, uuid));
@@ -38,6 +37,16 @@ export const MembersOrm = {
     return snap.docs.map((d) =>
       toMemberDoc(d.id, d.data() as Record<string, unknown>)
     );
+  },
+
+  async findContactByUuid(uuid: string): Promise<{ phone?: string } | null> {
+    try {
+      const snap = await getDoc(doc(getFirebaseDb(), "memberContacts", uuid));
+      if (!snap.exists()) return null;
+      return snap.data() as { phone?: string };
+    } catch {
+      return null;
+    }
   },
 
   async update(uuid: string, data: Partial<Omit<MemberDoc, "uuid">>): Promise<void> {
