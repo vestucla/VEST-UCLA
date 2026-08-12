@@ -74,7 +74,15 @@ export const MembersAdminOrm = {
   },
 
   async update(uuid: string, data: UpdateMemberInput): Promise<void> {
-    await getAdminDb().collection(COLLECTION).doc(uuid).update(data);
+    const { phone, ...rest } = data as UpdateMemberInput & { phone?: string };
+    const db = getAdminDb();
+
+    if (Object.keys(rest).length > 0) {
+      await db.collection(COLLECTION).doc(uuid).update(rest);
+    }
+    if (phone !== undefined) {
+      await db.collection("memberContacts").doc(uuid).set({ phone }, { merge: true });
+    }
   },
 
   async delete(uuid: string): Promise<void> {

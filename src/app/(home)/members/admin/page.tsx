@@ -25,14 +25,21 @@ export default function AdminPage() {
   const [created, setCreated] = useState<{ email: string } | null>(null);
 
   const [members, setMembers] = useState<MemberDoc[]>([]);
+  const [phones, setPhones] = useState<Record<string, string>>({});
   const [deletingEmail, setDeletingEmail] = useState<string | null>(null);
 
   const loadMembers = async () => {
     const list = await MembersOrm.findAll();
-    list.sort((a, b) =>
-      (a.lastName ?? "").localeCompare(b.lastName ?? "")
-    );
+    list.sort((a, b) => (a.lastName ?? "").localeCompare(b.lastName ?? ""));
     setMembers(list);
+
+    const contactEntries = await Promise.all(
+      list.map(async (m) => {
+        const c = await MembersOrm.findContactByUuid(m.uuid);
+        return [m.uuid, c?.phone ?? ""] as const;
+      })
+    );
+    setPhones(Object.fromEntries(contactEntries));
   };
 
   useEffect(() => {
@@ -232,21 +239,27 @@ export default function AdminPage() {
             <h2 className="mb-4 text-lg font-medium text-white">
               All Members ({members.length})
             </h2>
-            <div className="overflow-hidden rounded-2xl border border-white/10">
-              <table className="w-full">
+            <div className="overflow-x-auto rounded-2xl border border-white/10">
+              <table className="min-w-[900px] w-full">
                 <thead>
                   <tr className="border-b border-white/10 bg-white/5">
                     <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-neutral-400">
                       Name
                     </th>
                     <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-neutral-400">
-                      Email
+                      Year
                     </th>
                     <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-neutral-400">
-                      Role
+                      Major
                     </th>
                     <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-neutral-400">
                       Status
+                    </th>
+                    <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-neutral-400">
+                      Email
+                    </th>
+                    <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-neutral-400">
+                      Phone
                     </th>
                     <th className="px-4 py-3 text-right text-xs font-medium uppercase tracking-wider text-neutral-400">
                       Actions
@@ -263,18 +276,10 @@ export default function AdminPage() {
                         {m.firstName} {m.lastName}
                       </td>
                       <td className="px-4 py-3 text-sm text-neutral-300">
-                        {m.email}
+                        {m.classYear ?? "—"}
                       </td>
-                      <td className="px-4 py-3">
-                        <span
-                          className={`inline-block rounded-full px-2 py-0.5 text-xs font-medium ${
-                            m.role === MemberRole.Admin
-                              ? "bg-amber-500/20 text-amber-300"
-                              : "bg-blue-500/20 text-blue-300"
-                          }`}
-                        >
-                          {m.role}
-                        </span>
+                      <td className="px-4 py-3 text-sm text-neutral-300">
+                        {m.major ?? "—"}
                       </td>
                       <td className="px-4 py-3">
                         <span
@@ -286,6 +291,12 @@ export default function AdminPage() {
                         >
                           {m.status}
                         </span>
+                      </td>
+                      <td className="px-4 py-3 text-sm text-neutral-300">
+                        {m.email}
+                      </td>
+                      <td className="px-4 py-3 text-sm text-neutral-300">
+                        {phones[m.uuid] || "—"}
                       </td>
                       <td className="px-4 py-3 text-right">
                         <div className="flex items-center justify-end gap-2">
@@ -312,7 +323,7 @@ export default function AdminPage() {
                   {members.length === 0 && (
                     <tr>
                       <td
-                        colSpan={5}
+                        colSpan={7}
                         className="px-4 py-8 text-center text-sm text-neutral-400"
                       >
                         No members found.

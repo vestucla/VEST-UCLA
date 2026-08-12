@@ -20,13 +20,18 @@ export async function getMembersByStatus(
 
 export async function getMember(idOrSlug: string): Promise<Member | null> {
   const byUuid = await MembersOrm.findByUuid(idOrSlug);
-  if (byUuid) return toMember(byUuid);
+  if (byUuid) {
+    const contact = await MembersOrm.findContactByUuid(byUuid.uuid);
+    return toMember({ ...byUuid, phone: contact?.phone });
+  }
 
   const allMembers = await getAllMembers();
-  return (
-    allMembers.find((m) => m.id.toLowerCase() === idOrSlug.toLowerCase()) ??
-    null
+  const match = allMembers.find(
+    (m) => m.id.toLowerCase() === idOrSlug.toLowerCase()
   );
+  if (!match) return null;
+  const contact = await MembersOrm.findContactByUuid(match.uuid);
+  return { ...match, phone: contact?.phone };
 }
 
 export interface MemberSearchOptions {

@@ -67,7 +67,6 @@ export function toMemberDoc(
     twitter: data.twitter as string | undefined,
     github: data.github as string | undefined,
     website: data.website as string | undefined,
-    phone: data.phone as string | undefined,
   };
 }
 

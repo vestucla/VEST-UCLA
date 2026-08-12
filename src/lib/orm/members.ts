@@ -40,6 +40,16 @@ export const MembersOrm = {
     );
   },
 
+  async findContactByUuid(uuid: string): Promise<{ phone?: string } | null> {
+    try {
+      const snap = await getDoc(doc(getFirebaseDb(), "memberContacts", uuid));
+      if (!snap.exists()) return null;
+      return snap.data() as { phone?: string };
+    } catch {
+      return null;
+    }
+  },
+
   async update(uuid: string, data: Partial<Omit<MemberDoc, "uuid">>): Promise<void> {
     await updateDoc(doc(getFirebaseDb(), COLLECTION, uuid), data as DocumentData);
   },
