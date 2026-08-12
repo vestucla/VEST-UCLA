@@ -16,9 +16,6 @@ service cloud.firestore {
       return isAuthenticated() && resource.data.email == request.auth.token.email;
     }
 
-    function isCreatingOwn() {
-      return isAuthenticated() && request.resource.data.email == request.auth.token.email;
-    }
 
     function ownsMember(memberId) {
       return isAuthenticated() &&
@@ -26,10 +23,17 @@ service cloud.firestore {
         get(/databases/$(database)/documents/members/$(memberId)).data.email == request.auth.token.email;
     }
 
+    function ownerCanUpdateMember() {
+      return isOwner() &&
+        request.resource.data.email == resource.data.email &&
+        request.resource.data.role == resource.data.role &&
+        request.resource.data.status == resource.data.status;
+    }
+
     match /members/{memberId} {
       allow read: if true;
-      allow create: if isAdmin() || isCreatingOwn();
-      allow update: if isAdmin() || isOwner();
+      allow create: if isAdmin();
+      allow update: if isAdmin() || ownerCanUpdateMember();
       allow delete: if isAdmin();
     }
 
