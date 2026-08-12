@@ -195,7 +195,6 @@ export default function EditProfilePage({ params }: Params) {
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!memberEmail) return;
-    
     setSaving(true);
     try {
       const auth = getFirebaseAuth();

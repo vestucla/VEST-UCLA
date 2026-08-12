@@ -1,7 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getAdminAuth } from "@/lib/firebase-admin";
 import { MembersAdminOrm } from "@/lib/orm/members.admin";
-import { MemberRole, MemberStatus, VestTitle, JoinedQuarter } from "@/data/members";
+import {
+  MemberRole,
+  MemberStatus,
+  VestTitle,
+  JoinedQuarter,
+} from "@/data/members";
 
 async function verifyAdmin(token: string): Promise<boolean> {
   const auth = getAdminAuth();

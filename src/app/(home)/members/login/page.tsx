@@ -15,11 +15,9 @@ export default function LoginPage() {
   const handleGoogleSignIn = async () => {
     setSubmitting(true);
     try {
-      const { needsPasswordReset, profileCompleted } = await signInWithGoogle();
+      const { profileCompleted } = await signInWithGoogle();
       toast.success("Signed in with Google.");
-      if (needsPasswordReset) {
-        router.push("/members/reset-password");
-      } else if (!profileCompleted) {
+      if (!profileCompleted) {
         router.push("/members/onboarding");
       } else {
         router.push("/members");
@@ -31,6 +29,7 @@ export default function LoginPage() {
     }
   };
 
+
   return (
     <main>
       <PortalShell
@@ -39,7 +38,7 @@ export default function LoginPage() {
             Member <span className="italic">Login</span>
           </>
         }
-        subtitle="Sign in with your UCLA account to view member details."
+        subtitle="Sign in with the Google account associated with your member profile."
       >
         {user ? (
           <Card>
@@ -56,12 +55,13 @@ export default function LoginPage() {
           </Card>
         ) : (
           <Card>
+
             <GoogleButton type="button" disabled={submitting} onClick={handleGoogleSignIn}>
               <GoogleIcon />
-              {submitting ? "Signing in…" : "Sign in with UCLA Google"}
+              {submitting ? "Signing in…" : "Sign in with Google"}
             </GoogleButton>
 
-            <Hint>Only @g.ucla.edu and @ucla.edu accounts are allowed.</Hint>
+            <Hint>Only emails already listed in the members collection can sign in.</Hint>
           </Card>
         )}
       </PortalShell>
@@ -94,6 +94,7 @@ const Card = styled.div`
   }
 `;
 
+
 const Row = styled.div`
   display: flex;
   gap: 12px;
@@ -111,8 +112,13 @@ const PrimaryButton = styled.button`
   cursor: pointer;
   transition: background 200ms ease;
 
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+
   @media (hover: hover) and (pointer: fine) {
-    &:hover {
+    &:hover:not(:disabled) {
       background: rgba(173, 206, 255, 0.28);
     }
   }
@@ -135,6 +141,7 @@ const GhostButton = styled.button`
     }
   }
 `;
+
 
 const GoogleButton = styled.button`
   height: 44px;

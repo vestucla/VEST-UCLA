@@ -37,7 +37,6 @@ function parseStatus(value: unknown): MemberStatus {
   return value === MemberStatus.Alumni ? MemberStatus.Alumni : MemberStatus.Active;
 }
 
-/** Map a Firestore snapshot into MemberDoc (uuid = document id). */
 export function toMemberDoc(
   uuid: string,
   data: Record<string, unknown>
@@ -49,7 +48,6 @@ export function toMemberDoc(
     lastName: data.lastName as string | undefined,
     role: data.role ? parseRole(data.role) : undefined,
     status: data.status ? parseStatus(data.status) : undefined,
-    mustChangePassword: data.mustChangePassword as boolean | undefined,
     profileCompleted: data.profileCompleted as boolean | undefined,
     createdAt: data.createdAt as string | undefined,
     vestTitle: parseVestTitle(data.vestTitle),

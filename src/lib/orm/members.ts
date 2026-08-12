@@ -14,7 +14,6 @@ import { toMemberDoc } from "@/lib/orm/mappers";
 
 const COLLECTION = "members";
 
-/** Client-side members ORM over Firestore. */
 export const MembersOrm = {
   async findByUuid(uuid: string): Promise<MemberDoc | null> {
     const snap = await getDoc(doc(getFirebaseDb(), COLLECTION, uuid));

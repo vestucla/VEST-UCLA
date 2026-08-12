@@ -48,7 +48,6 @@ export interface MemberDoc {
   lastName?: string;
   role?: MemberRole;
   status?: MemberStatus;
-  mustChangePassword?: boolean;
   profileCompleted?: boolean;
   createdAt?: string;
 

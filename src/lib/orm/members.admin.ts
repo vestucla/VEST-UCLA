@@ -29,7 +29,6 @@ export type UpdateMemberInput = Partial<
   interests?: string[];
 };
 
-/** Admin SDK members ORM for API routes. */
 export const MembersAdminOrm = {
   async findByUuid(uuid: string): Promise<MemberDoc | null> {
     const snap = await getAdminDb().collection(COLLECTION).doc(uuid).get();
@@ -64,7 +63,6 @@ export const MembersAdminOrm = {
       vestTitle: input.vestTitle ?? null,
       joinedYear: input.joinedYear ?? null,
       joinedQuarter: input.joinedQuarter ?? null,
-      mustChangePassword: false,
       profileCompleted: false,
       createdAt: new Date().toISOString(),
     };
