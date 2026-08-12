@@ -14,6 +14,10 @@ import {
   type MemberDoc,
 } from "@/data/members";
 
+function csvCell(value: string) {
+  return `"${value.replaceAll(`"`, `""`)}"`;
+}
+
 export default function AdminPage() {
   const { isAdmin, loading } = useAuth();
   const [email, setEmail] = useState("");
@@ -134,6 +138,33 @@ export default function AdminPage() {
     }
   };
 
+  const onExportCsv = () => {
+    const header = ["Name", "Year", "Email", "Phone Number", "Major"];
+    const rows = members.map((m) => [
+      `${m.firstName ?? ""} ${m.lastName ?? ""}`.trim(),
+      m.classYear ?? "",
+      m.email ?? "",
+      phones[m.uuid] ?? "",
+      m.major ?? "",
+    ]);
+
+    const csv = [header, ...rows]
+      .map((row) => row.map((value) => csvCell(value)).join(","))
+      .join("\n");
+
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    const stamp = new Date().toISOString().slice(0, 10);
+
+    link.href = url;
+    link.download = `members-${stamp}.csv`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  };
+
   return (
     <main>
       <PortalShell
@@ -236,9 +267,19 @@ export default function AdminPage() {
           </form>
 
           <div className="mt-10">
-            <h2 className="mb-4 text-lg font-medium text-white">
-              All Members ({members.length})
-            </h2>
+            <div className="mb-4 flex items-center justify-between gap-3">
+              <h2 className="text-lg font-medium text-white">
+                All Members ({members.length})
+              </h2>
+              <button
+                type="button"
+                onClick={onExportCsv}
+                disabled={members.length === 0}
+                className="rounded-full border border-white/15 px-4 py-2 text-xs font-medium text-white transition hover:bg-white/5 disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                Export CSV
+              </button>
+            </div>
             <div className="overflow-x-auto rounded-2xl border border-white/10">
               <table className="min-w-[900px] w-full">
                 <thead>
