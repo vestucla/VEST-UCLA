@@ -65,9 +65,6 @@ const Header = () => {
                 {link.linkTo}
               </Link>
             ))}
-            <Link href="/hire" onClick={closeMenu}>
-              Hire Us
-            </Link>
           </nav>
           <CallToActions>
             <a
@@ -93,21 +90,7 @@ const Header = () => {
               {link.linkTo}
             </NavLink>
           ))}
-          <NavLink href="/hire" className={pathname === "/hire" ? "active" : ""}>
-            Hire Us
-          </NavLink>
         </NavMenu>
-        <CallToActions className="desktop">
-          <a
-            href="https://discord.gg/PTGgbFvm9t"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="discord-btn"
-          >
-            Join Discord
-          </a>
-          <GetStartedButton padding="0.5rem 0.75rem" />
-        </CallToActions>
       </Inner>
     </Wrapper>
   );

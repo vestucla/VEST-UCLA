@@ -72,6 +72,7 @@ export const NavMenu = styled.nav`
   display: flex;
   align-items: center;
   gap: 32px;
+  margin-left: auto;
   padding: 16px 32px;
   border-radius: 24px;
   border: 2px solid #1f00ff;

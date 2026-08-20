@@ -15,6 +15,70 @@ export const Wrapper = styled.section`
   }
 `;
 
+export const TechWeekApplyLink = styled.a`
+  display: inline-flex;
+  align-items: center;
+  gap: 0.625rem;
+  padding: 0.625rem 1.25rem;
+  border-radius: 76px;
+  background: linear-gradient(90deg, #2165c8, #0a2040);
+  border: 0.2px solid #efefef;
+  box-shadow:
+    0px 4px 12px 0px rgba(0, 0, 0, 0.1),
+    0px 0px 36px 6px rgba(55, 125, 226, 1);
+  backdrop-filter: blur(3px);
+  color: var(--white);
+  text-decoration: none;
+  font-family: Inter, sans-serif;
+  font-size: 1.4rem;
+  font-weight: 400;
+  transition: transform 0.3s ease;
+
+  &:hover {
+    transform: translateY(-2px);
+  }
+
+  @media (max-width: 768px) {
+    font-size: 0.95rem;
+  }
+`;
+
+export const TechWeekFooter = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+`;
+
+export const TechWeekLogo = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 14px 18px;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.95);
+  min-height: 88px;
+
+  img {
+    width: 275px;
+    height: 48px;
+  }
+
+  @media (max-width: 768px) {
+    width: 100%;
+    justify-content: flex-start;
+
+    img {
+      height: 36px;
+    }
+  }
+`;
+
 export const Inner = styled.div`
   width: 90%;
   max-width: 1236px;
@@ -213,9 +277,13 @@ export const TechWeekDescription = styled.div`
 export const TechWeekButtonRow = styled.div`
   display: flex;
   align-items: center;
+  justify-content: flex-end;
+  margin-left: auto;
 
   @media (max-width: 768px) {
     width: 100%;
+    margin-left: 0;
+    justify-content: flex-start;
   }
 `;
 

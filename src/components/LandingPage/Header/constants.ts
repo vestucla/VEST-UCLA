@@ -33,10 +33,6 @@ export const links = [
     linkTo: "Events",
   },
   {
-    url: "/faq",
-    linkTo: "FAQ",
-  },
-  {
     url: "/about",
     linkTo: "About",
   },
