@@ -29,6 +29,10 @@ export const links = [
     linkTo: "Team",
   },
   {
+    url: "/events",
+    linkTo: "Events",
+  },
+  {
     url: "/faq",
     linkTo: "FAQ",
   },

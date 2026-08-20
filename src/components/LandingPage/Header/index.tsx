@@ -6,6 +6,7 @@ import {
   Inner,
   LogoContainer,
   Nav,
+  MobileNavLink,
   CallToActions,
   BurgerMenu,
   MobileOverlay,
@@ -53,12 +54,14 @@ const Header = () => {
         <MobileOverlay className={isOpen ? 'active' : ''} onClick={closeMenu} />
         <MobileMenu className={isOpen ? 'active' : ''}>
           <Nav>
-            {links.map((link, i) => (
-              <AnimatedLink key={i} title={link.linkTo} url={link.url} />
+            {links.map((link) => (
+              <MobileNavLink key={link.url} href={link.url} onClick={closeMenu}>
+                {link.linkTo}
+              </MobileNavLink>
             ))}
-            <Link href="/hire" className="text-white hover:text-gray-300 transition-colors">
+            <MobileNavLink href="/hire" onClick={closeMenu}>
               Hire Us
-            </Link>
+            </MobileNavLink>
           </Nav>
           <CallToActions>
             <a
@@ -75,8 +78,8 @@ const Header = () => {
         </MobileMenu>
 
         <Nav className="desktop">
-          {links.map((link, i) => (
-            <AnimatedLink key={i} title={link.linkTo} url={link.url} />
+          {links.map((link) => (
+            <AnimatedLink key={link.url} title={link.linkTo} url={link.url} />
           ))}
           <Link href="/hire" className="text-white hover:text-gray-300 transition-colors">
             Hire Us

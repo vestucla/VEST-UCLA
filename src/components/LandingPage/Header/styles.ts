@@ -194,6 +194,10 @@ export const Nav = styled.div`
   }
 `;
 
+export const MobileNavLink = styled(Link)`
+  text-decoration: none;
+`;
+
 export const AbsoluteLinks = styled(Link)`
   position: absolute;
   top: 40px;
