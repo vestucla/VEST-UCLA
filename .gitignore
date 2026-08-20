@@ -38,3 +38,5 @@ next-env.d.ts
 
 src/db/.env
 src/db/node_modules
+# clerk configuration (can include secrets)
+/.clerk/

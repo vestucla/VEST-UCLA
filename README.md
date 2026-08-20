@@ -1,10 +1,5 @@
 # VEST Website
 
-Next.js hosted on cloudflare pages.
+Next.js hosted on Vercel.
 
-
-To make DB changes
-```
-npm run prisma:generate (check package.json for info)
-```
-
+Use pnpm for package manager (10.14.0) 

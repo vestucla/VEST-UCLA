@@ -1,6 +1,6 @@
 "use client";
 import Image from "next/image";
-import { Wrapper, Inner, Header, TimelineContainer } from "./styles";
+import { Wrapper, Inner, Header, TimelineContainer, BackgroundGlow } from "./styles";
 import MaskText from "@/components/Common/MaskText";
 import { useIsMobile } from "../../../../libs/useIsMobile";
 import {
@@ -15,6 +15,7 @@ const Timeline = () => {
 
   return (
     <Wrapper>
+      <BackgroundGlow />
       <Inner>
         <Header>
           {isMobile ? (

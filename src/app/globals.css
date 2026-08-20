@@ -1,11 +1,9 @@
-@import url("https://fonts.cdnfonts.com/css/sf-pro-display");
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 body {
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-geist-sans), system-ui, sans-serif;
 }
 
 @layer base {
@@ -35,6 +33,34 @@ body {
     --chart-4: 43 74% 66%;
     --chart-5: 27 87% 67%;
     --radius: 0.5rem;
+    
+    /* Header text variables */
+    --header-gradient: linear-gradient(180deg, #ffffff 0%, #adceff 100%);
+    --header-font-regular: var(--font-bit-apple), 'Bit Apple', monospace;
+    --header-font-italic: var(--font-playfair-display), 'Playfair Display', serif;
+    
+    /* Header text sizes */
+    --header-size-hero: 5.625rem;
+    --header-size-hero-mobile: 3rem;
+    --header-size-page: 4.5rem;
+    --header-size-page-mobile: 2.25rem;
+    --header-size-section: 3rem;
+    --header-size-section-mobile: 1.75rem;
+    --header-size-subsection: 2rem;
+    --header-size-subsection-mobile: 1.25rem;
+    
+    /* Body text sizes */
+    --text-xxl: 1.5rem;
+    --text-xxl-mobile: 1.25rem;
+    --text-xl: 1.25rem;
+    --text-xl-mobile: 1rem;
+    --text-lg: 1.125rem;
+    --text-lg-mobile: 1rem;
+    --text-base: 1rem;
+    --text-base-mobile: 0.875rem;
+    --text-sm: 0.875rem;
+    --text-sm-mobile: 0.75rem;
+    --text-xs: 0.75rem;
   }
   .dark {
     --background: 222.2 84% 4.9%;

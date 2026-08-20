@@ -4,6 +4,7 @@ import { useParams } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 import styled from "styled-components";
+import { ArrowLeft } from "@phosphor-icons/react";
 
 const blogPosts = {
   1: {
@@ -43,9 +44,13 @@ const BlogPost = () => {
   if (!post) {
     return (
       <Wrapper>
+        <BackgroundGlow />
         <Inner>
           <h1>Post not found</h1>
-          <BackLink href="/blog">← Back to blog</BackLink>
+          <BackLink href="/blog">
+            <ArrowLeft size={20} weight="bold" />
+            <span>Back to blog</span>
+          </BackLink>
         </Inner>
       </Wrapper>
     );
@@ -53,8 +58,12 @@ const BlogPost = () => {
 
   return (
     <Wrapper>
+      <BackgroundGlow />
       <Inner>
-        <BackLink href="/blog">← Back to blog</BackLink>
+        <BackLink href="/blog">
+          <ArrowLeft size={20} weight="bold" />
+          <span>Back to blog</span>
+        </BackLink>
 
         <Header>
           <Category>{post.category}</Category>
@@ -98,46 +107,80 @@ const BlogPost = () => {
 };
 
 const Wrapper = styled.section`
-  padding: 2rem 0;
-  background: var(--Background);
+  width: 100%;
+  min-height: 100vh;
+  padding-top: 160px;
+  padding-bottom: 100px;
+  position: relative;
+  
+  @media (max-width: 768px) {
+    padding-top: 120px;
+    padding-bottom: 60px;
+  }
+`;
+
+const BackgroundGlow = styled.div`
+  position: absolute;
+  top: 0;
+  left: -200px;
+  width: 1600px;
+  height: 800px;
+  background: radial-gradient(ellipse at center, rgba(31, 0, 255, 0.15) 0%, rgba(0, 116, 225, 0.08) 40%, transparent 70%);
+  pointer-events: none;
+  z-index: 0;
 `;
 
 const Inner = styled.div`
   width: 90%;
   max-width: 800px;
   margin: 0 auto;
+  position: relative;
+  z-index: 1;
 `;
 
 const BackLink = styled(Link)`
-  display: inline-block;
-  color: var(--emerald);
-  margin-bottom: 2rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: rgb(0, 140, 255);
+  margin-bottom: 32px;
   text-decoration: none;
+  font-size: var(--text-base);
+  font-weight: 500;
+  transition: opacity 0.2s ease;
 
   &:hover {
-    text-decoration: underline;
+    opacity: 0.8;
   }
 `;
 
 const Header = styled.header`
-  margin-bottom: 3rem;
+  margin-bottom: 48px;
 
   h1 {
-    font-size: 3.5rem;
+    font-family: var(--header-font-regular);
+    font-size: var(--header-size-section);
     font-weight: 400;
-    margin: 1rem 0;
+    line-height: 1;
+    margin: 16px 0 24px;
+    background: var(--header-gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
   }
 
   @media (max-width: 768px) {
+    margin-bottom: 32px;
+    
     h1 {
-      font-size: 2rem;
+      font-size: var(--header-size-section-mobile);
     }
   }
 `;
 
 const Category = styled.span`
-  color: var(--emerald);
-  font-size: 1rem;
+  color: rgb(0, 140, 255);
+  font-size: var(--text-sm);
   font-weight: 500;
 `;
 
@@ -146,86 +189,94 @@ const MetaInfo = styled.div`
   align-items: center;
   justify-content: space-between;
   flex-wrap: wrap;
-  gap: 1rem;
+  gap: 16px;
 `;
 
 const AuthorInfo = styled.div`
   display: flex;
   align-items: center;
-  gap: 1rem;
+  gap: 16px;
 `;
 
 const AuthorImage = styled.div`
-  width: 40px;
-  height: 40px;
+  width: 48px;
+  height: 48px;
   border-radius: 50%;
   overflow: hidden;
+  background: linear-gradient(90deg, rgba(0, 76, 255, 0.3) 0%, rgba(39, 0, 147, 0.3) 100%);
 `;
 
 const AuthorName = styled.div`
   font-weight: 500;
+  color: #efefef;
 `;
 
 const AuthorRole = styled.div`
-  color: var(--link-color);
-  font-size: 0.875rem;
+  color: rgba(239, 239, 239, 0.7);
+  font-size: var(--text-sm);
 `;
 
 const PostInfo = styled.div`
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  color: var(--link-color);
-  font-size: 0.875rem;
+  gap: 8px;
+  color: rgba(239, 239, 239, 0.7);
+  font-size: var(--text-sm);
 `;
 
 const Dot = styled.span`
-  color: var(--link-color);
+  color: rgba(239, 239, 239, 0.5);
 `;
 
 const CoverImage = styled.div`
   position: relative;
   width: 100%;
-  height: 400px;
-  margin-bottom: 3rem;
-  border-radius: 1rem;
+  aspect-ratio: 16 / 9;
+  margin-bottom: 48px;
+  border-radius: 24px;
   overflow: hidden;
+  background: linear-gradient(90deg, rgba(30, 70, 200, 0.2) 0%, rgba(50, 30, 110, 0.2) 100%);
+  box-shadow: inset 0px 0px 30px 0px rgba(239, 239, 239, 0.15);
 
   @media (max-width: 768px) {
-    height: 250px;
+    border-radius: 16px;
+    margin-bottom: 32px;
   }
 `;
 
 const Content = styled.div`
-  color: var(--white);
-  font-size: 1.125rem;
-  line-height: 1.8;
+  color: #efefef;
+  font-size: var(--text-lg);
+  line-height: 1.5;
 
   h2 {
-    font-size: 2rem;
-    font-weight: 400;
-    margin: 2rem 0 1rem;
+    font-size: 1.75rem;
+    font-weight: 600;
+    line-height: 1.5;
+    margin: 48px 0 24px;
+    color: #efefef;
   }
 
   p {
-    margin-bottom: 1.5rem;
-    color: var(--link-color);
+    margin-bottom: 24px;
+    color: rgba(239, 239, 239, 0.8);
   }
 
   ul {
-    margin: 1rem 0 1.5rem 2rem;
-    color: var(--link-color);
+    margin: 16px 0 24px 32px;
+    color: rgba(239, 239, 239, 0.8);
 
     li {
-      margin-bottom: 0.5rem;
+      margin-bottom: 8px;
     }
   }
 
   @media (max-width: 768px) {
-    font-size: 1rem;
+    font-size: var(--text-base);
 
     h2 {
-      font-size: 1.5rem;
+      font-size: 1.375rem;
+      margin: 32px 0 16px;
     }
   }
 `;

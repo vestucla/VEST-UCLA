@@ -19,7 +19,11 @@ export default function StyledComponentsRegistry({
     return <>{styles}</>;
   });
 
-  if (typeof window !== "undefined") return <>{children}</>;
+  // Always wrap with StyleSheetManager for consistent style handling
+  // The server uses the sheet for SSR, client uses default behavior
+  if (typeof window !== "undefined") {
+    return <StyleSheetManager>{children}</StyleSheetManager>;
+  }
 
   return (
     <StyleSheetManager sheet={styledComponentsStyleSheet.instance}>

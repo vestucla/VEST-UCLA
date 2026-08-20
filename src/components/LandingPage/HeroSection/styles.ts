@@ -1,146 +1,175 @@
 "use client";
 import { styled } from "styled-components";
-import hero_background from "../../../../public/images/grid_background.png";
 
 export const Wrapper = styled.section`
-  margin-top: 0;
-  width: 100vw;
-  margin-left: calc(-50vw + 50%);
-  margin-right: calc(-50vw + 50%);
-  min-height: calc(100vh - 6.25rem);
+  min-height: 100vh;
+  width: 100%;
   display: flex;
-  flex-direction: column;
+  align-items: center;
   justify-content: center;
+  position: relative;
+  overflow: hidden;
+  padding-top: 60px;
+  
+  @media (max-width: 768px) {
+    min-height: auto;
+    padding: 100px 0 20px;
+  }
+`;
+
+export const BackgroundGlow = styled.div`
+  position: absolute;
+  top: 0;
+  left: -200px;
+  width: 1600px;
+  height: 800px;
+  background: radial-gradient(ellipse at center, rgba(31, 0, 255, 0.15) 0%, rgba(0, 116, 225, 0.08) 40%, transparent 70%);
+  pointer-events: none;
+  z-index: 0;
 `;
 
 export const Inner = styled.div`
-  background: url(${hero_background.src}) no-repeat;
-  width: 100%;
-  background-position: top center;
-  background-size: cover;
-  padding: 4rem 0;
-
-  @media (max-width: 768px) {
-    padding: 2rem 0;
-  }
-`;
-
-export const Pill = styled.div`
+  width: 90%;
+  max-width: 1236px;
+  margin: 0 auto;
   display: flex;
-  padding: 0.375rem 0.75rem;
-  justify-content: center;
+  flex-direction: row;
   align-items: center;
-  gap: 0.625rem;
-  border-radius: 6.25rem;
-  border: 0.2px solid #989898;
-  background: rgba(255, 255, 255, 0.15);
-  backdrop-filter: blur(10px);
-  margin-bottom: 1rem;
-
-  span {
-    color: var(--light-gray);
-    font-size: 1rem;
-    font-weight: 400;
+  justify-content: space-between;
+  gap: 3rem;
+  position: relative;
+  z-index: 1;
+  
+  @media (max-width: 768px) {
+    flex-direction: column;
+    text-align: center;
   }
 `;
 
-export const HeroTextContainer = styled.div`
+export const HeroContent = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
-  padding-bottom: 2rem;
-
-  h1 {
-    font-size: 4rem;
-    font-weight: 400;
-  }
-
-  p {
-    max-width: 41.75rem;
-    color: #bdbdbd;
-    font-size: 1.25rem;
-    font-weight: 400;
-    margin: 0 auto;
-  }
-
+  align-items: flex-start;
+  gap: 32px;
+  max-width: 700px;
+  
   @media (max-width: 768px) {
-    gap: 1rem;
-    padding-bottom: 1.5rem;
-    h1 {
-      font-size: 2.75rem;
-      font-weight: 400;
-    }
-
-    p {
-      font-size: 1rem;
-      line-height: 1.5rem;
-    }
+    align-items: center;
+    max-width: 100%;
+    gap: 20px;
   }
 `;
 
-export const ContentContainer = styled.div`
+export const HeroBadge = styled.div`
   display: flex;
   align-items: center;
-  width: 100%;
-  min-height: calc(100vh - 14.5rem);
-
-  .left-content {
-    width: 50vw;
-    padding: 0 4rem;
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    justify-content: center;
+  gap: 10px;
+  padding: 12px 24px;
+  border-radius: 44px;
+  border: 2px solid #1f00ff;
+  background: linear-gradient(90deg, rgba(0, 76, 255, 0.3) 0%, rgba(39, 0, 147, 0.3) 100%);
+  
+  span {
+    color: #efefef;
+    font-size: var(--text-base);
+    font-weight: 400;
+  }
+  
+  svg {
+    color:rgb(0, 140, 255);
   }
 
   @media (max-width: 768px) {
-    flex-direction: column;
-    min-height: auto;
-
-    .left-content {
-      width: 100%;
-      padding: 3rem 2rem;
-      align-items: center;
-      text-align: center;
-    }
-  }
-`;
-
-export const Divider = styled.div`
-  width: 1px;
-  height: 80vh;
-  background-color: rgba(255, 255, 255, 0.2);
-  flex-shrink: 0;
-
-  @media (max-width: 768px) {
-    width: 100%;
-    height: 1px;
-    margin: 1rem 0;
-  }
-`;
-
-export const ImageContainer = styled.div`
-  width: 50vw;
-  position: relative;
-  height: calc(100vh - 14.5rem);
-  border-radius: 50%;
-  overflow: hidden;
-  aspect-ratio: 1;
-  margin: auto;
-
-  // Make container smaller but keep spline large
-  > div {
-    transform: scale(1.5);
-    width: 100% !important;
-    height: 100% !important;
-  }
-
-  @media (max-width: 768px) {
-    width: 100vw;
-    height: 100vw;
+    padding: 8px 16px;
+    border-radius: 32px;
+    gap: 8px;
     
-    > div {
-      transform: scale(1.2);
+    span {
+      font-size: var(--text-sm);
     }
   }
 `;
+
+export const HeroTitle = styled.h1`
+  font-family: var(--header-font-regular);
+  font-size: var(--header-size-hero);
+  font-weight: 400;
+  line-height: 1;
+  background: var(--header-gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  
+  .italic {
+    font-family: var(--header-font-italic);
+    font-style: italic;
+    font-weight: 400;
+  }
+  
+  @media (max-width: 768px) {
+    font-size: var(--header-size-hero-mobile);
+  }
+`;
+
+export const HeroDescription = styled.p`
+  font-size: var(--text-xxl);
+  font-weight: 400;
+  line-height: 1.5;
+  color: #efefef;
+  
+  @media (max-width: 768px) {
+    font-size: var(--text-lg);
+  }
+`;
+
+export const HeroButton = styled.button`
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 30px;
+  border-radius: 24px;
+  background: linear-gradient(180deg, #0074e1 0%, #1f00ff 100%);
+  box-shadow: 0px 0px 30px 0px #7843ff, inset 0px 0px 8px 0px #efefef;
+  text-decoration: none;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  
+  span {
+    color: #efefef;
+    font-size: var(--text-xl);
+    font-weight: 400;
+  }
+  
+  svg {
+    color: #efefef;
+  }
+  
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0px 0px 40px 0px #7843ff, inset 0px 0px 8px 0px #efefef;
+  }
+  
+  @media (max-width: 768px) {
+    padding: 12px 20px;
+    border-radius: 16px;
+    
+    span {
+      font-size: var(--text-base);
+    }
+  }
+`;
+
+export const HeroImageContainer = styled.div`
+  flex-shrink: 0;
+  width: 500px;
+  transform: rotate(4deg);
+  
+  @media (max-width: 768px) {
+    width: 280px;
+    transform: rotate(0deg);
+  }
+`;
+
+// Legacy exports for backwards compatibility
+export const ContentContainer = styled.div``;
+export const HeroTextContainer = styled.div``;
+export const BlurCircle = styled.div``;

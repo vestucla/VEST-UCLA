@@ -1,5 +1,8 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  compiler: {
+    styledComponents: true,
+  },
   images: {
     remotePatterns: [
       {
@@ -11,12 +14,6 @@ const nextConfig = {
       {
         protocol: 'https',
         hostname: 'fg5si9hh45.ufs.sh',
-        port: '',
-        pathname: '**',
-      },
-      {
-        protocol: 'https',
-        hostname: 'img.clerk.com',
         port: '',
         pathname: '**',
       },

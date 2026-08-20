@@ -8,6 +8,7 @@ import {
   Inner,
   Question,
   Wrapper,
+  BackgroundGlow,
 } from "./styles";
 import Image from "next/image";
 import ic_chevron_down from "../../../../public/svgs/ic_chevron_down.svg";
@@ -38,6 +39,7 @@ const FAQ = () => {
 
   return (
     <Wrapper>
+      <BackgroundGlow />
       <Inner>
         {isMobile ? (
           <MaskText phrases={mobileHeaderPhrase} tag="h1" />

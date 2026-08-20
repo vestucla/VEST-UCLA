@@ -2,227 +2,230 @@
 import { styled } from "styled-components";
 
 export const Wrapper = styled.footer`
-  padding-bottom: 3.5rem;
-  padding-top: 3.5rem;
+  width: 100%;
+  padding: 80px 0 40px;
+  position: relative;
+  border-top: 1px solid rgba(239, 239, 239, 0.1);
+  
+  @media (max-width: 768px) {
+    padding: 60px 0 32px;
+  }
 `;
 
-export const Inner = styled.main`
+export const Inner = styled.div`
   width: 90%;
-  max-width: 1440px;
+  max-width: 1236px;
   margin: 0 auto;
   display: flex;
   flex-direction: column;
-  gap: 3.75rem;
-
+  gap: 60px;
+  
   @media (max-width: 768px) {
-    gap: 2.5rem;
+    gap: 40px;
   }
 `;
 
-export const FooterLogo = styled.div`
-  @media (max-width: 768px) {
-    width: 13.2rem;
-    height: 5.6rem;
-    img {
-      width: 100%;
-      height: 100%;
-      object-fit: contain;
-    }
-  }
-`;
-
-export const FooterMainContent = styled.div`
-  display: flex;
-  flex-direction: column;
-  padding: 3.75rem 0 3.25rem;
-  border-top: 0.0625rem solid #3d3d3d;
-  gap: 3.25rem;
-`;
-
-export const FooterMiddle = styled.div`
+export const TopSection = styled.div`
   display: flex;
   justify-content: space-between;
-  width: 100%;
-  gap: 2rem;
-  align-items: flex-start;
-
+  gap: 60px;
+  
   @media (max-width: 768px) {
-    flex-direction: column;
-    gap: 3.5rem;
+    gap: 40px;
   }
 `;
 
-export const QRContainer = styled.div`
+export const LogoSection = styled.div`
   display: flex;
-  gap: 0.75rem;
-  padding: 1.25rem 1rem;
-  gap: 0.75rem;
-  border-radius: 0.5rem;
-  border: 1px dashed var(--White, #fff);
-`;
-
-export const QRImageCtn = styled.div``;
-
-export const TextCtn = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-
-  p {
-    max-width: 19.5625rem;
-    font-size: 1.25rem;
-    font-weight: 400;
-  }
-
-  @media (max-width: 768px) {
-    p {
-      font-size: 1rem;
-    }
-  }
-`;
-
-export const IconCtn = styled.div`
-  display: flex;
+  flex-direction: row;
   align-items: center;
-  gap: 0.75rem;
-`;
-
-export const FooterNavigation = styled.div`
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
-
-  @media (max-width: 768px) {
-    grid-template-columns: 1fr 1fr;
-    gap: 3rem 3.75rem;
-  }
-`;
-
-export const GridColumn = styled.div`
-  display: flex;
-  min-width: 12.5rem;
+  flex-shrink: 0;
   width: 100%;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 1rem;
-
-  @media (max-width: 768px) {
-    min-width: auto;
-  }
-`;
-
-export const LinksContainer = styled.ul`
-  list-style: none;
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-
-  li.clickable {
-    cursor: pointer;
-    color: #efefef;
-    font-size: 1rem;
-    font-weight: 400;
-    position: relative;
-    transition: transform 0.2s ease;
-
+  gap: 12px;
+  
+  a {
+    display: block;
+    transition: opacity 0.2s ease;
+    
     &:hover {
-      transform: translateY(-2px);
-    }
-
-    &::after {
-      position: absolute;
-      content: "";
-      width: 100%;
-      height: 1px;
-      background-color: #efefef;
-      left: 0;
-      bottom: -5px;
-      transform: scaleX(0);
-      transition: transform 0.5s cubic-bezier(0.165, 0.84, 0.44, 1);
-      transform-origin: center;
-    }
-
-    &:hover::after {
-      transform: scaleX(1);
+      opacity: 0.8;
     }
   }
 `;
 
-export const FooterBottom = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-`;
-
-export const Translator = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 1.12rem;
-  cursor: pointer;
-
-  h3 {
-    font-size: 1.5rem;
+export const LogoTitle = styled.h1`
+  font-family: var(--header-font-regular);
+  font-size: var(--header-size-subsection);
+  font-weight: 400;
+  background: var(--header-gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  line-height: 1;
+  
+  .italic {
+    font-family: var(--header-font-italic);
+    font-style: italic;
     font-weight: 400;
   }
-
+  
   @media (max-width: 768px) {
-    gap: 0.5rem;
+    font-size: var(--header-size-subsection-mobile);
+  }
+`;
 
-    h3 {
-      font-size: 0.875rem;
+export const NavSection = styled.div`
+  display: flex;
+  gap: 80px;
+  
+  @media (max-width: 768px) {
+    gap: 48px;
+  }
+`;
+
+export const NavColumn = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+`;
+
+export const NavTitle = styled.h4`
+  font-size: var(--text-base);
+  font-weight: 600;
+  color: rgba(239, 239, 239, 0.5);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+`;
+
+export const NavLinks = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  
+  a {
+    font-size: var(--text-base);
+    font-weight: 400;
+    color: rgba(239, 239, 239, 0.5);
+    text-decoration: none;
+      
+    &.active {
+      color: #efefef;
+    }
+    
+    &:hover,
+    &.active:hover {
+      color: #efefef;
+    }
+    
+    @media (max-width: 768px) {
+      font-size: var(--text-sm);
     }
   }
-`;
-
-export const CopyRight = styled.div`
-  font-size: 1rem;
-  font-weight: 400;
-  display: flex;
-  align-items: center;
-
+  
   @media (max-width: 768px) {
-    font-size: 0.875rem;
-    gap: 0.25rem;
+    gap: 8px;
   }
 `;
 
-export const ManifestoLinkContainer = styled.div`
+export const SocialSection = styled.div`
   display: flex;
   flex-direction: column;
   align-items: flex-end;
-  gap: 1rem;
-  justify-content: flex-end;
-  margin-top: 0;
-`;
-
-export const ManifestoLink = styled.a`
-  color: #ffffff;
-  font-size: 1rem;
-  font-weight: 400;
-  text-decoration: none;
-  padding: 0.75rem 1.25rem;
-  border-radius: 5px;
-  border: 1px solid #ffffff;
-  transition: all 0.3s ease;
+  gap: 24px;
   
-  &:hover {
-    background-color: #ffffff;
-    color: #000000;
+  @media (max-width: 768px) {
+    align-items: flex-end;
+    gap: 20px;
   }
 `;
 
-export const SignInButton = styled.button`
-  color: #ffffff;
-  font-size: 1rem;
-  font-weight: 400;
-  text-decoration: none;
-  padding: 0.75rem 1.25rem;
-  border-radius: 5px;
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  background: transparent;
-  cursor: pointer;
-  transition: all 0.3s ease;
+export const SocialLinks = styled.div`
+  display: flex;
+  gap: 20px;
   
-  &:hover {
-    background: rgba(255, 255, 255, 0.1);
+  a {
+    color: #efefef;
+    transition: color 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    
+    &:hover {
+      color: rgb(0, 140, 255);
+    }
+    
+    svg {
+      width: 32px;
+      height: 32px;
+      
+      @media (max-width: 768px) {
+        width: 24px;
+        height: 24px;
+      }
+    }
+  }
+
+  @media (max-width: 768px) {
+    gap: 12px;
   }
 `;
+
+export const NewsletterButton = styled.a`
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 30px;
+  border-radius: 24px;
+  background: linear-gradient(180deg, #0074e1 0%, #1f00ff 100%);
+  box-shadow: 0px 0px 30px 0px #7843ff, inset 0px 0px 8px 0px #efefef;
+  text-decoration: none;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  
+  span {
+    color: #efefef;
+    font-size: var(--text-xl);
+    font-weight: 400;
+  }
+  
+  svg {
+    color: #efefef;
+  }
+  
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0px 0px 40px 0px #7843ff, inset 0px 0px 8px 0px #efefef;
+  }
+  
+  @media (max-width: 768px) {
+    padding: 12px 20px;
+    border-radius: 16px;
+    
+    span {
+      font-size: var(--text-base);
+    }
+  }
+`;
+
+export const BottomSection = styled.div`
+  display: flex;
+  justify-content: center;
+  padding-top: 32px;
+  border-top: 1px solid rgba(239, 239, 239, 0.1);
+`;
+
+export const Copyright = styled.p`
+  font-size: var(--text-sm);
+  font-weight: 400;
+  color: rgba(239, 239, 239, 0.5);
+`;
+
+// Legacy exports
+export const Wrapper2 = styled.footer``;
+export const Inner2 = styled.div``;
+export const ItemContainer = styled.div``;
+export const LeftDiv = styled.div``;
+export const CenterDiv = styled.div``;
+export const RightDiv = styled.div``;
+export const Column = styled.div``;
+export const ColumnTitle = styled.div``;
+export const ColumnItem = styled.div``;

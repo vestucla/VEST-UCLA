@@ -2,135 +2,135 @@
 import { styled } from "styled-components";
 
 export const Wrapper = styled.section`
-  margin-top: 11.25rem;
-  background: #1a1a1a;
-  padding: 4rem 0;
-
+  width: 100%;
+  padding: 100px 0;
+  position: relative;
+  
   @media (max-width: 768px) {
-    margin-top: 6.25rem;
+    padding: 40px 0;
   }
 `;
 
 export const Inner = styled.div`
   width: 90%;
-  max-width: 1440px;
-  margin: 0 auto 8.25rem;
+  max-width: 1236px;
+  margin: 0 auto;
   display: flex;
   flex-direction: column;
-  align-items: center;
-
+  gap: 60px;
+  
   @media (max-width: 768px) {
-    margin-bottom: 6rem;
+    gap: 40px;
   }
 `;
 
-export const Header = styled.header`
+export const HeaderSection = styled.div`
   display: flex;
-  flex-direction: column;
   align-items: center;
-  gap: 1.5rem;
-  max-width: 56rem;
-  margin: 0 auto 7.75rem;
-  text-align: center;
-
-  h1 {
-    font-size: 4.75rem;
-    font-weight: 400;
-  }
-
-  p {
-    max-width: 41.75rem;
-    color: var(--link-color);
-    font-size: 1.25rem;
-    font-weight: 400;
-    line-height: 1.75rem;
-  }
-
+  justify-content: space-between;
+  gap: 60px;
+  
   @media (max-width: 768px) {
-    margin-bottom: 5rem;
-
-    h1 {
-      font-size: 2.25rem;
-    }
-
-    p {
-      font-size: 1rem;
-      line-height: 1.5rem;
-    }
+    flex-direction: column;
+    gap: 24px;
   }
 `;
 
-export const BannerCtn = styled.div`
-  margin-bottom: 5rem;
-  width: 100%;
-  position: relative;
-  width: 100%;
-  height: 38.4375rem;
-  overflow: hidden;
-  border-radius: 0.75rem;
-
-  img {
-    border-radius: 0.75rem;
-    object-fit: cover;
+export const HeaderTitle = styled.h2`
+  font-family: var(--header-font-regular);
+  font-size: var(--header-size-page);
+  font-weight: 400;
+  line-height: 1;
+  max-width: 594px;
+  flex-shrink: 0;
+  background: var(--header-gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  
+  .italic {
+    font-family: var(--header-font-italic);
+    font-style: italic;
+    font-weight: 400;
   }
-
+  
   @media (max-width: 768px) {
-    height: auto;
+    font-size: var(--header-size-page-mobile);
+    max-width: 100%;
   }
 `;
 
-export const Edges = styled.div`
+export const HeaderDescription = styled.p`
+  font-size: var(--text-xxl);
+  font-weight: 400;
+  line-height: 1.5;
+  color: #efefef;
+  max-width: 594px;
+  
+  @media (max-width: 768px) {
+    max-width: 100%;
+    font-size: var(--text-lg);
+  }
+`;
+
+export const CardsContainer = styled.div`
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 1.5rem;
-
+  gap: 32px;
+  
   @media (max-width: 768px) {
     grid-template-columns: 1fr;
-    gap: 2rem;
+    gap: 16px;
   }
 `;
 
-export const Edge = styled.div`
+export const Card = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 0.62rem;
-
-  p {
-    max-width: 26rem;
-    color: var(--link-color);
-    font-size: 1rem;
-    font-weight: 400;
-    line-height: 1.5rem;
-  }
-`;
-
-export const Title = styled.div`
-  display: flex;
-  gap: 0.5rem;
-  align-items: center;
-
-  h3 {
-    font-size: 1.5rem;
-    font-weight: 500;
-  }
-`;
-
-export const BriefNote = styled.div`
-  max-height: 54.75rem;
-  padding: 8.25rem 4.5rem;
-  background: var(--emerald);
-
-  p {
-    color: var(--Background, #070606);
-    font-size: 8rem;
-    font-weight: 400;
-    max-width: 1440px;
-  }
+  gap: 24px;
+  padding: 28px 30px;
+  border-radius: 24px;
+  background: linear-gradient(90deg, rgba(30, 70, 200, 0.2) 0%, rgba(50, 30, 110, 0.2) 100%);
+  box-shadow: inset 0px 0px 30px 0px rgba(239, 239, 239, 0.15);
+  position: relative;
 
   @media (max-width: 768px) {
-    padding: 2rem 1.5rem;
-    p {
-      font-size: 3.75rem;
-    }
+    padding: 20px;
+    gap: 16px;
   }
 `;
+
+export const CardIcon = styled.div`
+  color: rgb(0, 140, 255);
+`;
+
+export const CardTitle = styled.h3`
+  font-size: var(--text-xxl);
+  font-weight: 600;
+  line-height: 1.5;
+  color: #efefef;
+  
+  @media (max-width: 768px) {
+    font-size: var(--text-base);
+  }
+`;
+
+export const CardDescription = styled.p`
+  font-size: var(--text-base);
+  font-weight: 400;
+  line-height: 1.5;
+  color: rgba(239, 239, 239, 0.7);
+  
+  @media (max-width: 768px) {
+    font-size: var(--text-sm);
+  }
+`;
+
+// Legacy exports for backwards compatibility
+export const Header = styled.div``;
+export const HeaderContainer = styled.div``;
+export const Edges = styled.div``;
+export const Edge = styled.div``;
+export const Title = styled.div``;
+export const BriefNote = styled.div``;
+export const BannerCtn = styled.div``;

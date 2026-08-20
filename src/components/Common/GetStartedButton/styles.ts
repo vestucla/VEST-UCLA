@@ -11,14 +11,13 @@ export const LinkTo = styled(Link)`
   color: var(--white);
   font-size: 1rem;
   font-weight: 600;
-  transition: all 0.2s ease;
+  transition: all 0.3s ease;
 
   @media (max-width: 768px) {
-    width: 100%;
     padding: 1rem !important;
   }
 
   &:hover {
-    transform: translateY(-1px);
+    transform: translateY(-2px);
   }
 `;

@@ -1,6 +1,6 @@
 "use client";
-import { GetStartedButton } from "@/components/LandingPage";
 
+import { GetStartedButton } from "@/components/LandingPage";
 import Event from "@/components/ui/Event";
 import { events } from "@/data/events";
 import {

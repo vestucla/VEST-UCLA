@@ -1,57 +1,62 @@
 "use client";
 import Image from "next/image";
+import Link from "next/link";
+import { Rocket, ArrowRight } from "@phosphor-icons/react";
 import {
   Wrapper,
   Inner,
-  Pill,
-  HeroTextContainer,
-  ContentContainer,
-  Divider,
-  ImageContainer,
+  HeroContent,
+  HeroBadge,
+  HeroTitle,
+  HeroDescription,
+  HeroButton,
+  HeroImageContainer,
+  BackgroundGlow,
 } from "./styles";
-import ic_chevron_right from "../../../../public/svgs/ic_chevron_right.svg";
-import { GetStartedButton } from "@/components/LandingPage";
-import MaskText from "@/components/Common/MaskText";
-import { useIsMobile } from "../../../../libs/useIsMobile";
-import {
-  mobileParagraphPhrases,
-  mobilePhrases,
-  paragraphPhrases,
-  phrases,
-} from "./constants";
-import Spline from "@splinetool/react-spline";
 
 const HeroSection = () => {
-  const isMobile = useIsMobile();
   return (
     <Wrapper>
+      <BackgroundGlow />
       <Inner>
-        <ContentContainer>
-          <div className="left-content">
-            <Pill>
-              <span>Introducing UCLA&apos;s Premier VC/Startup Club</span>
-              <Image src={ic_chevron_right} alt="chevron-right" />
-            </Pill>
-            <HeroTextContainer>
-              {isMobile ? (
-                <>
-                  <MaskText phrases={mobilePhrases} tag="h1" />
-                  <MaskText phrases={mobileParagraphPhrases} tag="p" />
-                </>
-              ) : (
-                <>
-                  <MaskText phrases={phrases} tag="h1" />
-                  <MaskText phrases={paragraphPhrases} tag="p" />
-                </>
-              )}
-            </HeroTextContainer>
-            <GetStartedButton padding="1rem 2rem" />
-          </div>
-          <Divider />
-          <ImageContainer>
-            <Spline scene="https://prod.spline.design/84fjfvzP2Mn0uFeQ/scene.splinecode" />
-          </ImageContainer>
-        </ContentContainer>
+        <HeroContent>
+          <HeroBadge>
+            <Rocket size={16}/>
+            <span>UCLA&apos;s Builder/Startup Community</span>
+          </HeroBadge>
+          
+          <HeroTitle>
+            Build the<span className="italic"> Future.</span>
+          </HeroTitle>
+          
+          <HeroDescription>
+            Cultivating a startup ecosystem at UCLA.
+            <br />
+            A community of builders.
+          </HeroDescription>
+          
+          <Link href="/about" passHref>
+            <HeroButton>
+              <span>What We Do</span>
+              <ArrowRight size={20} weight="bold" />
+            </HeroButton>
+          </Link>
+        </HeroContent>
+        
+        <HeroImageContainer>
+          <Image
+            src="/images/VEST-Glass-Trans.png"
+            alt="VEST 3D Glass Logo"
+            width={600}
+            height={665}
+            priority
+            style={{
+              width: "100%",
+              height: "auto",
+              objectFit: "contain",
+            }}
+          />
+        </HeroImageContainer>
       </Inner>
     </Wrapper>
   );

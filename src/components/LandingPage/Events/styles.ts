@@ -15,7 +15,6 @@ export const Wrapper = styled.section`
   }
 `;
 
-
 export const Inner = styled.div`
   width: 90%;
   max-width: 1236px;
@@ -285,7 +284,6 @@ export const EventDate = styled.span`
   font-weight: 400;
   color: rgba(239, 239, 239, 0.5);
 `;
-
 
 export const FooterWrapper = styled.div`
   margin-top: 80px;

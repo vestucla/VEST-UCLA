@@ -1,62 +1,78 @@
-'use client';
-import { styled } from 'styled-components';
+"use client";
+import { styled } from "styled-components";
 
 export const Wrapper = styled.section`
-  padding: 4rem 0;
-  background: var(--Background);
+  width: 100%;
+  padding: 80px 0;
+  position: relative;
+  overflow: hidden;
+  
+  @media (max-width: 768px) {
+    padding: 60px 0;
+  }
 `;
 
 export const Inner = styled.div`
+  width: 100%;
+  max-width: 1440px;
+  margin: 0 auto;
   display: flex;
   flex-direction: column;
   align-items: center;
-  max-width: 1440px;
-  width: 90%;
-  margin: 0 auto;
-
-  h2 {
-    color: var(--link-color);
-    font-size: 1.25rem;
-    font-weight: 500;
-    text-transform: uppercase;
-    margin-bottom: 2rem;
-    text-align: center;
-  }
-
+  gap: 60px;
+  
   @media (max-width: 768px) {
-    h2 {
-      font-size: 1rem;
-    }
+    gap: 40px;
   }
 `;
 
-export const ImageContainer = styled.div`
-  overflow: hidden;
-  width: 100%;
+export const Title = styled.h2`
+  font-family: var(--header-font-regular);
+  font-size: var(--header-size-subsection);
+  font-weight: 400;
+  background: var(--header-gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 16px;
+  width: 500px;
+  line-height: 1;
+  text-align: center;
+  
+  .italic {
+    font-family: var(--header-font-italic);
+    font-style: italic;
+    font-weight: 400;
+  }
+  
+  @media (max-width: 768px) {
+    font-size: var(--header-size-subsection-mobile);
+    width: 100%;
+    margin-bottom: 0;
+  }
 `;
 
-export const ScrollingWrapper = styled.div`
-  display: flex;
-  height: 100%;
-  width: fit-content;
-  animation: scroll 20s linear infinite;
-
-  .scroll-group {
-    height: 100%;
+export const LogoTrack = styled.div`
+  width: 100%;
+  overflow: hidden;
+  
+  .logo-slider {
     display: flex;
+    gap: 0;
     align-items: center;
   }
-
-  @keyframes scroll {
-    0% {
-      transform: translateX(0);
+  
+  .logo-banner {
+    height: 84px;
+    width: auto;
+    object-fit: contain;
+    flex-shrink: 0;
+    
+    @media (max-width: 768px) {
+      height: 48px;
     }
-    100% {
-      transform: translateX(-33.333%);
-    }
-  }
-
-  &:hover {
-    animation-play-state: paused;
   }
 `;
+
+// Legacy export
+export const ImageContainer = styled.div``;

@@ -21,8 +21,8 @@ export const menu = {
 };
 export const links = [
   {
-    url: "/timeline",
-    linkTo: "Timeline",
+    url: "/",
+    linkTo: "Home",
   },
   {
     url: "/team",
@@ -37,7 +37,11 @@ export const links = [
     linkTo: "FAQ",
   },
   {
-    url: "/work-with-us",
-    linkTo: "Work with Us",
+    url: "/about",
+    linkTo: "About",
+  },
+  {
+    url: "/join",
+    linkTo: "Join Us",
   },
 ];

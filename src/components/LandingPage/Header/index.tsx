@@ -5,27 +5,28 @@ import {
   Wrapper,
   Inner,
   LogoContainer,
-  Nav,
-  MobileNavLink,
   CallToActions,
+  NavMenu,
+  NavLink,
   BurgerMenu,
   MobileOverlay,
   MobileMenu,
 } from "./styles";
 import { GetStartedButton } from "@/components/LandingPage";
-import AnimatedLink from "@/components/Common/AnimatedLink";
 import { useState, useEffect } from "react";
 import { links } from "./constants";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 const Header = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const pathname = usePathname();
 
   useEffect(() => {
     if (isOpen) {
-      document.body.style.overflow = 'hidden';
+      document.body.style.overflow = "hidden";
     } else {
-      document.body.style.overflow = 'unset';
+      document.body.style.overflow = "unset";
     }
   }, [isOpen]);
 
@@ -35,34 +36,39 @@ const Header = () => {
     <Wrapper>
       <Inner>
         <LogoContainer>
-          <Link href="/">
+          <Link href="/" className="mobile-logo">
             <Image
-              src="https://fg5si9hh45.ufs.sh/f/S5FODHw5IM4mHzO2YaA3KchNgqDrHkFn5i2GJTb6Aove8Rp1"
-              width={70}
-              height={70}
+              src="/images/VEST-logo-white.svg"
+              width={48}
+              height={48}
               alt="VEST logo"
               priority
             />
           </Link>
-          <BurgerMenu onClick={() => setIsOpen(!isOpen)} className={isOpen ? 'open' : ''}>
+          <BurgerMenu onClick={() => setIsOpen(!isOpen)} className={isOpen ? "open" : ""}>
             <span />
             <span />
             <span />
           </BurgerMenu>
         </LogoContainer>
 
-        <MobileOverlay className={isOpen ? 'active' : ''} onClick={closeMenu} />
-        <MobileMenu className={isOpen ? 'active' : ''}>
-          <Nav>
-            {links.map((link) => (
-              <MobileNavLink key={link.url} href={link.url} onClick={closeMenu}>
+        <MobileOverlay className={isOpen ? "active" : ""} onClick={closeMenu} />
+        <MobileMenu className={isOpen ? "active" : ""}>
+          <nav>
+            {links.map((link, i) => (
+              <Link
+                key={i}
+                href={link.url}
+                className={pathname === link.url ? "active" : ""}
+                onClick={closeMenu}
+              >
                 {link.linkTo}
-              </MobileNavLink>
+              </Link>
             ))}
-            <MobileNavLink href="/hire" onClick={closeMenu}>
+            <Link href="/hire" onClick={closeMenu}>
               Hire Us
-            </MobileNavLink>
-          </Nav>
+            </Link>
+          </nav>
           <CallToActions>
             <a
               href="https://discord.gg/PTGgbFvm9t"
@@ -77,14 +83,20 @@ const Header = () => {
           </CallToActions>
         </MobileMenu>
 
-        <Nav className="desktop">
-          {links.map((link) => (
-            <AnimatedLink key={link.url} title={link.linkTo} url={link.url} />
+        <NavMenu className="desktop">
+          {links.map((link, i) => (
+            <NavLink
+              key={i}
+              href={link.url}
+              className={pathname === link.url ? "active" : ""}
+            >
+              {link.linkTo}
+            </NavLink>
           ))}
-          <Link href="/hire" className="text-white hover:text-gray-300 transition-colors">
+          <NavLink href="/hire" className={pathname === "/hire" ? "active" : ""}>
             Hire Us
-          </Link>
-        </Nav>
+          </NavLink>
+        </NavMenu>
         <CallToActions className="desktop">
           <a
             href="https://discord.gg/PTGgbFvm9t"
