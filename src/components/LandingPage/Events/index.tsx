@@ -1,7 +1,8 @@
 "use client";
 
+import Image from "next/image";
+import { ChevronRight } from "lucide-react";
 import Event from "@/components/ui/Event";
-import Footer from "@/components/LandingPage/Footer";
 import { events } from "@/data/events";
 import {
   Wrapper,
@@ -9,13 +10,18 @@ import {
   ContentContainer,
   EventsHeader,
   EventsGrid,
-  FooterWrapper,
   BackgroundGlow,
   EventsText,
   EventsTitle,
-  TopRow,
   BlurCircle,
-  TextContainer
+  TextContainer,
+  TechWeekSection,
+  TechWeekContent,
+  TechWeekDescription,
+  TechWeekFooter,
+  TechWeekLogo,
+  TechWeekApplyLink,
+  TechWeekButtonRow,
 } from "./styles";
 
 const Events = () => {
@@ -34,6 +40,38 @@ const Events = () => {
               <p>Our events are where insight meets connection, and big ideas begin.</p>
             </EventsText>
           </TextContainer>
+          <TechWeekSection>
+            <TechWeekContent>
+              <EventsTitle>LA Tech Week Product Demo Application</EventsTitle>
+              <TechWeekDescription>
+                <p>
+                  VEST is hosting for LA Tech Week and we&apos;re looking for 5 founders to
+                  demo their products during our event. Interested in hiring great student
+                  talent and showcasing your company to 100+ people? Now&apos;s your chance!
+                </p>
+              </TechWeekDescription>
+            </TechWeekContent>
+            <TechWeekFooter>
+              <TechWeekLogo>
+                <Image
+                  src="/images/techweek-la-black.svg"
+                  alt="LA Tech Week"
+                  width={1400}
+                  height={515}
+                />
+              </TechWeekLogo>
+              <TechWeekButtonRow>
+                <TechWeekApplyLink
+                  href="https://forms.gle/Tmy8LE2M2KPLp5tX6"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <span>Apply Here</span>
+                  <ChevronRight size={18} />
+                </TechWeekApplyLink>
+              </TechWeekButtonRow>
+            </TechWeekFooter>
+          </TechWeekSection>
           <EventsGrid>
             {events.map((event) => (
               <Event

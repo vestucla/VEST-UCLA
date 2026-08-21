@@ -1,7 +1,6 @@
 "use client";
 import Image from "next/image";
-import Link from "next/link";
-import { Rocket, ArrowRight } from "@phosphor-icons/react";
+import { Rocket } from "@phosphor-icons/react";
 import {
   Wrapper,
   Inner,
@@ -9,7 +8,6 @@ import {
   HeroBadge,
   HeroTitle,
   HeroDescription,
-  HeroButton,
   HeroImageContainer,
   BackgroundGlow,
 } from "./styles";
@@ -34,13 +32,6 @@ const HeroSection = () => {
             <br />
             A community of builders.
           </HeroDescription>
-          
-          <Link href="/about" passHref>
-            <HeroButton>
-              <span>What We Do</span>
-              <ArrowRight size={20} weight="bold" />
-            </HeroButton>
-          </Link>
         </HeroContent>
         
         <HeroImageContainer>

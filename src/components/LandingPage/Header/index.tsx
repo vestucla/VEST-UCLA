@@ -5,12 +5,14 @@ import {
   Wrapper,
   Inner,
   LogoContainer,
+  CallToActions,
   NavMenu,
   NavLink,
   BurgerMenu,
   MobileOverlay,
   MobileMenu,
 } from "./styles";
+import { GetStartedButton } from "@/components/LandingPage";
 import { useState, useEffect } from "react";
 import { links } from "./constants";
 import Link from "next/link";
@@ -22,9 +24,9 @@ const Header = () => {
 
   useEffect(() => {
     if (isOpen) {
-      document.body.style.overflow = 'hidden';
+      document.body.style.overflow = "hidden";
     } else {
-      document.body.style.overflow = 'unset';
+      document.body.style.overflow = "unset";
     }
   }, [isOpen]);
 
@@ -43,40 +45,51 @@ const Header = () => {
               priority
             />
           </Link>
-          <BurgerMenu onClick={() => setIsOpen(!isOpen)} className={isOpen ? 'open' : ''}>
+          <BurgerMenu onClick={() => setIsOpen(!isOpen)} className={isOpen ? "open" : ""}>
             <span />
             <span />
             <span />
           </BurgerMenu>
         </LogoContainer>
 
-        <MobileOverlay className={isOpen ? 'active' : ''} onClick={closeMenu} />
-        <MobileMenu className={isOpen ? 'active' : ''}>
+        <MobileOverlay className={isOpen ? "active" : ""} onClick={closeMenu} />
+        <MobileMenu className={isOpen ? "active" : ""}>
           <nav>
             {links.map((link, i) => (
-              <Link 
-                key={i} 
+              <Link
+                key={i}
                 href={link.url}
-                className={pathname === link.url ? 'active' : ''}
+                className={pathname === link.url ? "active" : ""}
                 onClick={closeMenu}
               >
                 {link.linkTo}
               </Link>
             ))}
           </nav>
+          <CallToActions>
+            <a
+              href="https://discord.gg/PTGgbFvm9t"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="discord-btn"
+              onClick={closeMenu}
+            >
+              Join Discord
+            </a>
+            <GetStartedButton padding="0.75rem" />
+          </CallToActions>
         </MobileMenu>
 
         <NavMenu className="desktop">
           {links.map((link, i) => (
-            <NavLink 
-              key={i} 
+            <NavLink
+              key={i}
               href={link.url}
-              className={pathname === link.url ? 'active' : ''}
+              className={pathname === link.url ? "active" : ""}
             >
               {link.linkTo}
             </NavLink>
           ))}
-          
         </NavMenu>
       </Inner>
     </Wrapper>
