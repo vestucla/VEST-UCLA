@@ -7,6 +7,8 @@ import {
   Title,
   ViewAllLink,
   EventsGrid,
+  BottomCtaRow,
+  ApplyLink,
 } from "./styles";
 import { events } from "@/data/events";
 import Event from "@/components/ui/Event";
@@ -42,6 +44,12 @@ const Recent = () => {
             />
           ))}
         </EventsGrid>
+        <BottomCtaRow>
+          <ApplyLink href="/events">
+            <span>Apply to LA Tech Week Product Demo</span>
+            <ArrowRight size={20} weight="bold" />
+          </ApplyLink>
+        </BottomCtaRow>
       </Inner>
     </Wrapper>
   );

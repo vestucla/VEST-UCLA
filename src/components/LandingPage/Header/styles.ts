@@ -72,6 +72,7 @@ export const NavMenu = styled.nav`
   display: flex;
   align-items: center;
   gap: 32px;
+  margin-left: auto;
   padding: 16px 32px;
   border-radius: 24px;
   border: 2px solid #1f00ff;
@@ -221,6 +222,73 @@ export const MobileMenu = styled.div`
   }
 `;
 
-// Legacy exports
-export const Nav = styled.div``;
-export const AbsoluteLinks = styled(Link)``;
+export const AbsoluteLinks = styled(Link)`
+  position: absolute;
+  top: 40px;
+  color: var(--link-color);
+  font-size: 1rem;
+  font-weight: 400;
+`;
+
+export const CallToActions = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+
+  .discord-btn {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 0.5rem 0.75rem;
+    border-radius: 6.25rem;
+    background: #5865f2;
+    color: var(--white);
+    font-size: 1rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.2s ease;
+
+    &:hover {
+      background: #4752c4;
+    }
+  }
+
+  @media (max-width: 768px) {
+    &.desktop {
+      display: none;
+    }
+
+    position: static;
+    margin-top: 3rem;
+    flex-direction: column;
+    gap: 1rem;
+    width: 100%;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    padding-top: 2rem;
+
+    .discord-btn, button {
+      width: 100%;
+      text-align: center;
+      padding: 1rem;
+      font-size: 1rem;
+      color: white;
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+      border-radius: 6.25rem;
+      transition: all 0.2s ease;
+      
+      &:hover {
+        transform: translateY(-1px);
+      }
+    }
+
+    .discord-btn {
+      background: rgba(88, 101, 242, 0.9);
+      
+      &:hover {
+        background: #5865f2;
+      }
+    }
+  }
+`;

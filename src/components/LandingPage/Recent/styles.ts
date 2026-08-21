@@ -105,6 +105,51 @@ export const EventsGrid = styled.div`
   }
 `;
 
+export const BottomCtaRow = styled.div`
+  display: flex;
+  justify-content: center;
+  width: 100%;
+`;
+
+export const ApplyLink = styled(Link)`
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 30px;
+  border-radius: 24px;
+  background: linear-gradient(180deg, #0074e1 0%, #1f00ff 100%);
+  box-shadow: 0px 0px 30px 0px #7843ff, inset 0px 0px 8px 0px #efefef;
+  text-decoration: none;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  
+  span {
+    color: #efefef;
+    font-size: var(--text-xl);
+    font-weight: 400;
+  }
+  
+  svg {
+    color: #efefef;
+  }
+  
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0px 0px 40px 0px #7843ff, inset 0px 0px 8px 0px #efefef;
+  }
+  
+  @media (max-width: 768px) {
+    width: 100%;
+    justify-content: center;
+    padding: 12px 20px;
+    border-radius: 16px;
+    
+    span {
+      font-size: var(--text-base);
+      text-align: center;
+    }
+  }
+`;
+
 export const EventCard = styled.div`
   display: flex;
   flex-direction: column;
