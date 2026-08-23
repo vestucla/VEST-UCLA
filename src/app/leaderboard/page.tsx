@@ -24,7 +24,10 @@ type LeaderboardEntry = {
   points: number;
 };
 
-async function getLeaderboard(): Promise<LeaderboardEntry[]> {
+async function getLeaderboard(): Promise<{
+  entries: LeaderboardEntry[];
+  failed: boolean;
+}> {
   noStore();
   const { data, error } = await getSupabaseClient()
     .from("leaderboard")
@@ -33,14 +36,14 @@ async function getLeaderboard(): Promise<LeaderboardEntry[]> {
 
   if (error) {
     console.error("Error fetching leaderboard:", error);
-    return [];
+    return { entries: [], failed: true };
   }
 
-  return (data ?? []) as LeaderboardEntry[];
+  return { entries: (data ?? []) as LeaderboardEntry[], failed: false };
 }
 
 export default async function LeaderboardPage() {
-  const leaderboard = await getLeaderboard();
+  const { entries: leaderboard, failed } = await getLeaderboard();
 
   return (
     <div className="mx-auto flex min-h-[60vh] max-w-3xl items-center justify-center px-4 pt-32 pb-16">
@@ -54,7 +57,11 @@ export default async function LeaderboardPage() {
           </CardDescription>
         </CardHeader>
         <CardContent className="pt-4">
-          {leaderboard.length === 0 ? (
+          {failed ? (
+            <p className="text-center text-sm text-red-400">
+              Failed to load the leaderboard. Please try again later.
+            </p>
+          ) : leaderboard.length === 0 ? (
             <p className="text-center text-sm text-neutral-400">
               No leaderboard data available yet.
             </p>
