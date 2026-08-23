@@ -73,6 +73,3 @@ export const LogoTrack = styled.div`
     }
   }
 `;
-
-// Legacy export
-export const ImageContainer = styled.div``;

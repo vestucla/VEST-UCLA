@@ -56,7 +56,3 @@ export const ImageCard = styled.div`
     border-radius: 24px;
   }
 `;
-
-// Legacy exports
-export const Subtitle = styled.p``;
-export const ImageContainer = styled.div``;
