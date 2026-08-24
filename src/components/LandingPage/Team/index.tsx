@@ -21,7 +21,7 @@ import {
   TeamTitle
 } from "./styles";
 
-// Sample board members data
+// Board members data
 const boardMembers = [
   { id: 1, firstName: "Kiersten", lastName: "Roth", role: "President", imageSrc: "/images/Headshots/Kiersten-Roth.jpg" },
   { id: 2, firstName: "Shloak", lastName: "Rathod", role: "External Vice President", imageSrc: "/images/Headshots/Shloak-Rathod.jpg" },

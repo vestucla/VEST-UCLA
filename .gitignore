@@ -27,6 +27,9 @@ yarn-error.log*
 # local env files
 .env*.local
 
+# service account keys
+scripts/service-account.json
+
 # vercel
 .vercel
 
@@ -36,7 +39,10 @@ next-env.d.ts
 
 .env
 
-src/db/.env
-src/db/node_modules
 # clerk configuration (can include secrets)
 /.clerk/
+
+# AI agent folders
+.agents/
+.claude/
+skills-lock.json

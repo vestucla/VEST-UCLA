@@ -1,0 +1,102 @@
+// Data access layer for the member portal (read helpers for UI).
+// Mutations go through MembersOrm / MembersAdminOrm.
+
+import type { Member, MemberStatus } from "@/data/members";
+import { MembersOrm, toMember } from "@/lib/orm/members";
+
+export type { Member, MemberStatus } from "@/data/members";
+
+export async function getAllMembers(): Promise<Member[]> {
+  const docs = await MembersOrm.findAll();
+  return docs.map(toMember);
+}
+
+export async function getMembersByStatus(
+  status: MemberStatus
+): Promise<Member[]> {
+  const members = await getAllMembers();
+  return members.filter((m) => m.status === status);
+}
+
+export async function getMember(idOrSlug: string): Promise<Member | null> {
+  const byUuid = await MembersOrm.findByUuid(idOrSlug);
+  if (byUuid) {
+    const contact = await MembersOrm.findContactByUuid(byUuid.uuid);
+    return toMember({ ...byUuid, phone: contact?.phone });
+  }
+
+  const allMembers = await getAllMembers();
+  const match = allMembers.find(
+    (m) => m.id.toLowerCase() === idOrSlug.toLowerCase()
+  );
+  if (!match) return null;
+  const contact = await MembersOrm.findContactByUuid(match.uuid);
+  return { ...match, phone: contact?.phone };
+}
+
+export interface MemberSearchOptions {
+  query?: string;
+  companies?: string[];
+  interests?: string[];
+  status?: MemberStatus;
+}
+
+export async function searchMembers(
+  opts: MemberSearchOptions = {}
+): Promise<Member[]> {
+  const q = opts.query?.trim().toLowerCase();
+  const companySet = opts.companies?.length ? new Set(opts.companies) : null;
+  const interestSet = opts.interests?.length ? new Set(opts.interests) : null;
+
+  const members = await getAllMembers();
+  return members.filter((m) => {
+    if (opts.status && m.status !== opts.status) return false;
+
+    if (q) {
+      const haystack = [
+        m.firstName,
+        m.lastName,
+        m.vestTitle ?? "",
+        m.bio ?? "",
+        m.major ?? "",
+        m.city ?? "",
+        m.currentlyWorkingOn ?? "",
+        ...m.interests,
+        ...m.experiences.flatMap((e) => [
+          e.company,
+          e.role,
+          e.description ?? "",
+        ]),
+      ]
+        .join(" ")
+        .toLowerCase();
+      if (!haystack.includes(q)) return false;
+    }
+
+    if (companySet) {
+      const hit = m.experiences.some((e) => companySet.has(e.company));
+      if (!hit) return false;
+    }
+
+    if (interestSet) {
+      const hit = m.interests.some((i) => interestSet.has(i));
+      if (!hit) return false;
+    }
+
+    return true;
+  });
+}
+
+export async function getAllCompanies(): Promise<string[]> {
+  const members = await getAllMembers();
+  const set = new Set<string>();
+  for (const m of members) for (const e of m.experiences) set.add(e.company);
+  return Array.from(set).sort();
+}
+
+export async function getAllInterests(): Promise<string[]> {
+  const members = await getAllMembers();
+  const set = new Set<string>();
+  for (const m of members) for (const i of m.interests) set.add(i);
+  return Array.from(set).sort();
+}
