@@ -168,8 +168,3 @@ export const HeroImageContainer = styled.div`
     transform: rotate(0deg);
   }
 `;
-
-// Legacy exports for backwards compatibility
-export const ContentContainer = styled.div``;
-export const HeroTextContainer = styled.div``;
-export const BlurCircle = styled.div``;

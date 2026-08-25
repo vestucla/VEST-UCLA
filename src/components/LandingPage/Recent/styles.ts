@@ -202,7 +202,3 @@ export const EventDate = styled.span`
   font-weight: 400;
   color: rgba(239, 239, 239, 0.5);
 `;
-
-// Legacy exports
-export const EventsContainer = styled.div``;
-export const Subtitle = styled.p``;

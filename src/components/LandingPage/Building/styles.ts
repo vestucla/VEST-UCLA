@@ -125,12 +125,3 @@ export const CardDescription = styled.p`
     font-size: var(--text-sm);
   }
 `;
-
-// Legacy exports for backwards compatibility
-export const Header = styled.div``;
-export const HeaderContainer = styled.div``;
-export const Edges = styled.div``;
-export const Edge = styled.div``;
-export const Title = styled.div``;
-export const BriefNote = styled.div``;
-export const BannerCtn = styled.div``;

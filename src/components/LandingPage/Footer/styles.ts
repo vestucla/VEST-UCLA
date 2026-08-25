@@ -218,14 +218,3 @@ export const Copyright = styled.p`
   font-weight: 400;
   color: rgba(239, 239, 239, 0.5);
 `;
-
-// Legacy exports
-export const Wrapper2 = styled.footer``;
-export const Inner2 = styled.div``;
-export const ItemContainer = styled.div``;
-export const LeftDiv = styled.div``;
-export const CenterDiv = styled.div``;
-export const RightDiv = styled.div``;
-export const Column = styled.div``;
-export const ColumnTitle = styled.div``;
-export const ColumnItem = styled.div``;
