@@ -37,34 +37,68 @@ function parseStatus(value: unknown): MemberStatus {
   return value === MemberStatus.Alumni ? MemberStatus.Alumni : MemberStatus.Active;
 }
 
+function parseString(value: unknown): string | undefined {
+  return typeof value === "string" ? value : undefined;
+}
+
+function parseStringArray(value: unknown): string[] {
+  return Array.isArray(value)
+    ? value.filter((item): item is string => typeof item === "string")
+    : [];
+}
+
+function parseExperiences(value: unknown): Experience[] {
+  if (!Array.isArray(value)) return [];
+  return value.flatMap((item) => {
+    if (!item || typeof item !== "object" || Array.isArray(item)) return [];
+    const experience = item as Record<string, unknown>;
+    if (
+      typeof experience.company !== "string" ||
+      typeof experience.role !== "string"
+    ) {
+      return [];
+    }
+    return [{
+      company: experience.company,
+      role: experience.role,
+      startDate: parseString(experience.startDate),
+      endDate: parseString(experience.endDate),
+      description: parseString(experience.description),
+    }];
+  });
+}
+
 export function toMemberDoc(
   uuid: string,
   data: Record<string, unknown>
 ): MemberDoc {
   return {
     uuid,
-    email: (data.email as string) ?? "",
-    firstName: data.firstName as string | undefined,
-    lastName: data.lastName as string | undefined,
+    email: parseString(data.email) ?? "",
+    firstName: parseString(data.firstName),
+    lastName: parseString(data.lastName),
     role: data.role ? parseRole(data.role) : undefined,
     status: data.status ? parseStatus(data.status) : undefined,
-    profileCompleted: data.profileCompleted as boolean | undefined,
-    createdAt: data.createdAt as string | undefined,
+    profileCompleted:
+      typeof data.profileCompleted === "boolean"
+        ? data.profileCompleted
+        : undefined,
+    createdAt: parseString(data.createdAt),
     vestTitle: parseVestTitle(data.vestTitle),
-    classYear: data.classYear as string | undefined,
-    joinedYear: data.joinedYear as string | undefined,
+    classYear: parseString(data.classYear),
+    joinedYear: parseString(data.joinedYear),
     joinedQuarter: parseJoinedQuarter(data.joinedQuarter),
     imageSrc: typeof data.imageSrc === "string" ? data.imageSrc : undefined,
-    bio: data.bio as string | undefined,
-    interests: (data.interests as string[]) ?? [],
-    experiences: (data.experiences as Experience[]) ?? [],
-    currentlyWorkingOn: data.currentlyWorkingOn as string | undefined,
-    major: data.major as string | undefined,
-    city: data.city as string | undefined,
-    linkedin: data.linkedin as string | undefined,
-    twitter: data.twitter as string | undefined,
-    github: data.github as string | undefined,
-    website: data.website as string | undefined,
+    bio: parseString(data.bio),
+    interests: parseStringArray(data.interests),
+    experiences: parseExperiences(data.experiences),
+    currentlyWorkingOn: parseString(data.currentlyWorkingOn),
+    major: parseString(data.major),
+    city: parseString(data.city),
+    linkedin: parseString(data.linkedin),
+    twitter: parseString(data.twitter),
+    github: parseString(data.github),
+    website: parseString(data.website),
   };
 }
 
