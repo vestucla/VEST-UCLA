@@ -24,7 +24,8 @@ async function verifyMember(token: string): Promise<{ email: string } | null> {
     if (!member) return null;
 
     return { email };
-  } catch {
+  } catch (err) {
+    console.error("[upload/image] Firebase verification failed:", err);
     return null;
   }
 }

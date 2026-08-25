@@ -23,7 +23,8 @@ async function verifyUserAndGetEmail(
     if (!member) return null;
 
     return { email, isAdmin: member.role === MemberRole.Admin };
-  } catch {
+  } catch (err) {
+    console.error("[update] Firebase verification failed:", err);
     return null;
   }
 }
