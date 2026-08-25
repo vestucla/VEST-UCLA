@@ -29,6 +29,33 @@ const emptyExperience: ExperienceItem = {
   description: "",
 };
 
+type ApiResponse = {
+  url?: unknown;
+  error?: unknown;
+};
+
+async function readApiResponse(res: Response): Promise<ApiResponse> {
+  const text = await res.text();
+
+  try {
+    const data: unknown = JSON.parse(text);
+    if (data && typeof data === "object") {
+      return data as ApiResponse;
+    }
+  } catch {
+    const detail = text.trim().slice(0, 160);
+    throw new Error(
+      `Request failed (${res.status})${detail ? `: ${detail}` : ""}`
+    );
+  }
+
+  return {};
+}
+
+function getApiError(data: ApiResponse, fallback: string): string {
+  return typeof data.error === "string" ? data.error : fallback;
+}
+
 export default function EditProfilePage({ params }: Params) {
   const { user, isAdmin, loading } = useAuth();
   const router = useRouter();
@@ -175,8 +202,8 @@ export default function EditProfilePage({ params }: Params) {
         body: formData,
       });
 
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Upload failed");
+      const data = await readApiResponse(res);
+      if (!res.ok) throw new Error(getApiError(data, "Upload failed"));
       if (
         typeof data.url !== "string" ||
         (!data.url.startsWith("https://") && !data.url.startsWith("http://"))
@@ -259,8 +286,8 @@ export default function EditProfilePage({ params }: Params) {
 
       clearTimeout(timeoutId);
 
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Failed to save");
+      const data = await readApiResponse(res);
+      if (!res.ok) throw new Error(getApiError(data, "Failed to save"));
 
       toast.success("Profile saved!");
       router.push(`/members/${params.slug}`);

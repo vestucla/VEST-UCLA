@@ -17,9 +17,21 @@ let app: FirebaseApp | null = null;
 
 export function getFirebaseApp(): FirebaseApp {
   if (app) return app;
-  if (!firebaseConfig.apiKey) {
+  const requiredKeys = [
+    "apiKey",
+    "authDomain",
+    "projectId",
+    "storageBucket",
+    "messagingSenderId",
+    "appId",
+  ] as const;
+  const missingKeys = requiredKeys.filter((key) => !firebaseConfig[key]);
+
+  if (missingKeys.length > 0) {
     throw new Error(
-      "Firebase client config is missing. Add NEXT_PUBLIC_FIREBASE_* env vars to .env.local."
+      `Firebase client config is incomplete. Missing: ${missingKeys
+        .map((key) => `NEXT_PUBLIC_FIREBASE_${key}`)
+        .join(", ")}`
     );
   }
   app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
