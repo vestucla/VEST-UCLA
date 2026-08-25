@@ -20,7 +20,7 @@
     "cloudinary": "^2.10.0",
     "clsx": "^2.0.0",
     "firebase": "^12.16.0",
-    "firebase-admin": "^14.1.0",
+    "firebase-admin": "^13.10.0",
     "framer-motion": "^10.16.16",
     "geist": "^1.5.1",
     "lucide-react": "^0.298.0",
@@ -51,6 +51,8 @@
   "packageManager": "pnpm@10.14.0",
   "pnpm": {
     "onlyBuiltDependencies": [
+      "@firebase/util",
+      "protobufjs",
       "sharp",
       "unrs-resolver"
     ]
