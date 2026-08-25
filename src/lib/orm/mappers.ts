@@ -54,7 +54,7 @@ export function toMemberDoc(
     classYear: data.classYear as string | undefined,
     joinedYear: data.joinedYear as string | undefined,
     joinedQuarter: parseJoinedQuarter(data.joinedQuarter),
-    imageSrc: data.imageSrc as string | undefined,
+    imageSrc: typeof data.imageSrc === "string" ? data.imageSrc : undefined,
     bio: data.bio as string | undefined,
     interests: (data.interests as string[]) ?? [],
     experiences: (data.experiences as Experience[]) ?? [],
