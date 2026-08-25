@@ -120,8 +120,15 @@ export async function POST(req: NextRequest) {
       }
     }
 
+    if ("imageSrc" in updateData && typeof updateData.imageSrc !== "string") {
+      return NextResponse.json(
+        { error: "imageSrc must be a URL string (upload the image first)" },
+        { status: 400 }
+      );
+    }
+
     if (typeof updateData.imageSrc === "string" && updateData.imageSrc.length > 0) {
-      const src = updateData.imageSrc as string;
+      const src = updateData.imageSrc;
       if (!src.startsWith("https://") && !src.startsWith("http://")) {
         return NextResponse.json(
           {

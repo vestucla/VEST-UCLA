@@ -177,9 +177,15 @@ export default function EditProfilePage({ params }: Params) {
 
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Upload failed");
+      if (
+        typeof data.url !== "string" ||
+        (!data.url.startsWith("https://") && !data.url.startsWith("http://"))
+      ) {
+        throw new Error("Upload service returned an invalid image URL");
+      }
 
       URL.revokeObjectURL(previewUrl);
-      setImageSrc(data.url as string);
+      setImageSrc(data.url);
       toast.success("Photo uploaded");
     } catch (err) {
       console.error("Upload error:", err);
