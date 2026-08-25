@@ -6,6 +6,7 @@ import {
   type Experience,
   VestTitle,
   JoinedQuarter,
+  normalizeEmail,
 } from "@/data/members";
 import { toMemberDoc } from "@/lib/orm/mappers";
 
@@ -37,13 +38,21 @@ export const MembersAdminOrm = {
   },
 
   async findByEmail(email: string): Promise<MemberDoc | null> {
-    const snap = await getAdminDb()
-      .collection(COLLECTION)
-      .where("email", "==", email)
-      .get();
-    if (snap.empty) return null;
-    const d = snap.docs[0];
-    return toMemberDoc(d.id, d.data() as Record<string, unknown>);
+    const db = getAdminDb();
+    const candidates = [normalizeEmail(email)];
+    // Documents created before emails were normalized keep their original casing.
+    if (!candidates.includes(email)) candidates.push(email);
+
+    for (const candidate of candidates) {
+      const snap = await db
+        .collection(COLLECTION)
+        .where("email", "==", candidate)
+        .get();
+      if (snap.empty) continue;
+      const d = snap.docs[0];
+      return toMemberDoc(d.id, d.data() as Record<string, unknown>);
+    }
+    return null;
   },
 
   async findAll(): Promise<MemberDoc[]> {
@@ -55,7 +64,7 @@ export const MembersAdminOrm = {
 
   async create(input: CreateMemberInput): Promise<MemberDoc> {
     const payload = {
-      email: input.email,
+      email: normalizeEmail(input.email),
       firstName: input.firstName,
       lastName: input.lastName,
       role: input.role ?? MemberRole.Member,

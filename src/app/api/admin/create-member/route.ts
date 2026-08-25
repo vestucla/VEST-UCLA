@@ -6,6 +6,7 @@ import {
   MemberStatus,
   VestTitle,
   JoinedQuarter,
+  normalizeEmail,
 } from "@/data/members";
 
 async function verifyAdmin(token: string): Promise<boolean> {
@@ -33,7 +34,7 @@ export async function POST(req: NextRequest) {
 
     const body = await req.json();
     const {
-      email,
+      email: rawEmail,
       firstName,
       lastName,
       role = MemberRole.Member,
@@ -43,13 +44,19 @@ export async function POST(req: NextRequest) {
       joinedQuarter,
     } = body;
 
-    if (!email || !firstName || !lastName) {
+    if (
+      !rawEmail ||
+      typeof rawEmail !== "string" ||
+      !firstName ||
+      !lastName
+    ) {
       return NextResponse.json(
         { error: "Missing required fields" },
         { status: 400 }
       );
     }
 
+    const email = normalizeEmail(rawEmail);
     const existing = await MembersAdminOrm.findByEmail(email);
     if (existing) {
       return NextResponse.json(
