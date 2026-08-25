@@ -3,6 +3,8 @@ import { getAdminAuth } from "@/lib/firebase-admin";
 import { getCloudinary } from "@/lib/cloudinary";
 import { MembersAdminOrm } from "@/lib/orm/members.admin";
 
+export const runtime = "nodejs";
+
 const MAX_BYTES = 5 * 1024 * 1024; // 5 MB
 const ALLOWED_TYPES = new Set([
   "image/jpeg",
@@ -22,7 +24,8 @@ async function verifyMember(token: string): Promise<{ email: string } | null> {
     if (!member) return null;
 
     return { email };
-  } catch {
+  } catch (err) {
+    console.error("[upload/image] Firebase verification failed:", err);
     return null;
   }
 }

@@ -8,6 +8,8 @@ import {
   MemberStatus,
 } from "@/data/members";
 
+export const runtime = "nodejs";
+
 async function verifyUserAndGetEmail(
   token: string
 ): Promise<{ email: string; isAdmin: boolean } | null> {
@@ -21,7 +23,8 @@ async function verifyUserAndGetEmail(
     if (!member) return null;
 
     return { email, isAdmin: member.role === MemberRole.Admin };
-  } catch {
+  } catch (err) {
+    console.error("[update] Firebase verification failed:", err);
     return null;
   }
 }
@@ -45,6 +48,9 @@ export async function POST(req: NextRequest) {
     console.log("[update] User verified:", userInfo.email);
 
     const body = await req.json();
+    if (!body || typeof body !== "object") {
+      return NextResponse.json({ error: "Invalid JSON payload" }, { status: 400 });
+    }
     console.log("[update] Payload received for:", body.targetEmail);
     const { targetEmail, ...profileData } = body;
 
