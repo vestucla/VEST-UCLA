@@ -117,4 +117,9 @@ export function memberSlug(firstName: string, lastName: string): string {
   return `${firstName.toLowerCase()}-${lastName.toLowerCase()}`;
 }
 
+/** Canonical form used for storing and looking up member emails. */
+export function normalizeEmail(email: string): string {
+  return email.trim().toLowerCase();
+}
+
 export type ExperienceItem = Experience;

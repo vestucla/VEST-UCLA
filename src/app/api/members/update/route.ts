@@ -6,6 +6,7 @@ import {
   VestTitle,
   JoinedQuarter,
   MemberStatus,
+  normalizeEmail,
 } from "@/data/members";
 
 export const runtime = "nodejs";
@@ -54,11 +55,13 @@ export async function POST(req: NextRequest) {
     console.log("[update] Payload received for:", body.targetEmail);
     const { targetEmail, ...profileData } = body;
 
-    if (!targetEmail) {
+    if (!targetEmail || typeof targetEmail !== "string") {
       return NextResponse.json({ error: "Missing targetEmail" }, { status: 400 });
     }
 
-    const canEdit = userInfo.isAdmin || userInfo.email === targetEmail;
+    const canEdit =
+      userInfo.isAdmin ||
+      normalizeEmail(userInfo.email) === normalizeEmail(targetEmail);
     if (!canEdit) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }

@@ -9,7 +9,7 @@ import {
   type DocumentData,
 } from "firebase/firestore";
 import { getFirebaseDb } from "@/lib/firebase";
-import type { MemberDoc } from "@/data/members";
+import { normalizeEmail, type MemberDoc } from "@/data/members";
 import { toMemberDoc } from "@/lib/orm/mappers";
 
 const COLLECTION = "members";
@@ -22,14 +22,21 @@ export const MembersOrm = {
   },
 
   async findByEmail(email: string): Promise<MemberDoc | null> {
-    const q = query(
-      collection(getFirebaseDb(), COLLECTION),
-      where("email", "==", email)
-    );
-    const snap = await getDocs(q);
-    if (snap.empty) return null;
-    const d = snap.docs[0];
-    return toMemberDoc(d.id, d.data() as Record<string, unknown>);
+    const candidates = [normalizeEmail(email)];
+    // Documents created before emails were normalized keep their original casing.
+    if (!candidates.includes(email)) candidates.push(email);
+
+    for (const candidate of candidates) {
+      const q = query(
+        collection(getFirebaseDb(), COLLECTION),
+        where("email", "==", candidate)
+      );
+      const snap = await getDocs(q);
+      if (snap.empty) continue;
+      const d = snap.docs[0];
+      return toMemberDoc(d.id, d.data() as Record<string, unknown>);
+    }
+    return null;
   },
 
   async findAll(): Promise<MemberDoc[]> {
