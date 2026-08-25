@@ -48,12 +48,13 @@ export async function POST(req: NextRequest) {
     }
     console.log("[update] User verified:", userInfo.email);
 
-    const body = await req.json();
-    if (!body || typeof body !== "object") {
+    const body: unknown = await req.json();
+    if (!body || typeof body !== "object" || Array.isArray(body)) {
       return NextResponse.json({ error: "Invalid JSON payload" }, { status: 400 });
     }
-    console.log("[update] Payload received for:", body.targetEmail);
-    const { targetEmail, ...profileData } = body;
+    const payload = body as Record<string, unknown>;
+    console.log("[update] Payload received for:", payload.targetEmail);
+    const { targetEmail, ...profileData } = payload;
 
     if (!targetEmail || typeof targetEmail !== "string") {
       return NextResponse.json({ error: "Missing targetEmail" }, { status: 400 });
@@ -102,6 +103,82 @@ export async function POST(req: NextRequest) {
       if (field in profileData) {
         updateData[field] = profileData[field];
       }
+    }
+
+    const stringFields = [
+      "firstName",
+      "lastName",
+      "bio",
+      "currentlyWorkingOn",
+      "major",
+      "classYear",
+      "city",
+      "linkedin",
+      "twitter",
+      "github",
+      "website",
+      "phone",
+      "joinedYear",
+    ] as const;
+    for (const field of stringFields) {
+      if (field in updateData && updateData[field] !== undefined &&
+          typeof updateData[field] !== "string") {
+        return NextResponse.json(
+          { error: `${field} must be a string` },
+          { status: 400 }
+        );
+      }
+    }
+
+    if (
+      "interests" in updateData &&
+      (!Array.isArray(updateData.interests) ||
+        !updateData.interests.every((item) => typeof item === "string"))
+    ) {
+      return NextResponse.json(
+        { error: "interests must be an array of strings" },
+        { status: 400 }
+      );
+    }
+
+    if ("experiences" in updateData) {
+      const experiences = updateData.experiences;
+      const validExperiences =
+        Array.isArray(experiences) &&
+        experiences.every((experience) => {
+          if (
+            !experience ||
+            typeof experience !== "object" ||
+            Array.isArray(experience)
+          ) {
+            return false;
+          }
+          const item = experience as Record<string, unknown>;
+          return (
+            typeof item.company === "string" &&
+            typeof item.role === "string" &&
+            (item.startDate === undefined || typeof item.startDate === "string") &&
+            (item.endDate === undefined || typeof item.endDate === "string") &&
+            (item.description === undefined ||
+              typeof item.description === "string")
+          );
+        });
+      if (!validExperiences) {
+        return NextResponse.json(
+          { error: "experiences contains an invalid entry" },
+          { status: 400 }
+        );
+      }
+    }
+
+    if (
+      "profileCompleted" in updateData &&
+      typeof updateData.profileCompleted !== "boolean"
+    ) {
+      return NextResponse.json(
+        { error: "profileCompleted must be a boolean" },
+        { status: 400 }
+      );
     }
 
     if (typeof updateData.vestTitle === "string" && updateData.vestTitle.length > 0) {
