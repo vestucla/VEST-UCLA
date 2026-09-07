@@ -1,10 +1,11 @@
 // Data access layer for the member portal (read helpers for UI).
 // Mutations go through MembersOrm / MembersAdminOrm.
 
-import type { Member, MemberStatus } from "@/data/members";
+import { MemberStatus, type Member } from "@/data/members";
 import { MembersOrm, toMember } from "@/lib/orm/members";
 
-export type { Member, MemberStatus } from "@/data/members";
+export { MemberStatus };
+export type { Member };
 
 export async function getAllMembers(): Promise<Member[]> {
   const docs = await MembersOrm.findAll();

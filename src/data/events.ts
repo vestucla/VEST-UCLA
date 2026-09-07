@@ -16,7 +16,7 @@ export const events: Event[] = [
     date: "02/06/2025",
     subtitle: "Learning from the founder of Zillow",
     description: "Spencer Rascoff, founder of Zillow, joined us for an engaging fireside chat on February 6, 2025, where he shared candid insights into his entrepreneurial journey, the challenges of scaling Zillow, and advice for aspiring founders.",
-    imageSrc: "/images/Events/VEST-SpencerRascoff.jpeg"
+    imageSrc: "/images/Events/VEST-SpencerRascoff.webp"
   },
   {
     id: 2,
@@ -25,7 +25,7 @@ export const events: Event[] = [
     date: "02/26/2025",
     subtitle: "Introducing our founders to VC staff",
     description: "On February 26, 2025, our members visited the a16z office for an exclusive opportunity to connect with venture capital staff and learn about the firm’s investment approach.",
-    imageSrc: "/images/Events/VEST-a16zOfficeVisit.jpg"
+    imageSrc: "/images/Events/VEST-a16zOfficeVisit.webp"
   },
   {
     id: 3,
@@ -34,7 +34,7 @@ export const events: Event[] = [
     date: "03/11/2025",
     subtitle: "Insights from a Thiel Fellow",
     description: "Jacob Rodriguez, Thiel Fellow and founder of space infrastructure startup Oligo, joined us as a guest speaker on March 11, 2025, to share his journey in spacecraft entrepreneurship, building Oligo, and his experience as a Thiel Fellow.",
-    imageSrc: "/images/Events/VEST-Oligo.png"
+    imageSrc: "/images/Events/VEST-Oligo.webp"
   },
   {
     id: 4,
@@ -43,6 +43,31 @@ export const events: Event[] = [
     date: "04/20/2025",
     subtitle: "Learning from YC23",
     description: "On April 20, 2025, Bowen Xue, a founder from Y Combinator’s Summer 2023 batch, spoke with us about his startup experience, navigating YC, and key takeaways from building his company DisputeNinja.",
-    imageSrc: "/images/Events/VEST-BowenXue.jpg"
+    imageSrc: "/images/Events/VEST-BowenXue.webp"
   }
 ]; 
+/** `MM/DD/YYYY` -> epoch ms, parsed as UTC so the ordering never shifts by zone. */
+function toTime(date: string) {
+  const [month, day, year] = date.split("/").map(Number);
+  return Date.UTC(year, month - 1, day);
+}
+
+/**
+ * Events newest first. Derived once from a copy — `events` itself is shared
+ * across pages and must not be sorted in place.
+ */
+export const eventsByDate: Event[] = [...events].sort(
+  (a, b) => toTime(b.date) - toTime(a.date)
+);
+
+const eventDateFormat = new Intl.DateTimeFormat("en-US", {
+  month: "long",
+  day: "numeric",
+  year: "numeric",
+  timeZone: "UTC",
+});
+
+/** `"02/06/2025"` -> `"February 6, 2025"`. */
+export function formatEventDate(date: string) {
+  return eventDateFormat.format(new Date(toTime(date)));
+}

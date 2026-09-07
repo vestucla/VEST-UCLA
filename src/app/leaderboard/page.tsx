@@ -1,20 +1,8 @@
 import { getSupabaseClient } from "@/lib/supabase";
 import { unstable_noStore as noStore } from "next/cache";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-} from "@/components/ui/card";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
+import { PageHeader } from "@/components/ui/PageHeader";
+import { FadeIn } from "@/components/ui/FadeIn";
+import { Card } from "@/components/ui/card";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -43,56 +31,47 @@ export default async function LeaderboardPage() {
   const leaderboard = await getLeaderboard();
 
   return (
-    <div className="mx-auto flex min-h-[60vh] max-w-3xl items-center justify-center px-4 pt-32 pb-16">
-      <Card className="w-full border-neutral-800 bg-gradient-to-b from-neutral-950/80 to-neutral-900/80 backdrop-blur">
-        <CardHeader className="border-b border-neutral-800 pb-4">
-          <CardTitle className="text-2xl font-semibold tracking-tight text-white">
-            Leaderboard
-          </CardTitle>
-          <CardDescription className="text-sm text-neutral-400">
-            Ranked by total points, highest to lowest.
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="pt-4">
-          {leaderboard.length === 0 ? (
-            <p className="text-center text-sm text-neutral-400">
-              No leaderboard data available yet.
-            </p>
-          ) : (
-            <Table>
-              <TableHeader>
-                <TableRow className="border-neutral-800">
-                  <TableHead className="w-16 text-neutral-400">Rank</TableHead>
-                  <TableHead className="text-neutral-400">Username</TableHead>
-                  <TableHead className="w-24 text-right text-neutral-400">
-                    Points
-                  </TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {leaderboard.map((entry, index) => (
-                  <TableRow
-                    key={`${entry.username}-${index}`}
-                    className="border-neutral-800"
-                  >
-                    <TableCell className="font-mono text-sm text-neutral-300">
-                      #{index + 1}
-                    </TableCell>
-                    <TableCell className="font-medium text-white">
-                      {entry.username}
-                    </TableCell>
-                    <TableCell className="text-right font-semibold text-emerald-400">
-                      {entry.points}
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          )}
-        </CardContent>
-      </Card>
-    </div>
+    <>
+      <PageHeader
+        title="Leaderboard"
+        description="Ranked by total points, highest to lowest."
+      />
+      <section className="section bg-white min-h-[60vh]">
+        <div className="container-content max-w-[800px]">
+          <FadeIn>
+            <Card className="overflow-hidden">
+              <div className="overflow-x-auto">
+                <table className="w-full text-left border-collapse">
+                  <thead>
+                    <tr className="bg-haze border-b-2 border-black-10">
+                      <th className="py-4 px-6 text-sm font-semibold uppercase tracking-wider text-black-80 w-16">Rank</th>
+                      <th className="py-4 px-6 text-sm font-semibold uppercase tracking-wider text-black-80">Username</th>
+                      <th className="py-4 px-6 text-sm font-semibold uppercase tracking-wider text-black-80 text-right w-24">Points</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {leaderboard.length === 0 ? (
+                      <tr>
+                        <td colSpan={3} className="py-8 px-6 text-center text-black-80">
+                          No leaderboard data available yet.
+                        </td>
+                      </tr>
+                    ) : (
+                      leaderboard.map((entry, index) => (
+                        <tr key={`${entry.username}-${index}`} className="border-b border-black-10 last:border-0 hover:bg-haze/50 transition-colors">
+                          <td className="py-4 px-6 text-black-80 font-mono">#{index + 1}</td>
+                          <td className="py-4 px-6 font-bold text-black">{entry.username}</td>
+                          <td className="py-4 px-6 text-right font-bold text-blue">{entry.points}</td>
+                        </tr>
+                      ))
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </Card>
+          </FadeIn>
+        </div>
+      </section>
+    </>
   );
 }
-
-

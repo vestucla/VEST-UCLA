@@ -1,10 +1,10 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
-import styled from "styled-components";
 import type { Member } from "@/lib/members";
 import { useAuth } from "@/lib/auth";
+import { Card } from "@/components/ui/card";
+import { FadeIn } from "@/components/ui/FadeIn";
 
 interface Props {
   member: Member;
@@ -13,406 +13,175 @@ interface Props {
 export default function MemberProfile({ member }: Props) {
   const { user, isMember, isAdmin } = useAuth();
   
-  // Can edit if it's their own profile or if they're an admin
   const canEdit = user && (isAdmin || user.email === member.email);
   const memberSlug = `${member.firstName.toLowerCase()}-${member.lastName.toLowerCase()}`;
 
   return (
-    <Layout>
-      <Sidebar>
-        <Avatar>
-          {member.imageSrc ? (
-            <Image
-              src={member.imageSrc}
-              alt={`${member.firstName} ${member.lastName}`}
-              fill
-              style={{ objectFit: "cover" }}
-              sizes="320px"
-              priority
-              unoptimized={member.imageSrc.startsWith("data:")}
-            />
-          ) : (
-            <AvatarPlaceholder>
-              {member.firstName[0]}
-              {member.lastName[0]}
-            </AvatarPlaceholder>
-          )}
-        </Avatar>
-
-        <Name>
-          {member.firstName} {member.lastName}
-        </Name>
-        <Role>{member.vestTitle}</Role>
-        {member.classYear && <Meta>Class of {member.classYear}</Meta>}
-        {member.major && <Meta>Major: {member.major}</Meta>}
-        {member.city && <Meta>{member.city}</Meta>}
-        {member.joinedYear && (
-          <Meta>
-            Joined VEST {member.joinedQuarter ? `${member.joinedQuarter} ` : ""}
-            {member.joinedYear}
-          </Meta>
-        )}
-
-        <SocialList>
-          {member.linkedin && (
-            <SocialLink href={member.linkedin} target="_blank" rel="noreferrer">
-              LinkedIn
-            </SocialLink>
-          )}
-          {member.twitter && (
-            <SocialLink
-              href={
-                member.twitter.startsWith("http")
-                  ? member.twitter
-                  : `https://x.com/${member.twitter}`
-              }
-              target="_blank"
-              rel="noreferrer"
-            >
-              X / Twitter
-            </SocialLink>
-          )}
-          {member.github && (
-            <SocialLink href={member.github} target="_blank" rel="noreferrer">
-              GitHub
-            </SocialLink>
-          )}
-          {member.website && (
-            <SocialLink href={member.website} target="_blank" rel="noreferrer">
-              Website
-            </SocialLink>
-          )}
-        </SocialList>
-
-        {canEdit && (
-          <EditButton href={`/members/edit/${memberSlug}`}>
-            Edit Profile
-          </EditButton>
-        )}
-
-        <ContactBlock>
-          <ContactHeader>Contact</ContactHeader>
-          {member.email || member.phone ? (
-            isMember ? (
-              <ContactList>
-                {member.email && (
-                  <li>
-                    <a href={`mailto:${member.email}`}>{member.email}</a>
-                  </li>
-                )}
-                {member.phone && (
-                  <li>
-                    <a href={`tel:${member.phone}`}>{member.phone}</a>
-                  </li>
-                )}
-              </ContactList>
+    <div className="flex flex-col md:flex-row gap-8 lg:gap-12 pb-16">
+      {/* Sidebar */}
+      <aside className="w-full md:w-[320px] flex-shrink-0 flex flex-col gap-6">
+        <FadeIn delay={0}>
+          <div className="relative w-full aspect-square rounded-[24px] overflow-hidden bg-haze border border-black-10">
+            {member.imageSrc ? (
+              <img
+                src={member.imageSrc}
+                alt={`${member.firstName} ${member.lastName}`}
+                className="w-full h-full object-cover"
+              />
             ) : (
-              <ContactGated>
-                <p>Email and phone are visible to logged-in VEST members.</p>
-                <Link href="/members/login">Sign in →</Link>
-              </ContactGated>
-            )
-          ) : (
-            <Meta>No contact info on file.</Meta>
-          )}
-        </ContactBlock>
-      </Sidebar>
+              <div className="w-full h-full flex items-center justify-center text-black-30 font-display text-6xl uppercase">
+                {member.firstName[0]}
+                {member.lastName[0]}
+              </div>
+            )}
+          </div>
+        </FadeIn>
 
-      <MainCol>
-        {member.bio && <Bio>{member.bio}</Bio>}
+        <FadeIn delay={100} className="flex flex-col gap-2">
+          <h2 className="font-sans font-bold text-3xl text-black leading-tight">
+            {member.firstName} {member.lastName}
+          </h2>
+          <p className="text-lg text-black-80">{member.vestTitle}</p>
+          
+          <div className="flex flex-col gap-1 mt-2">
+            {member.classYear && <p className="text-sm text-black-50">Class of {member.classYear}</p>}
+            {member.major && <p className="text-sm text-black-50">Major: {member.major}</p>}
+            {member.city && <p className="text-sm text-black-50">{member.city}</p>}
+            {member.joinedYear && (
+              <p className="text-sm text-black-50">
+                Joined VEST {member.joinedQuarter ? `${member.joinedQuarter} ` : ""}
+                {member.joinedYear}
+              </p>
+            )}
+          </div>
+
+          <div className="flex flex-wrap gap-2 mt-4">
+            {member.linkedin && (
+              <a href={member.linkedin} target="_blank" rel="noreferrer" className="chip bg-haze text-black hover:bg-black-10 transition-colors">
+                LinkedIn
+              </a>
+            )}
+            {member.twitter && (
+              <a
+                href={member.twitter.startsWith("http") ? member.twitter : `https://x.com/${member.twitter}`}
+                target="_blank"
+                rel="noreferrer"
+                className="chip bg-haze text-black hover:bg-black-10 transition-colors"
+              >
+                X / Twitter
+              </a>
+            )}
+            {member.github && (
+              <a href={member.github} target="_blank" rel="noreferrer" className="chip bg-haze text-black hover:bg-black-10 transition-colors">
+                GitHub
+              </a>
+            )}
+            {member.website && (
+              <a href={member.website} target="_blank" rel="noreferrer" className="chip bg-haze text-black hover:bg-black-10 transition-colors">
+                Website
+              </a>
+            )}
+          </div>
+
+          {canEdit && (
+            <Link href={`/members/edit/${memberSlug}`} className="btn btn-inverse mt-4 text-center">
+              Edit Profile
+            </Link>
+          )}
+
+          <Card className="mt-6 p-5 bg-haze">
+            <h4 className="eyebrow text-black-80 mb-3">Contact</h4>
+            {member.email || member.phone ? (
+              isMember ? (
+                <ul className="flex flex-col gap-2">
+                  {member.email && (
+                    <li>
+                      <a href={`mailto:${member.email}`} className="text-sm font-medium text-blue hover:text-blue-80 transition-colors">
+                        {member.email}
+                      </a>
+                    </li>
+                  )}
+                  {member.phone && (
+                    <li>
+                      <a href={`tel:${member.phone}`} className="text-sm font-medium text-blue hover:text-blue-80 transition-colors">
+                        {member.phone}
+                      </a>
+                    </li>
+                  )}
+                </ul>
+              ) : (
+                <div className="flex flex-col gap-2">
+                  <p className="text-sm text-black-50">Email and phone are visible to logged-in VEST members.</p>
+                  <Link href="/members/login" className="text-sm font-medium text-blue hover:text-blue-80 transition-colors">
+                    Sign in →
+                  </Link>
+                </div>
+              )
+            ) : (
+              <p className="text-sm text-black-50">No contact info on file.</p>
+            )}
+          </Card>
+        </FadeIn>
+      </aside>
+
+      {/* Main Column */}
+      <div className="flex-1 flex flex-col gap-12">
+        <FadeIn delay={200}>
+          {member.bio && (
+            <p className="text-lg text-black leading-relaxed whitespace-pre-wrap">
+              {member.bio}
+            </p>
+          )}
+        </FadeIn>
 
         {member.currentlyWorkingOn && (
-          <Section>
-            <SectionTitle>Currently working on</SectionTitle>
-            <p className="text-sm text-neutral-300">{member.currentlyWorkingOn}</p>
-          </Section>
+          <FadeIn delay={300}>
+            <section className="flex flex-col gap-4">
+              <h3 className="font-display text-2xl text-black">Currently working on</h3>
+              <p className="text-black-80 leading-relaxed">{member.currentlyWorkingOn}</p>
+            </section>
+          </FadeIn>
         )}
 
         {member.interests.length > 0 && (
-          <Section>
-            <SectionTitle>Interests</SectionTitle>
-            <TagRow>
-              {member.interests.map((i) => (
-                <Tag key={i}>{i}</Tag>
-              ))}
-            </TagRow>
-          </Section>
+          <FadeIn delay={400}>
+            <section className="flex flex-col gap-4">
+              <h3 className="font-display text-2xl text-black">Interests</h3>
+              <div className="flex flex-wrap gap-2">
+                {member.interests.map((i) => (
+                  <span key={i} className="chip bg-haze text-black-80">{i}</span>
+                ))}
+              </div>
+            </section>
+          </FadeIn>
         )}
 
         {member.experiences.length > 0 && (
-          <Section>
-            <SectionTitle>Experience</SectionTitle>
-            <ExperienceList>
-              {member.experiences.map((e, idx) => (
-                <ExperienceItem key={`${e.company}-${idx}`}>
-                  <ExperienceHead>
-                    <CompanyName>{e.company}</CompanyName>
-                    <DateRange>
-                      {e.startDate ?? ""}
-                      {e.startDate || e.endDate ? " — " : ""}
-                      {e.endDate ?? (e.startDate ? "Present" : "")}
-                    </DateRange>
-                  </ExperienceHead>
-                  <ExperienceRole>{e.role}</ExperienceRole>
-                  {e.description && <ExperienceDesc>{e.description}</ExperienceDesc>}
-                </ExperienceItem>
-              ))}
-            </ExperienceList>
-          </Section>
+          <FadeIn delay={500}>
+            <section className="flex flex-col gap-4">
+              <h3 className="font-display text-2xl text-black">Experience</h3>
+              <div className="flex flex-col gap-4">
+                {member.experiences.map((e, idx) => (
+                  <Card key={`${e.company}-${idx}`} className="p-5 md:p-6 bg-white border border-black-10 transition-transform duration-200 hover:-translate-y-1 hover:shadow-md">
+                    <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-2 mb-1">
+                      <h4 className="font-bold text-lg text-black">{e.company}</h4>
+                      <span className="text-xs font-mono text-black-50 uppercase tracking-wider">
+                        {e.startDate ?? ""}
+                        {e.startDate || e.endDate ? " — " : ""}
+                        {e.endDate ?? (e.startDate ? "Present" : "")}
+                      </span>
+                    </div>
+                    <p className="text-sm font-medium text-black-80 mb-3">{e.role}</p>
+                    {e.description && (
+                      <p className="text-sm text-black-80 leading-relaxed">{e.description}</p>
+                    )}
+                  </Card>
+                ))}
+              </div>
+            </section>
+          </FadeIn>
         )}
-      </MainCol>
-    </Layout>
+      </div>
+    </div>
   );
 }
-
-const Layout = styled.div`
-  display: grid;
-  grid-template-columns: 320px 1fr;
-  gap: 48px;
-
-  @media (max-width: 900px) {
-    grid-template-columns: 1fr;
-    gap: 32px;
-  }
-`;
-
-const Sidebar = styled.aside`
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-`;
-
-const Avatar = styled.div`
-  position: relative;
-  width: 100%;
-  aspect-ratio: 1 / 1;
-  border-radius: 24px;
-  overflow: hidden;
-  background: linear-gradient(
-    90deg,
-    rgba(30, 70, 200, 0.2) 0%,
-    rgba(50, 30, 110, 0.2) 100%
-  );
-  box-shadow: inset 0 0 30px 0 rgba(239, 239, 239, 0.15);
-`;
-
-const AvatarPlaceholder = styled.div`
-  width: 100%;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: rgba(239, 239, 239, 0.6);
-  font-family: var(--header-font-regular);
-  font-size: 4rem;
-`;
-
-const Name = styled.h2`
-  font-family: var(--header-font-regular);
-  font-size: var(--header-size-subsection);
-  font-weight: 400;
-  background: var(--header-gradient);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  line-height: 1;
-  margin-top: 12px;
-`;
-
-const Role = styled.p`
-  font-size: var(--text-base);
-  color: rgba(239, 239, 239, 0.85);
-`;
-
-const Meta = styled.p`
-  font-size: var(--text-sm);
-  color: rgba(239, 239, 239, 0.6);
-`;
-
-const SocialList = styled.div`
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin-top: 12px;
-`;
-
-const SocialLink = styled.a`
-  font-size: var(--text-sm);
-  padding: 8px 14px;
-  border-radius: 999px;
-  border: 1px solid rgba(239, 239, 239, 0.15);
-  color: #efefef;
-  background: rgba(239, 239, 239, 0.05);
-  text-decoration: none;
-  transition: background 200ms ease, border-color 200ms ease;
-
-  @media (hover: hover) and (pointer: fine) {
-    &:hover {
-      background: rgba(173, 206, 255, 0.15);
-      border-color: rgba(173, 206, 255, 0.4);
-    }
-  }
-`;
-
-const EditButton = styled(Link)`
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  margin-top: 12px;
-  padding: 10px 20px;
-  font-size: var(--text-sm);
-  font-weight: 500;
-  border-radius: 999px;
-  border: 1px solid rgba(173, 206, 255, 0.3);
-  color: rgba(173, 206, 255, 0.95);
-  background: rgba(173, 206, 255, 0.1);
-  text-decoration: none;
-  transition: background 200ms ease, border-color 200ms ease;
-
-  @media (hover: hover) and (pointer: fine) {
-    &:hover {
-      background: rgba(173, 206, 255, 0.2);
-      border-color: rgba(173, 206, 255, 0.5);
-    }
-  }
-`;
-
-const ContactBlock = styled.div`
-  margin-top: 16px;
-  padding: 16px;
-  border-radius: 16px;
-  background: rgba(239, 239, 239, 0.04);
-  border: 1px solid rgba(239, 239, 239, 0.1);
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-`;
-
-const ContactHeader = styled.h4`
-  font-size: var(--text-xs);
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: rgba(239, 239, 239, 0.55);
-`;
-
-const ContactList = styled.ul`
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-
-  a {
-    color: #efefef;
-    font-size: var(--text-sm);
-    text-decoration: none;
-  }
-  a:hover {
-    color: rgba(173, 206, 255, 0.95);
-  }
-`;
-
-const ContactGated = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  font-size: var(--text-sm);
-  color: rgba(239, 239, 239, 0.7);
-
-  a {
-    color: rgba(173, 206, 255, 0.95);
-    text-decoration: none;
-  }
-`;
-
-const MainCol = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 32px;
-`;
-
-const Bio = styled.p`
-  font-size: var(--text-base);
-  line-height: 1.6;
-  color: rgba(239, 239, 239, 0.85);
-`;
-
-const Section = styled.section`
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-`;
-
-const SectionTitle = styled.h3`
-  font-family: var(--header-font-regular);
-  font-size: var(--header-size-subsection-mobile);
-  font-weight: 400;
-  background: var(--header-gradient);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-`;
-
-const TagRow = styled.div`
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-`;
-
-const Tag = styled.span`
-  font-size: var(--text-xs);
-  padding: 6px 12px;
-  border-radius: 999px;
-  background: rgba(239, 239, 239, 0.08);
-  border: 1px solid rgba(239, 239, 239, 0.15);
-  color: rgba(239, 239, 239, 0.85);
-`;
-
-const ExperienceList = styled.ol`
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 18px;
-`;
-
-const ExperienceItem = styled.li`
-  padding: 18px 20px;
-  border-radius: 16px;
-  background: rgba(239, 239, 239, 0.04);
-  border: 1px solid rgba(239, 239, 239, 0.1);
-`;
-
-const ExperienceHead = styled.div`
-  display: flex;
-  justify-content: space-between;
-  gap: 12px;
-  align-items: baseline;
-  flex-wrap: wrap;
-`;
-
-const CompanyName = styled.span`
-  font-size: var(--text-base);
-  font-weight: 600;
-  color: #efefef;
-`;
-
-const DateRange = styled.span`
-  font-size: var(--text-xs);
-  color: rgba(239, 239, 239, 0.55);
-`;
-
-const ExperienceRole = styled.p`
-  font-size: var(--text-sm);
-  color: rgba(239, 239, 239, 0.8);
-  margin-top: 4px;
-`;
-
-const ExperienceDesc = styled.p`
-  font-size: var(--text-sm);
-  color: rgba(239, 239, 239, 0.7);
-  margin-top: 8px;
-  line-height: 1.5;
-`;

@@ -1,100 +1,414 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
 
-body {
-  font-family: var(--font-geist-sans), system-ui, sans-serif;
+@theme {
+  /* ---------------------------------------------------------------------
+     Colour — Figma "2026 website redesign" variables. The -NN suffixes are
+     fixed alpha steps rather than tints, so they sit correctly over both the
+     white and haze surfaces.
+     --------------------------------------------------------------------- */
+  --color-white: #ffffff;
+  --color-white-50: color-mix(in srgb, #ffffff 50%, transparent);
+
+  --color-haze: #f4f7fb;
+  --color-haze-50: color-mix(in srgb, #f4f7fb 50%, transparent);
+
+  --color-black: #10103d;
+  --color-black-80: color-mix(in srgb, #10103d 80%, transparent);
+  --color-black-30: color-mix(in srgb, #10103d 30%, transparent);
+  --color-black-10: color-mix(in srgb, #10103d 10%, transparent);
+
+  --color-blue: #0059ff;
+  --color-blue-80: color-mix(in srgb, #0059ff 80%, transparent);
+  --color-blue-50: color-mix(in srgb, #0059ff 50%, transparent);
+
+  --color-mint: #c4ffc0;
+
+  /* ---------------------------------------------------------------------
+     Type — `--font-rethink` / `--font-bit-apple` are injected by next/font
+     in `layout.tsx`; aliasing them here keeps `font-sans` / `font-display`
+     working without a self-referential custom property.
+     --------------------------------------------------------------------- */
+  --font-sans: var(--font-rethink), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-bit-apple), var(--font-rethink), sans-serif;
+
+  /* Display sizes are fluid: they hit the Figma value at 1440 and stay
+     legible at 375 instead of overflowing. */
+  --text-display-lg: clamp(2.5rem, 7.5vw, 4.625rem); /* 40 -> 74px */
+  --text-display-lg--line-height: 1;
+  --text-display: clamp(2rem, 5.5vw, 3rem); /* 32 -> 48px */
+  --text-display--line-height: 1;
+  --text-display-sm: clamp(1.75rem, 3.6vw, 2.25rem); /* 28 -> 36px */
+  --text-display-sm--line-height: 1.2;
+  --text-display-sm--letter-spacing: 0.02em;
+  --text-h3: 2.25rem; /* 36px, paired with a smaller class on mobile */
+  --text-h3--line-height: 1.2;
+  --text-body: 1rem;
+  --text-body--line-height: 1.4;
+  --text-meta: 1rem;
+  --text-meta--line-height: 1.4;
+
+  /* Motion */
+  --ease-out-quart: cubic-bezier(0.165, 0.84, 0.44, 1);
+  --ease-out-expo: cubic-bezier(0.19, 1, 0.22, 1);
+  --ease-in-out-cubic: cubic-bezier(0.645, 0.045, 0.355, 1);
+  --dur-fast: 150ms;
+  --dur-base: 220ms;
+  --dur-slow: 320ms;
+
+  /* Shape */
+  --radius-card: 12px;
+  --radius-btn: 8px;
+
+  /* Rhythm */
+  --spacing-section: 120px;
+  --spacing-section-sm: 64px;
 }
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
-    --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
-    --chart-1: 12 76% 61%;
-    --chart-2: 173 58% 39%;
-    --chart-3: 197 37% 24%;
-    --chart-4: 43 74% 66%;
-    --chart-5: 27 87% 67%;
-    --radius: 0.5rem;
-    
-    /* Header text variables */
-    --header-gradient: linear-gradient(180deg, #ffffff 0%, #adceff 100%);
-    --header-font-regular: var(--font-bit-apple), 'Bit Apple', monospace;
-    --header-font-italic: var(--font-playfair-display), 'Playfair Display', serif;
-    
-    /* Header text sizes */
-    --header-size-hero: 5.625rem;
-    --header-size-hero-mobile: 3rem;
-    --header-size-page: 4.5rem;
-    --header-size-page-mobile: 2.25rem;
-    --header-size-section: 3rem;
-    --header-size-section-mobile: 1.75rem;
-    --header-size-subsection: 2rem;
-    --header-size-subsection-mobile: 1.25rem;
-    
-    /* Body text sizes */
-    --text-xxl: 1.5rem;
-    --text-xxl-mobile: 1.25rem;
-    --text-xl: 1.25rem;
-    --text-xl-mobile: 1rem;
-    --text-lg: 1.125rem;
-    --text-lg-mobile: 1rem;
-    --text-base: 1rem;
-    --text-base-mobile: 0.875rem;
-    --text-sm: 0.875rem;
-    --text-sm-mobile: 0.75rem;
-    --text-xs: 0.75rem;
+    color-scheme: light;
   }
-  .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
-    --primary: 210 40% 98%;
-    --primary-foreground: 222.2 47.4% 11.2%;
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 212.7 26.8% 83.9%;
-    --chart-1: 220 70% 50%;
-    --chart-2: 160 60% 45%;
-    --chart-3: 30 80% 55%;
-    --chart-4: 280 65% 60%;
-    --chart-5: 340 75% 55%;
+
+  html {
+    /* No smooth-scroll and no scroll library: the page scrolls natively. */
+    scroll-behavior: auto;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    background-color: var(--color-white);
+    color: var(--color-black);
+    font-family: var(--font-sans);
+    font-size: var(--text-body);
+    line-height: 1.4;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* The nav is a fixed pill, so in-page anchors need to clear it. */
+  :target {
+    scroll-margin-top: 7rem;
+  }
+
+  ::selection {
+    background-color: var(--color-mint);
+    color: var(--color-black);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-blue);
+    outline-offset: 2px;
+    border-radius: 2px;
+  }
+
+  img {
+    /* Nothing in the design relies on an image's intrinsic size. */
+    max-width: 100%;
   }
 }
 
-@layer base {
-  * {
-    @apply border-border;
+@layer components {
+  .container-content {
+    max-width: 1200px;
+    margin-inline: auto;
+    padding-inline: 1.5rem;
   }
-  body {
-    @apply bg-background text-foreground;
+  @media (min-width: 768px) {
+    .container-content {
+      padding-inline: 2.5rem;
+    }
+  }
+
+  .section {
+    padding-block: var(--spacing-section-sm);
+  }
+  @media (min-width: 768px) {
+    .section {
+      padding-block: var(--spacing-section);
+    }
+  }
+
+  /* Two-column section header: title left, supporting paragraph right. */
+  .section-header {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 1.5rem;
+    align-items: end;
+  }
+  @media (min-width: 900px) {
+    .section-header {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 360px);
+      gap: 3rem;
+    }
+  }
+
+  .card {
+    background-color: var(--color-white);
+    border-radius: var(--radius-card);
+    border: 2px solid var(--color-black-10);
+    overflow: hidden;
+  }
+
+  /* Card that is itself a link — lifts on hover. */
+  .card-interactive {
+    transition:
+      transform var(--dur-base) var(--ease-out-quart),
+      border-color var(--dur-base) var(--ease-out-quart),
+      box-shadow var(--dur-base) var(--ease-out-quart);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .card-interactive:hover {
+      transform: translateY(-2px);
+      border-color: var(--color-black-30);
+      box-shadow: 0 12px 28px -16px color-mix(in srgb, #10103d 40%, transparent);
+    }
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    border-radius: var(--radius-btn);
+    padding: 0.75rem 1.25rem;
+    font-weight: 500;
+    line-height: 1;
+    white-space: nowrap;
+    border: 2px solid transparent;
+    cursor: pointer;
+    transition:
+      background-color var(--dur-base) var(--ease-out-quart),
+      border-color var(--dur-base) var(--ease-out-quart),
+      color var(--dur-base) var(--ease-out-quart),
+      transform var(--dur-fast) var(--ease-out-quart);
+  }
+
+  .btn:active {
+    transform: scale(0.98);
+    transition-duration: 100ms;
+  }
+
+  .btn-primary {
+    background-color: var(--color-blue);
+    color: var(--color-white);
+    border-color: var(--color-blue-50);
+  }
+
+  .btn-inverse {
+    background-color: var(--color-white);
+    color: var(--color-blue);
+    border-color: var(--color-white-50);
+  }
+
+  .btn-ghost {
+    background-color: transparent;
+    color: var(--color-black-80);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .btn-primary:hover {
+      background-color: var(--color-blue-80);
+    }
+    .btn-inverse:hover {
+      background-color: var(--color-haze);
+    }
+    .btn-ghost:hover {
+      color: var(--color-black);
+      background-color: var(--color-black-10);
+    }
+  }
+
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    background-color: var(--color-haze);
+    border: 1px solid var(--color-black-10);
+    font-size: 0.8125rem;
+    font-weight: 500;
+    line-height: 1.4;
+  }
+
+  .input {
+    width: 100%;
+    padding: 0.75rem;
+    border-radius: var(--radius-btn);
+    border: 2px solid var(--color-black-10);
+    background-color: var(--color-white);
+    transition: border-color var(--dur-base) var(--ease-out-quart);
+  }
+
+  .input:focus {
+    outline: none;
+    border-color: var(--color-blue);
+  }
+
+  /* Mint marker-pen highlight. Painted as a background so it never depends on
+     a stacking context, and it follows the text across line breaks. */
+  .highlight {
+    background-image: linear-gradient(var(--color-mint), var(--color-mint));
+    background-repeat: no-repeat;
+    background-size: 100% 0.42em;
+    background-position: 0 76%;
+    padding-inline: 0.05em;
+  }
+
+  /* Italic date / byline line used on event and member cards. */
+  .meta {
+    font-size: var(--text-meta);
+    font-style: italic;
+    color: var(--color-black-80);
+  }
+
+  /* Long-form copy: comfortable measure and leading. */
+  .prose {
+    line-height: 1.6;
+    max-width: 68ch;
+  }
+
+  .prose > * + * {
+    margin-top: 1rem;
+  }
+
+  /* Footer sky: the generated cloud art fades into flat blue at its own
+     bottom edge, so it sits on the blue fill with no seam at any width. */
+  .footer-sky {
+    background-color: var(--color-blue);
+    background-image: url("/images/footer-clouds.png");
+    background-repeat: no-repeat;
+    background-position: top center;
+    background-size: 100% auto;
+  }
+
+  .footer-link {
+    color: color-mix(in srgb, #ffffff 80%, transparent);
+    transition: color var(--dur-base) var(--ease-out-quart);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .footer-link:hover {
+      color: var(--color-white);
+    }
+  }
+
+  .eyebrow {
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-size: 0.75rem;
+    color: var(--color-black-80);
+  }
+
+  /* --------------------------------------------------------------------
+     Infinite logo marquee. The track holds two identical copies, so sliding
+     it exactly -50% of its own width puts copy B where copy A began — the
+     wrap is invisible and needs no JS per frame.
+     -------------------------------------------------------------------- */
+  .marquee {
+    /* Fade both ends so logos dissolve instead of being guillotined by the
+       container edge. */
+    -webkit-mask-image: linear-gradient(
+      to right,
+      transparent,
+      #000 6%,
+      #000 94%,
+      transparent
+    );
+    mask-image: linear-gradient(
+      to right,
+      transparent,
+      #000 6%,
+      #000 94%,
+      transparent
+    );
+  }
+
+  .marquee-track {
+    animation-name: marquee-slide;
+    /* Constant motion: anything but `linear` reads as a stutter at the wrap. */
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+    will-change: transform;
+  }
+
+  /* Let a reader stop the row to actually look at a logo. Pausing the
+     animation keeps the current offset, so there is no jump on either edge. */
+  @media (hover: hover) and (pointer: fine) {
+    .marquee:hover .marquee-track {
+      animation-play-state: paused !important;
+    }
+  }
+
+  @keyframes marquee-slide {
+    from {
+      transform: translate3d(0, 0, 0);
+    }
+    to {
+      transform: translate3d(-50%, 0, 0);
+    }
+  }
+
+  /* The row is autoplaying decoration; without JS it should sit still and
+     legible rather than animate to a half-measured duration. */
+  @media (scripting: none) {
+    .marquee-track {
+      animation: none;
+    }
+  }
+
+  /* One-shot scroll reveal, driven by the FadeIn IntersectionObserver. */
+  .fade-up {
+    opacity: 0;
+    transform: translateY(8px);
+    transition:
+      opacity var(--dur-slow) var(--ease-out-quart),
+      transform var(--dur-slow) var(--ease-out-quart);
+  }
+
+  .fade-up.is-visible {
+    opacity: 1;
+    transform: none;
+  }
+
+  /* The reveal is JS-driven, so it must not be the only thing standing between
+     the reader and the content. */
+  @media (scripting: none) {
+    .fade-up {
+      opacity: 1;
+      transform: none;
+      transition: none;
+    }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* An infinite loop must be cancelled, not shortened: the blanket
+     `animation-duration: 0.01ms` below would park the track at its -50% end
+     state and blank the first half of the row. */
+  .marquee-track {
+    animation: none !important;
+    transform: none !important;
+  }
+
+  /* Show the content outright rather than fading it in more politely. */
+  .fade-up {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+  .btn:active {
+    transform: none;
+  }
+  .card-interactive:hover {
+    transform: none;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
   }
 }

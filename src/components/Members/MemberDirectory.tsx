@@ -1,10 +1,10 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import styled from "styled-components";
 import MemberCard from "./MemberCard";
 import type { Member, MemberStatus } from "@/lib/members";
 import { searchMembers, getAllCompanies, getAllInterests } from "@/lib/members";
+import { MagnifyingGlass, X } from "@phosphor-icons/react/dist/ssr";
 
 interface Props {
   status: MemberStatus;
@@ -58,193 +58,88 @@ export default function MemberDirectory({ status, emptyHint }: Props) {
   }, [results.length, loading]);
 
   return (
-    <Container>
-      <Controls>
-        <SearchInput
-          type="search"
-          placeholder="Search by name, company, role, or interest…"
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-        />
-        <ResultCount>{headerLabel}</ResultCount>
-      </Controls>
+    <div className="flex flex-col gap-8">
+      {/* Search Bar */}
+      <div className="flex flex-wrap items-center gap-4">
+        <div className="relative flex-1 min-w-[260px] max-w-md">
+          <MagnifyingGlass className="absolute left-4 top-1/2 -translate-y-1/2 text-black-30" size={20} />
+          <input
+            type="search"
+            placeholder="Search by name, company, role, or interest…"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            className="input pl-11"
+          />
+        </div>
+        <span className="text-black-80 text-sm">{headerLabel}</span>
+      </div>
 
-      <FiltersRow>
-        <FilterGroup>
-          <FilterLabel>Companies</FilterLabel>
-          <Chips>
-            {allCompanies.map((c) => (
-              <Chip
-                key={c}
-                $active={companies.includes(c)}
-                type="button"
-                onClick={() => toggle(companies, setCompanies, c)}
-              >
-                {c}
-              </Chip>
-            ))}
-          </Chips>
-        </FilterGroup>
+      {/* Filters */}
+      <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-2">
+          <span className="eyebrow text-black-80">Companies</span>
+          <div className="flex flex-wrap gap-2">
+            {allCompanies.map((c) => {
+              const active = companies.includes(c);
+              return (
+                <button
+                  key={c}
+                  type="button"
+                  onClick={() => toggle(companies, setCompanies, c)}
+                  className={`chip transition-colors ${active ? "bg-blue text-white" : "hover:bg-blue hover:text-white"}`}
+                >
+                  {c}
+                </button>
+              );
+            })}
+          </div>
+        </div>
 
-        <FilterGroup>
-          <FilterLabel>Interests</FilterLabel>
-          <Chips>
-            {allInterests.map((i) => (
-              <Chip
-                key={i}
-                $active={interests.includes(i)}
-                type="button"
-                onClick={() => toggle(interests, setInterests, i)}
-              >
-                {i}
-              </Chip>
-            ))}
-          </Chips>
-        </FilterGroup>
+        <div className="flex flex-col gap-2 mt-2">
+          <span className="eyebrow text-black-80">Interests</span>
+          <div className="flex flex-wrap gap-2">
+            {allInterests.map((i) => {
+              const active = interests.includes(i);
+              return (
+                <button
+                  key={i}
+                  type="button"
+                  onClick={() => toggle(interests, setInterests, i)}
+                  className={`chip transition-colors ${active ? "bg-blue text-white" : "hover:bg-blue hover:text-white"}`}
+                >
+                  {i}
+                </button>
+              );
+            })}
+          </div>
+        </div>
 
         {activeFilterCount > 0 && (
-          <ClearButton
+          <button
             type="button"
             onClick={() => {
               setCompanies([]);
               setInterests([]);
             }}
+            className="self-start flex items-center gap-1 text-sm text-blue hover:text-blue-80 mt-2 transition-colors"
           >
-            Clear filters
-          </ClearButton>
+            <X size={16} /> Clear filters
+          </button>
         )}
-      </FiltersRow>
+      </div>
 
+      {/* Results Grid */}
       {results.length === 0 ? (
-        <Empty>
+        <div className="py-16 px-6 text-center rounded-card border-2 border-dashed border-black-10 text-black-80">
           {emptyHint ?? "No members match those filters yet."}
-        </Empty>
+        </div>
       ) : (
-        <Grid>
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
           {results.map((m) => (
             <MemberCard key={m.id} member={m} />
           ))}
-        </Grid>
+        </div>
       )}
-    </Container>
+    </div>
   );
 }
-
-const Container = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 24px;
-`;
-
-const Controls = styled.div`
-  display: flex;
-  gap: 16px;
-  align-items: center;
-  flex-wrap: wrap;
-`;
-
-const SearchInput = styled.input`
-  flex: 1;
-  min-width: 260px;
-  height: 48px;
-  padding: 0 18px;
-  border-radius: 999px;
-  border: 1px solid rgba(239, 239, 239, 0.15);
-  background: rgba(239, 239, 239, 0.06);
-  color: #efefef;
-  font-size: var(--text-base);
-  outline: none;
-  transition: border-color 200ms ease, background 200ms ease;
-
-  &::placeholder {
-    color: rgba(239, 239, 239, 0.45);
-  }
-
-  &:focus {
-    border-color: rgba(173, 206, 255, 0.6);
-    background: rgba(239, 239, 239, 0.1);
-  }
-`;
-
-const ResultCount = styled.span`
-  font-size: var(--text-sm);
-  color: rgba(239, 239, 239, 0.6);
-`;
-
-const FiltersRow = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-`;
-
-const FilterGroup = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-`;
-
-const FilterLabel = styled.span`
-  font-size: var(--text-xs);
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: rgba(239, 239, 239, 0.55);
-`;
-
-const Chips = styled.div`
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-`;
-
-const Chip = styled.button<{ $active: boolean }>`
-  font-size: var(--text-xs);
-  padding: 6px 12px;
-  border-radius: 999px;
-  border: 1px solid
-    ${({ $active }) => ($active ? "rgba(173, 206, 255, 0.7)" : "rgba(239, 239, 239, 0.15)")};
-  background: ${({ $active }) =>
-    $active ? "rgba(173, 206, 255, 0.18)" : "rgba(239, 239, 239, 0.05)"};
-  color: ${({ $active }) => ($active ? "#fff" : "rgba(239, 239, 239, 0.8)")};
-  cursor: pointer;
-  transition: background 200ms ease, color 200ms ease, border-color 200ms ease;
-
-  @media (hover: hover) and (pointer: fine) {
-    &:hover {
-      background: rgba(173, 206, 255, 0.12);
-      color: #fff;
-    }
-  }
-`;
-
-const ClearButton = styled.button`
-  align-self: flex-start;
-  background: none;
-  border: none;
-  color: rgba(173, 206, 255, 0.85);
-  font-size: var(--text-sm);
-  cursor: pointer;
-  padding: 0;
-  text-decoration: underline;
-`;
-
-const Grid = styled.div`
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 24px;
-
-  @media (max-width: 1024px) {
-    grid-template-columns: repeat(3, 1fr);
-  }
-  @media (max-width: 768px) {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 16px;
-  }
-`;
-
-const Empty = styled.div`
-  padding: 60px 24px;
-  text-align: center;
-  border-radius: 24px;
-  border: 1px dashed rgba(239, 239, 239, 0.15);
-  color: rgba(239, 239, 239, 0.65);
-`;
