@@ -64,7 +64,8 @@ export default function Nav() {
   useEffect(() => {
     if (!accountOpen) return;
     const onPointerDown = (e: PointerEvent) => {
-      if (!accountRef.current?.contains(e.target as Node)) setAccountOpen(false);
+      if (!accountRef.current?.contains(e.target as Node))
+        setAccountOpen(false);
     };
     document.addEventListener("pointerdown", onPointerDown);
     return () => document.removeEventListener("pointerdown", onPointerDown);
@@ -77,10 +78,11 @@ export default function Nav() {
   }, [signOut]);
 
   return (
-    <header className="fixed inset-x-0 top-4 z-50 md:top-6">
-      <div className="container-content">
-        {/* The floating pill */}
-        <div className="flex items-center justify-between gap-4 rounded-full border-2 border-haze-50 bg-white/90 py-2 pl-3 pr-2 shadow-[0_8px_32px_-16px] shadow-black-30 backdrop-blur-[4px] md:mx-auto md:w-fit md:gap-9 md:pl-4">
+    <header className="fixed inset-x-0 top-4 z-50 md:top-5">
+      {/* 1380 of the design's 1440, i.e. a 30px margin either side — the pill
+          is nearly full-bleed rather than a centred capsule. */}
+      <div className="mx-auto w-full max-w-[1380px] px-4 md:px-[30px]">
+        <div className="border-haze-50 flex items-center justify-between gap-4 rounded-card border-2 bg-white/90 py-2 pl-3 pr-2 shadow-[0_4px_40px] shadow-haze-50 backdrop-blur-[4px] md:gap-9 md:px-4">
           <Link
             href="/"
             aria-label="VEST at UCLA — home"
@@ -89,7 +91,10 @@ export default function Nav() {
             <VestMark className="h-7 w-7 md:h-8 md:w-8" />
           </Link>
 
-          <nav aria-label="Primary" className="hidden md:flex md:items-center md:gap-9">
+          <nav
+            aria-label="Primary"
+            className="ml-auto hidden md:flex md:items-center md:gap-9"
+          >
             {NAV_ITEMS.map((item) => {
               const current = isCurrent(pathname, item.href);
               return (
@@ -97,7 +102,7 @@ export default function Nav() {
                   key={item.href}
                   href={item.href}
                   aria-current={current ? "page" : undefined}
-                  className={`text-sm transition-colors duration-200 ${
+                  className={`transition-colors duration-200 ${
                     current
                       ? "font-semibold text-black"
                       : "font-medium text-black-80 hover:text-black"
@@ -141,15 +146,23 @@ export default function Nav() {
                       <p className="truncate text-sm font-semibold text-black">
                         {user.firstName} {user.lastName}
                       </p>
-                      <p className="truncate text-xs text-black-80">{user.email}</p>
-                      {isAdmin && <span className="chip mt-2 text-blue">Admin</span>}
+                      <p className="truncate text-xs text-black-80">
+                        {user.email}
+                      </p>
+                      {isAdmin && (
+                        <span className="chip mt-2 text-blue">Admin</span>
+                      )}
                     </div>
                     <div className="pt-2">
                       {userSlug && (
-                        <MenuLink href={`/members/edit/${userSlug}`}>Edit profile</MenuLink>
+                        <MenuLink href={`/members/edit/${userSlug}`}>
+                          Edit profile
+                        </MenuLink>
                       )}
                       <MenuLink href="/members">Member directory</MenuLink>
-                      {isAdmin && <MenuLink href="/members/admin">Manage users</MenuLink>}
+                      {isAdmin && (
+                        <MenuLink href="/members/admin">Manage users</MenuLink>
+                      )}
                       <button
                         type="button"
                         role="menuitem"
@@ -163,13 +176,16 @@ export default function Nav() {
                   </div>
                 </>
               ) : (
-                <Link href="/members/login" className="btn btn-ghost px-3 text-sm">
+                <Link
+                  href="/members/login"
+                  className="btn btn-ghost px-3 text-sm"
+                >
                   Sign in
                 </Link>
               )}
             </div>
 
-            <Link href="/join" className="btn btn-primary px-4 text-sm">
+            <Link href="/join" className="btn btn-primary px-3 py-1">
               Join Us
             </Link>
 
@@ -191,7 +207,9 @@ export default function Nav() {
           id="mobile-menu"
           inert={!menuOpen}
           className={`mt-2 origin-top rounded-card border-2 border-haze-50 bg-white/95 p-2 shadow-[0_16px_40px_-20px] shadow-black-30 backdrop-blur-md transition-[opacity,transform,visibility] duration-[var(--dur-base)] ease-out-quart md:hidden ${
-            menuOpen ? "visible translate-y-0 opacity-100" : "invisible -translate-y-2 opacity-0"
+            menuOpen
+              ? "visible translate-y-0 opacity-100"
+              : "invisible -translate-y-2 opacity-0"
           }`}
         >
           <nav aria-label="Primary (mobile)" className="flex flex-col">
@@ -217,43 +235,43 @@ export default function Nav() {
           {/* Rendered only once auth has resolved — an empty divider while
               Firebase initialises reads as a broken menu. */}
           {!loading && (
-          <div className="mt-2 border-t-2 border-black-10 pt-2">
-            {!user && (
-              <Link
-                href="/members/login"
-                className="block rounded-btn px-3 py-2.5 text-base font-medium text-black-80 transition-colors duration-200 hover:text-black"
-              >
-                Sign in
-              </Link>
-            )}
-            {user && (
-              <>
-                {userSlug && (
-                  <Link
-                    href={`/members/edit/${userSlug}`}
-                    className="block rounded-btn px-3 py-2.5 text-base font-medium text-black-80 transition-colors duration-200 hover:text-black"
-                  >
-                    Edit profile
-                  </Link>
-                )}
-                {isAdmin && (
-                  <Link
-                    href="/members/admin"
-                    className="block rounded-btn px-3 py-2.5 text-base font-medium text-black-80 transition-colors duration-200 hover:text-black"
-                  >
-                    Manage users
-                  </Link>
-                )}
-                <button
-                  type="button"
-                  onClick={handleSignOut}
-                  className="block w-full rounded-btn px-3 py-2.5 text-left text-base font-medium text-black-80 transition-colors duration-200 hover:text-black"
+            <div className="mt-2 border-t-2 border-black-10 pt-2">
+              {!user && (
+                <Link
+                  href="/members/login"
+                  className="block rounded-btn px-3 py-2.5 text-base font-medium text-black-80 transition-colors duration-200 hover:text-black"
                 >
-                  Sign out
-                </button>
-              </>
-            )}
-          </div>
+                  Sign in
+                </Link>
+              )}
+              {user && (
+                <>
+                  {userSlug && (
+                    <Link
+                      href={`/members/edit/${userSlug}`}
+                      className="block rounded-btn px-3 py-2.5 text-base font-medium text-black-80 transition-colors duration-200 hover:text-black"
+                    >
+                      Edit profile
+                    </Link>
+                  )}
+                  {isAdmin && (
+                    <Link
+                      href="/members/admin"
+                      className="block rounded-btn px-3 py-2.5 text-base font-medium text-black-80 transition-colors duration-200 hover:text-black"
+                    >
+                      Manage users
+                    </Link>
+                  )}
+                  <button
+                    type="button"
+                    onClick={handleSignOut}
+                    className="block w-full rounded-btn px-3 py-2.5 text-left text-base font-medium text-black-80 transition-colors duration-200 hover:text-black"
+                  >
+                    Sign out
+                  </button>
+                </>
+              )}
+            </div>
           )}
         </div>
       </div>
@@ -261,7 +279,13 @@ export default function Nav() {
   );
 }
 
-function MenuLink({ href, children }: { href: string; children: React.ReactNode }) {
+function MenuLink({
+  href,
+  children,
+}: {
+  href: string;
+  children: React.ReactNode;
+}) {
   return (
     <Link
       href={href}
