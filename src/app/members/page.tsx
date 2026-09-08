@@ -1,0 +1,20 @@
+"use client";
+
+import PortalShell from "@/components/Members/PortalShell";
+import MemberDirectory from "@/components/Members/MemberDirectory";
+import { MemberStatus } from "@/data/members";
+
+export default function MembersPage() {
+  return (
+    <PortalShell
+      title={
+        <>
+          Member <span className="italic font-sans font-normal text-blue">Portfolio</span>
+        </>
+      }
+      subtitle="Browse the current VEST class. Search by name, company, or interest — and click into anyone for their full background."
+    >
+      <MemberDirectory status={MemberStatus.Active} />
+    </PortalShell>
+  );
+}

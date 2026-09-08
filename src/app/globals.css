@@ -1,100 +1,1100 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
 
-body {
-  font-family: var(--font-geist-sans), system-ui, sans-serif;
+@theme {
+  /* ---------------------------------------------------------------------
+     Colour — Figma "2026 website redesign" variables. The -NN suffixes are
+     fixed alpha steps rather than tints, so they sit correctly over both the
+     white and haze surfaces.
+     --------------------------------------------------------------------- */
+  --color-white: #ffffff;
+  --color-white-50: color-mix(in srgb, #ffffff 50%, transparent);
+
+  --color-haze: #f4f7fb;
+  --color-haze-50: color-mix(in srgb, #f4f7fb 50%, transparent);
+
+  --color-black: #10103d;
+  --color-black-80: color-mix(in srgb, #10103d 80%, transparent);
+  --color-black-30: color-mix(in srgb, #10103d 30%, transparent);
+  --color-black-10: color-mix(in srgb, #10103d 10%, transparent);
+
+  --color-blue: #0059ff;
+  --color-blue-80: color-mix(in srgb, #0059ff 80%, transparent);
+  --color-blue-50: color-mix(in srgb, #0059ff 50%, transparent);
+
+  --color-mint: #c4ffc0;
+
+  /* Flat fills sampled from the dithered art's own top edge, so the colour
+     behind each photograph matches it and no seam shows while it loads or
+     when the art is shorter than its container. */
+  --color-hero-sky: #1165ea;
+  --color-footer-sky: #0040c2;
+
+  /* ---------------------------------------------------------------------
+     Type — `--font-rethink` / `--font-bit-apple` are injected by next/font
+     in `layout.tsx`; aliasing them here keeps `font-sans` / `font-display`
+     working without a self-referential custom property.
+     --------------------------------------------------------------------- */
+  --font-sans: var(--font-rethink), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-bit-apple), var(--font-rethink), sans-serif;
+  /* The design sets the footer column headers in Aptos Mono Bold, which is not
+     licensed for the web here — the system mono stack keeps the same
+     wide-tracked, utilitarian read. */
+  --font-mono: ui-monospace, "SF Mono", "Aptos Mono", Menlo, monospace;
+
+  /* Display sizes are fluid: they hit the Figma value at 1440 and stay
+     legible at 375 instead of overflowing. */
+  --text-display-lg: clamp(2rem, 5vw, 3rem); /* 32 -> 48px (design: 48) */
+  --text-display-lg--line-height: 1;
+  --text-display: clamp(2rem, 5.5vw, 3rem); /* 32 -> 48px */
+  --text-display-xl: clamp(
+    3rem,
+    7vw,
+    4.5rem
+  ); /* 48 -> 72px (footer wordmark) */
+  --text-display-xl--line-height: 1;
+  --text-display--line-height: 1;
+  --text-display-sm: clamp(1.75rem, 3.6vw, 2.25rem); /* 28 -> 36px */
+  --text-display-sm--line-height: 1.2;
+  --text-display-sm--letter-spacing: 0.02em;
+  --text-h3: 2.25rem; /* 36px, paired with a smaller class on mobile */
+  --text-h3--line-height: 1.2;
+  --text-body: 1rem;
+  --text-body--line-height: 1.4;
+  --text-meta: 1rem;
+  --text-meta--line-height: 1.4;
+
+  /* Motion */
+  --ease-out-quart: cubic-bezier(0.165, 0.84, 0.44, 1);
+  --ease-out-expo: cubic-bezier(0.19, 1, 0.22, 1);
+  --ease-in-out-cubic: cubic-bezier(0.645, 0.045, 0.355, 1);
+  --dur-fast: 150ms;
+  --dur-base: 220ms;
+  --dur-slow: 320ms;
+  /* Reserved for a photograph settling into its frame. Long on purpose: the
+     same 320ms that reads as "arrived" on a line of text reads as a lurch on
+     a 1200px picture, because the eye is tracking the whole surface. */
+  --dur-media: 900ms;
+
+  /* Shape */
+  --radius-card: 12px;
+  --radius-btn: 8px;
+
+  /* Rhythm — the design's own 120px block padding, 44px on small screens.
+     A phone shows roughly a third of the content a 1440 artboard does, so
+     holding anything near the desktop figure turns every section break into
+     a screenful of nothing. */
+  --spacing-section: 120px;
+  --spacing-section-sm: 44px;
+  /* Body gutter. 120px at 1440 leaves the 1200px content column. */
+  --spacing-gutter: 120px;
 }
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
-    --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
-    --chart-1: 12 76% 61%;
-    --chart-2: 173 58% 39%;
-    --chart-3: 197 37% 24%;
-    --chart-4: 43 74% 66%;
-    --chart-5: 27 87% 67%;
-    --radius: 0.5rem;
-    
-    /* Header text variables */
-    --header-gradient: linear-gradient(180deg, #ffffff 0%, #adceff 100%);
-    --header-font-regular: var(--font-bit-apple), 'Bit Apple', monospace;
-    --header-font-italic: var(--font-playfair-display), 'Playfair Display', serif;
-    
-    /* Header text sizes */
-    --header-size-hero: 5.625rem;
-    --header-size-hero-mobile: 3rem;
-    --header-size-page: 4.5rem;
-    --header-size-page-mobile: 2.25rem;
-    --header-size-section: 3rem;
-    --header-size-section-mobile: 1.75rem;
-    --header-size-subsection: 2rem;
-    --header-size-subsection-mobile: 1.25rem;
-    
-    /* Body text sizes */
-    --text-xxl: 1.5rem;
-    --text-xxl-mobile: 1.25rem;
-    --text-xl: 1.25rem;
-    --text-xl-mobile: 1rem;
-    --text-lg: 1.125rem;
-    --text-lg-mobile: 1rem;
-    --text-base: 1rem;
-    --text-base-mobile: 0.875rem;
-    --text-sm: 0.875rem;
-    --text-sm-mobile: 0.75rem;
-    --text-xs: 0.75rem;
+    color-scheme: light;
   }
-  .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
-    --primary: 210 40% 98%;
-    --primary-foreground: 222.2 47.4% 11.2%;
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 212.7 26.8% 83.9%;
-    --chart-1: 220 70% 50%;
-    --chart-2: 160 60% 45%;
-    --chart-3: 30 80% 55%;
-    --chart-4: 280 65% 60%;
-    --chart-5: 340 75% 55%;
+
+  html {
+    /* No smooth-scroll and no scroll library: the page scrolls natively. */
+    scroll-behavior: auto;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    background-color: var(--color-white);
+    color: var(--color-black);
+    font-family: var(--font-sans);
+    font-size: var(--text-body);
+    line-height: 1.4;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* The nav is a fixed pill, so in-page anchors need to clear it. */
+  :target {
+    scroll-margin-top: 7rem;
+  }
+
+  ::selection {
+    background-color: var(--color-mint);
+    color: var(--color-black);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-blue);
+    outline-offset: 2px;
+    border-radius: 2px;
+  }
+
+  img {
+    /* Nothing in the design relies on an image's intrinsic size. */
+    max-width: 100%;
   }
 }
 
-@layer base {
-  * {
-    @apply border-border;
+@layer components {
+  .container-content {
+    --gutter: 1.5rem;
+    max-width: calc(1200px + 2 * var(--gutter));
+    margin-inline: auto;
+    padding-inline: var(--gutter);
   }
-  body {
-    @apply bg-background text-foreground;
+  @media (min-width: 768px) {
+    .container-content {
+      --gutter: 2.5rem;
+    }
+  }
+
+  .section,
+  .section-block {
+    padding-block: var(--spacing-section-sm);
+  }
+  @media (min-width: 768px) {
+    .section,
+    .section-block {
+      padding-block: var(--spacing-section);
+    }
+  }
+
+  /* Two-column section header: title left, supporting paragraph right. */
+  .section-header {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 1.5rem;
+    /* The design hangs both columns from a shared top edge, not a baseline. */
+    align-items: start;
+  }
+  @media (min-width: 900px) {
+    .section-header {
+      grid-template-columns: minmax(0, 400px) minmax(0, 360px);
+      justify-content: space-between;
+      gap: 3rem;
+    }
+  }
+
+  /* --------------------------------------------------------------------
+     The header's lede column — heading over its text CTA. Two columns
+     side by side, that reads as "here is the claim, here is where to go
+     next", with the supporting copy alongside.
+
+     Stacked, the same markup puts the CTA between the heading and the
+     paragraph that explains it: an exit offered before the reader has been
+     told what they would be leaving for. So below the two-column
+     breakpoint the wrapper dissolves into the grid and the link is ordered
+     last, landing under the body copy where it answers it.
+     -------------------------------------------------------------------- */
+  @media (max-width: 899px) {
+    .section-lede {
+      display: contents;
+    }
+
+    .section-lede-cta {
+      /* Everything else defaults to 0, so this is the only item that moves. */
+      order: 1;
+      /* `display: contents` takes the wrapper's `items-start` with it, and a
+         grid item stretches by default — without this the link's box, and so
+         its hit target, would span the whole column. */
+      justify-self: start;
+    }
+  }
+
+  .card {
+    background-color: var(--color-white);
+    border-radius: var(--radius-card);
+    border: 2px solid var(--color-black-10);
+    overflow: hidden;
+  }
+
+  /* --------------------------------------------------------------------
+     Card that is itself a link. The whole card is the hit target, so hover
+     only has to say "this one is live": the hairline goes blue and a tight
+     shadow sits it just off the page. Deliberately no transform on the card
+     — a grid of cards that each jump under a passing pointer reads as noise.
+
+     `--card-hover-border` is the one knob: blue-80 keeps a 2px rule from
+     shouting at full saturation. Swap it for `--color-blue-50` to soften
+     further, or `--color-blue` to go all the way.
+     -------------------------------------------------------------------- */
+  .card-interactive {
+    --card-hover-border: var(--color-blue-80);
+    transition:
+      border-color var(--dur-fast) var(--ease-out-quart),
+      box-shadow var(--dur-fast) var(--ease-out-quart);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    /* The `.group:hover` arm is for the common shape where the <a> is the
+       wrapper and the card is its child, so the card still answers to a
+       hover anywhere in the link — including its own padding. */
+    .card-interactive:hover,
+    .group:hover > .card-interactive,
+    .group:focus-visible > .card-interactive {
+      border-color: var(--card-hover-border);
+      box-shadow: 0 2px 6px -1px color-mix(in srgb, #10103d 14%, transparent);
+    }
+  }
+
+  /* --------------------------------------------------------------------
+     The "this leads somewhere" cue on a linked card. Absent at rest so a
+     grid of cards stays quiet, then it fades in and travels right on
+     hover. This is the one transform the card language allows, because
+     here the direction *is* the message — it points at where the click
+     goes. The slide runs longer than the fade so the arrow is legible
+     before it has finished arriving.
+     -------------------------------------------------------------------- */
+  .card-arrow {
+    opacity: 0;
+    transform: translateX(-6px);
+    transition:
+      opacity var(--dur-fast) var(--ease-out-quart),
+      transform var(--dur-base) var(--ease-out-quart);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .card-interactive:hover .card-arrow,
+    .group:hover .card-arrow,
+    .group:focus-visible .card-arrow {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  /* Touch has no hover to reveal it, and an affordance nobody can trigger
+     is just a hole in the layout — so on touch the arrow simply stays. */
+  @media (hover: none), (pointer: coarse) {
+    .card-arrow {
+      opacity: 1;
+      transform: none;
+      transition: none;
+    }
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    border-radius: var(--radius-btn);
+    padding: 0.75rem 1.25rem;
+    font-weight: 500;
+    line-height: 1;
+    white-space: nowrap;
+    border: 2px solid transparent;
+    cursor: pointer;
+    transition:
+      background-color var(--dur-base) var(--ease-out-quart),
+      border-color var(--dur-base) var(--ease-out-quart),
+      color var(--dur-base) var(--ease-out-quart),
+      transform var(--dur-fast) var(--ease-out-quart);
+  }
+
+  .btn:active {
+    transform: scale(0.98);
+    transition-duration: 100ms;
+  }
+
+  .btn-primary {
+    background-color: var(--color-blue);
+    color: var(--color-white);
+    border-color: var(--color-blue-50);
+  }
+
+  .btn-inverse {
+    background-color: var(--color-white);
+    color: var(--color-blue);
+    border-color: var(--color-white-50);
+  }
+
+  .btn-ghost {
+    background-color: transparent;
+    color: var(--color-black-80);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .btn-primary:hover {
+      background-color: var(--color-blue-80);
+    }
+    .btn-inverse:hover {
+      background-color: var(--color-haze);
+    }
+    .btn-ghost:hover {
+      color: var(--color-black);
+      background-color: var(--color-black-10);
+    }
+  }
+
+  /* --------------------------------------------------------------------
+     Quiet text CTA. Stands in for `.btn` where a filled pill would out-shout
+     the section heading it hangs under — a section's job is to be read, not
+     clicked, so the link asks rather than demands. The underline is present
+     at rest, half-strength, because nothing else here says "link"; hover
+     just brings it to full and lets the arrow travel.
+     -------------------------------------------------------------------- */
+  .link-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    font-weight: 500;
+    color: var(--color-blue-50);
+    text-decoration-color: var(--color-blue-50);
+    text-decoration-thickness: 1.5px;
+    text-underline-offset: 4px;
+    transition: text-decoration-color var(--dur-base) var(--ease-out-quart);
+  }
+
+  .link-cta-arrow {
+    transition: transform var(--dur-base) var(--ease-out-quart);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .link-cta:hover {
+      text-decoration-color: currentColor;
+    }
+    .link-cta:hover .link-cta-arrow {
+      transform: translateX(3px);
+    }
+  }
+
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    background-color: var(--color-haze);
+    border: 1px solid var(--color-black-10);
+    font-size: 0.8125rem;
+    font-weight: 500;
+    line-height: 1.4;
+  }
+
+  .input {
+    width: 100%;
+    padding: 0.75rem;
+    border-radius: var(--radius-btn);
+    border: 2px solid var(--color-black-10);
+    background-color: var(--color-white);
+    transition: border-color var(--dur-base) var(--ease-out-quart);
+  }
+
+  .input:focus {
+    outline: none;
+    border-color: var(--color-blue);
+  }
+
+  /* Mint marker-pen highlight. Painted as a background so it never depends on
+     a stacking context, and it follows the text across line breaks.
+     `--highlight-thickness` is the nib width, and it is the only place the
+     stroke height is written down — the sweep and the no-motion fallbacks all
+     read it, so the mark can be fattened or thinned from here alone. */
+  .highlight {
+    --highlight-thickness: 0.62em;
+    background-image: linear-gradient(var(--color-mint), var(--color-mint));
+    background-repeat: no-repeat;
+    background-size: 100% var(--highlight-thickness);
+    background-position: 0 76%;
+    padding-inline: 0.05em;
+  }
+
+  /* Animated variant: the stroke is drawn on left-to-right once the phrase
+     scrolls into view, driven by the Highlight IntersectionObserver. The
+     default `box-decoration-break: slice` is what fills a wrapped phrase one
+     line at a time, in reading order, the way a real marker pen would. */
+  .highlight-sweep {
+    background-size: 0% var(--highlight-thickness);
+    transition: background-size 620ms var(--ease-out-expo);
+  }
+
+  .highlight-sweep.is-visible {
+    background-size: 100% var(--highlight-thickness);
+  }
+
+  /* The stroke is JS-driven; without it the mark should simply be there. */
+  @media (scripting: none) {
+    .highlight-sweep {
+      background-size: 100% var(--highlight-thickness);
+      transition: none;
+    }
+  }
+
+  /* Italic date / byline line used on event and member cards. */
+  .meta {
+    font-size: var(--text-meta);
+    font-style: italic;
+    color: var(--color-black-80);
+  }
+
+  /* Long-form copy: comfortable measure and leading. */
+  .prose {
+    line-height: 1.6;
+    max-width: 68ch;
+  }
+
+  .prose > * + * {
+    margin-top: 1rem;
+  }
+
+  /* Footer sky. The art is a full 1440x720 dithered plate, not a cutout, so
+     it is anchored to the bottom at its native horizontal scale: scaling it to
+     `cover` on a wide monitor would coarsen the dither. Anything above it
+     falls back to the flat colour sampled from the plate's top edge, which is
+     why there is no seam. */
+  .footer-sky {
+    background-color: var(--color-footer-sky);
+    background-image: url("/images/footer-clouds.png");
+    background-repeat: no-repeat;
+    background-position: center bottom;
+    background-size: 100% auto;
+  }
+
+  /* The plate is 2:1. Held at full width on a phone it is ~190px of cloud
+     under a ~500px footer, which reads as a stripe rather than as sky. Cover
+     scales it off the height instead and crops the sides — the top of the
+     plate is the flat colour the fill already is, so the content block above
+     the clouds is unaffected. */
+  @media (max-width: 767px) {
+    .footer-sky {
+      background-size: cover;
+    }
+  }
+
+  /* --------------------------------------------------------------------
+     Company logo grid. Explicit placement on desktop reproduces the
+     design's exact arrangement; below that the grid steps 4 -> 5 -> 7
+     columns, because holding seven on a phone renders every mark ~40px
+     wide.
+
+     `--logo-scale` shrinks the whole set together, so the design's relative
+     sizing — a wordmark earning its presence from width, a square mark from
+     height — survives at every width. Each logo carries its drawn size as
+     the unitless `--logo-w` / `--logo-h`.
+     -------------------------------------------------------------------- */
+  .company-grid {
+    --logo-scale: 0.46;
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 1.25rem 0.75rem;
+    align-items: center;
+    justify-items: center;
+  }
+
+  .company-grid > li {
+    /* A grid item's `auto` minimum is its content, which a wide wordmark
+       would use to push its column — and the whole grid — open. */
+    min-width: 0;
+  }
+
+  .company-grid > li > img {
+    width: calc(var(--logo-w) * var(--logo-scale) * 1px);
+    /* The pair of these is what keeps a mark too wide for its column in
+       proportion: max-width takes the width, aspect-ratio takes the height
+       with it. A fixed height here would squash it instead. */
+    aspect-ratio: var(--logo-w) / var(--logo-h);
+    height: auto;
+    max-width: 100%;
+    object-fit: contain;
+  }
+
+  @media (min-width: 640px) {
+    .company-grid {
+      --logo-scale: 0.68;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 1.5rem 1rem;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .company-grid {
+      --logo-scale: 1;
+      grid-template-columns: repeat(var(--cols), minmax(0, 1fr));
+      grid-auto-rows: 100px;
+      gap: 0;
+    }
+
+    .company-grid > li {
+      grid-column: var(--col);
+      grid-row: var(--row);
+    }
+  }
+
+  /* Footer column headers: bold mono, uppercase, wide tracking. */
+  .footer-heading {
+    font-family: var(--font-mono);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    font-size: 1rem;
+    line-height: 1.5;
+    color: color-mix(in srgb, #ffffff 80%, transparent);
+  }
+
+  .footer-link {
+    color: color-mix(in srgb, #ffffff 80%, transparent);
+    transition: color var(--dur-base) var(--ease-out-quart);
+  }
+
+  /* Brand blue would disappear into the footer sky, so the brackets take the
+     colour the links themselves resolve to on hover. */
+  .footer-sky .reticle-row {
+    --reticle-color: var(--color-white);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .footer-link:hover {
+      color: var(--color-white);
+    }
+  }
+
+  .eyebrow {
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-size: 0.75rem;
+    color: var(--color-black-80);
+  }
+
+  /* --------------------------------------------------------------------
+     Infinite logo marquee. The track holds two identical copies, so sliding
+     it exactly -50% of its own width puts copy B where copy A began — the
+     wrap is invisible and needs no JS per frame.
+     -------------------------------------------------------------------- */
+  /* The row's one responsive knob, shared by the animated and the
+     reduced-motion branch. Logos and the gap between them scale together, so
+     a phone gets the same rhythm at ~60% of the size rather than eight marks
+     at the design's 60px eating a fifth of the viewport. */
+  .marquee-root {
+    --marquee-scale: 0.5;
+  }
+
+  @media (min-width: 768px) {
+    .marquee-root {
+      --marquee-scale: 1;
+    }
+  }
+
+  .marquee {
+    /* Fade both ends so logos dissolve instead of being guillotined by the
+       container edge. */
+    -webkit-mask-image: linear-gradient(
+      to right,
+      transparent,
+      #000 6%,
+      #000 94%,
+      transparent
+    );
+    mask-image: linear-gradient(
+      to right,
+      transparent,
+      #000 6%,
+      #000 94%,
+      transparent
+    );
+  }
+
+  .marquee-track {
+    animation-name: marquee-slide;
+    /* Constant motion: anything but `linear` reads as a stutter at the wrap. */
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+    will-change: transform;
+  }
+
+  /* Let a reader stop the row to actually look at a logo. Pausing the
+     animation keeps the current offset, so there is no jump on either edge. */
+  @media (hover: hover) and (pointer: fine) {
+    .marquee:hover .marquee-track {
+      animation-play-state: paused !important;
+    }
+  }
+
+  @keyframes marquee-slide {
+    from {
+      transform: translate3d(0, 0, 0);
+    }
+    to {
+      transform: translate3d(-50%, 0, 0);
+    }
+  }
+
+  /* The row is autoplaying decoration; without JS it should sit still and
+     legible rather than animate to a half-measured duration. */
+  @media (scripting: none) {
+    .marquee-track {
+      animation: none;
+    }
+  }
+
+  /* Event carousel track: a native snap scroller with the bar hidden, since
+     the dots and arrows below it are the visible position indicator. */
+  .carousel-track {
+    scrollbar-width: none;
+    overscroll-behavior-x: contain;
+    -webkit-overflow-scrolling: touch;
+  }
+  .carousel-track::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* One-shot scroll reveal, driven by the FadeIn IntersectionObserver.
+     The stagger comes in as `--fade-delay` rather than an inline
+     `transition-delay`, because a custom property inherits — which is what
+     lets the picture inside a `.reveal-media` frame wait out the same beat
+     as the frame it sits in. */
+  .fade-up {
+    opacity: 0;
+    transform: translateY(8px);
+    transition:
+      opacity var(--dur-slow) var(--ease-out-quart),
+      transform var(--dur-slow) var(--ease-out-quart);
+    transition-delay: var(--fade-delay, 0ms);
+  }
+
+  .fade-up.is-visible {
+    opacity: 1;
+    transform: none;
+  }
+
+  /* --------------------------------------------------------------------
+     Media reveal. A photograph carries the reveal differently from a
+     paragraph: it is a window, not a block of text, so instead of sliding
+     the frame further it holds the frame still and lets the picture settle
+     back into it from slightly oversized. The frame must clip
+     (`overflow-hidden`), which every photo box in the design already does.
+
+     The scale runs long against the fade's 320ms and on an expo curve, so
+     nearly all of the travel is spent before the picture is even fully
+     opaque and what is left is a slow drift to rest — a photo that is still
+     visibly zooming once you can read it reads as a slideshow effect.
+
+     `--reveal-scale` is the one knob. Over 1 for a clipped photograph, so
+     it eases *out* of a crop; under 1 for unclipped marks like the company
+     logos, which have no frame to be cropped by and instead grow into
+     place. Either way the picture ends at its true size, never past it.
+     -------------------------------------------------------------------- */
+  .reveal-media {
+    --reveal-scale: 1.06;
+  }
+
+  .reveal-media-soft {
+    --reveal-scale: 0.94;
+  }
+
+  :is(.reveal-media, .reveal-media-soft) :is(img, video) {
+    transform: scale(var(--reveal-scale));
+    transition: transform var(--dur-media) var(--ease-out-expo);
+    transition-delay: var(--fade-delay, 0ms);
+  }
+
+  :is(.reveal-media, .reveal-media-soft).is-visible :is(img, video) {
+    transform: none;
+  }
+
+  /* The reveal is JS-driven, so it must not be the only thing standing between
+     the reader and the content. */
+  @media (scripting: none) {
+    .fade-up {
+      opacity: 1;
+      transform: none;
+      transition: none;
+    }
+
+    :is(.reveal-media, .reveal-media-soft) :is(img, video) {
+      transform: none;
+      transition: none;
+    }
+
+    /* Same bargain for the hero art, which is held back by Motion until the
+       PNG has actually decoded. */
+    .hero-art {
+      opacity: 1 !important;
+      transform: none !important;
+    }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* An infinite loop must be cancelled, not shortened: the blanket
+     `animation-duration: 0.01ms` below would park the track at its -50% end
+     state and blank the first half of the row. */
+  .marquee-track {
+    animation: none !important;
+    transform: none !important;
+  }
+
+  /* Show the content outright rather than fading it in more politely. */
+  .fade-up {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+
+  /* A picture that grows is exactly the kind of full-surface movement this
+     preference is asking about, so the crop is dropped and the photograph is
+     painted at its true size from the first frame. */
+  :is(.reveal-media, .reveal-media-soft) :is(img, video) {
+    transform: none !important;
+    transition: none !important;
+  }
+
+  /* The mint mark is the point of the effect, so it stays; only the stroke
+     travel goes, painted in full from the start. */
+  .highlight-sweep,
+  .highlight-sweep.is-visible {
+    background-size: 100% var(--highlight-thickness);
+    transition: none;
+  }
+  .btn:active {
+    transform: none;
+  }
+  /* The fade still says "this is live"; only the travel goes. */
+  .card-arrow {
+    transform: none !important;
+  }
+  /* The underline colour still answers the hover; only the travel goes. */
+  .link-cta-arrow {
+    transform: none !important;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ======================================================================
+   Focus reticle
+   ====================================================================== */
+
+@layer components {
+  /* --------------------------------------------------------------------
+     A row of links that share one focus reticle. The brackets are placed
+     against this box and measured from it, so it has to be the positioned
+     ancestor — putting `relative` in the class rather than at each call
+     site means a row can never be wired up without it.
+     -------------------------------------------------------------------- */
+  .reticle-row {
+    position: relative;
+  }
+
+  /* --------------------------------------------------------------------
+     Focus reticle. Shared by the nav row and the footer's Navigate column;
+     see FocusReticle.tsx, which measures it and owns the state.
+
+     Four corner brackets, not a filled pill: neither row has space for a
+     background without crowding it, and brackets frame the word instead of
+     covering it. There is one reticle per row, moved between links, so
+     travelling from About to Events is a single object crossing the gap
+     rather than one box fading out while another fades in — the eye tracks
+     the object and lands where it stops.
+
+     Size and position arrive as --x/--y/--w/--h, measured from the row in
+     JS; the padding below is what turns the text box into a frame around
+     it. Off -> on is committed with transitions suppressed for a frame,
+     so the brackets only ever slide between links, never in from wherever
+     they were last seen. --reticle-color retints them for a dark row.
+     -------------------------------------------------------------------- */
+  .focus-reticle {
+    --pad-x: 10px;
+    --pad-y: 6px;
+    position: absolute;
+    top: 0;
+    left: 0;
+    /* Never in the way of the pointer that drives it. It sits first in the
+       row's markup, so it also paints under the links without a z-index. */
+    pointer-events: none;
+    width: calc(var(--w, 0px) + var(--pad-x) * 2);
+    height: calc(var(--h, 0px) + var(--pad-y) * 2);
+    transform: translate3d(
+      calc(var(--x, 0px) - var(--pad-x)),
+      calc(var(--y, 0px) - var(--pad-y)),
+      0
+    );
+    /* Quart-out is the snap: most of the distance is gone in the first
+       third of the move, and it settles without overshooting into the
+       neighbouring link. Width trails the same curve so the frame resizes
+       as it travels rather than after it. */
+    transition:
+      transform var(--dur-base) var(--ease-out-quart),
+      width var(--dur-base) var(--ease-out-quart),
+      height var(--dur-base) var(--ease-out-quart);
+  }
+
+  .focus-reticle-corner {
+    position: absolute;
+    width: 7px;
+    height: 7px;
+    border: 2px solid var(--reticle-color, var(--color-blue));
+    /* The corners close in on the word as they appear and spring back out
+       as they leave, which is the whole read: a lens pulling focus. --cx
+       and --cy give each corner its own diagonal. */
+    transform: translate(calc(var(--cx) * 4px), calc(var(--cy) * 4px));
+    transition:
+      opacity var(--dur-fast) var(--ease-out-quart),
+      transform var(--dur-base) var(--ease-out-quart);
+  }
+
+  /* Each corner keeps only its two outer edges, and rounds the one join
+     between them. */
+  .focus-reticle-corner[data-corner="tl"] {
+    --cx: -1;
+    --cy: -1;
+    top: 0;
+    left: 0;
+    border-right: 0;
+    border-bottom: 0;
+    border-top-left-radius: 4px;
+  }
+
+  .focus-reticle-corner[data-corner="tr"] {
+    --cx: 1;
+    --cy: -1;
+    top: 0;
+    right: 0;
+    border-left: 0;
+    border-bottom: 0;
+    border-top-right-radius: 4px;
+  }
+
+  .focus-reticle-corner[data-corner="bl"] {
+    --cx: -1;
+    --cy: 1;
+    bottom: 0;
+    left: 0;
+    border-right: 0;
+    border-top: 0;
+    border-bottom-left-radius: 4px;
+  }
+
+  .focus-reticle-corner[data-corner="br"] {
+    --cx: 1;
+    --cy: 1;
+    bottom: 0;
+    right: 0;
+    border-left: 0;
+    border-top: 0;
+    border-bottom-right-radius: 4px;
+  }
+
+  .focus-reticle[data-on="true"] .focus-reticle-corner {
+    opacity: 1;
+    transform: translate(0, 0);
+  }
+
+  .focus-reticle[data-on="false"] .focus-reticle-corner {
+    opacity: 0;
+  }
+
+  /* Keyboard focus lands the brackets as well, which makes the global ring
+     a second blue outline nested inside a first — two indicators arguing
+     about the same word. Drop the ring, but only while the brackets are
+     demonstrably up: `[data-on="true"]` is set by React, so if the script
+     never runs the native ring is still there to be the focus indicator. */
+  .reticle-row:has(.focus-reticle[data-on="true"]) a:focus-visible {
+    outline: none;
+  }
+}
+
+/* ======================================================================
+   Nav
+   ====================================================================== */
+
+@layer components {
+  /* --------------------------------------------------------------------
+     The pill. `outline` rather than `border`, as the design draws it: the
+     2px hairline sits outside the box, so the 16px inner padding lands
+     exactly instead of being eaten into. Deliberately not `overflow-clip`
+     — the account menu is a child and has to escape the rounded corners.
+     -------------------------------------------------------------------- */
+  .nav-pill {
+    border-radius: var(--radius-card);
+    background-color: color-mix(in srgb, #ffffff 90%, transparent);
+    outline: 2px solid var(--color-haze-50);
+    box-shadow: 0 4px 40px var(--color-haze-50);
+    -webkit-backdrop-filter: blur(4px);
+    backdrop-filter: blur(4px);
+  }
+
+  /* --------------------------------------------------------------------
+     Nav link. Colour alone separates the three states, at one shared
+     weight, so nothing reflows as they change: #10103DCC at rest, full
+     #10103D under the pointer, brand blue for the page you are on. The
+     current page is the only blue in the row, which is why hover stops at
+     ink rather than reaching for it — a hovered link must never read as
+     the one you already have open. `aria-current` carries the same state
+     for screen readers, which a colour step cannot.
+     -------------------------------------------------------------------- */
+  .nav-link {
+    /* Transform does not apply to a bare inline <a>. */
+    display: inline-block;
+    color: var(--color-black-80);
+    /* A colour swap is a state change, not an entrance: `ease`, and quick
+       enough to stay under a pointer sweeping the row. */
+    transition:
+      color var(--dur-fast) ease,
+      transform 100ms var(--ease-out-quart);
+  }
+
+  .nav-link[aria-current="page"] {
+    color: var(--color-blue);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    /* Excluded rather than outranked: the two selectors weigh the same, so
+       without this the current page would drop its blue on hover — losing
+       the state exactly when the pointer asks about it. */
+    .nav-link:not([aria-current="page"]):hover {
+      color: var(--color-black);
+    }
+  }
+
+  /* Navigating leaves a dead beat between the press and the next paint.
+     This scale is the only thing acknowledging the press inside it. */
+  .nav-link:active {
+    transform: scale(0.97);
+  }
+
+  .nav-logo {
+    display: inline-flex;
+    transition:
+      opacity var(--dur-fast) ease,
+      transform 100ms var(--ease-out-quart);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .nav-logo:hover {
+      opacity: 0.7;
+    }
+  }
+
+  .nav-logo:active {
+    transform: scale(0.94);
+  }
+
+  /* --------------------------------------------------------------------
+     Menu icon. The two glyphs are stacked and cross-faded through a
+     quarter turn, in opposite directions, so the swap reads as one
+     control turning rather than two icons trading places.
+     -------------------------------------------------------------------- */
+  .nav-icon {
+    position: absolute;
+    display: grid;
+    place-items: center;
+    inset: 0;
+    transition:
+      opacity var(--dur-fast) var(--ease-out-quart),
+      transform var(--dur-base) var(--ease-out-quart);
+  }
+
+  .nav-icon[data-state="hidden"] {
+    opacity: 0;
+    transform: rotate(var(--nav-icon-turn, 90deg)) scale(0.9);
+  }
+
+  /* --------------------------------------------------------------------
+     Mobile sheet. Grows from the pill's bottom edge, so `transform-origin:
+     top`. `visibility` is transitioned rather than dropped, so the closed
+     sheet leaves the tab order the moment it is gone — never before.
+     -------------------------------------------------------------------- */
+  .nav-sheet {
+    transform-origin: top center;
+    transition:
+      opacity var(--dur-base) var(--ease-out-quart),
+      transform var(--dur-base) var(--ease-out-quart),
+      visibility 0s linear 0s;
+  }
+
+  .nav-sheet[data-open="false"] {
+    visibility: hidden;
+    opacity: 0;
+    transform: translateY(-8px) scale(0.98);
+    /* Opening is the user deciding; closing is the system responding. Run
+       the exit faster, and hold visibility until the fade is actually
+       finished. */
+    transition-duration: var(--dur-fast), var(--dur-fast), 0s;
+    transition-delay: 0s, 0s, var(--dur-fast);
+  }
+
+  .nav-sheet-item {
+    color: var(--color-black-80);
+    transition:
+      opacity var(--dur-base) var(--ease-out-quart),
+      transform var(--dur-base) var(--ease-out-quart),
+      color var(--dur-fast) ease,
+      background-color var(--dur-fast) ease;
+    /* The stagger is set per item as `--stagger`, and applied to the
+       entrance only: a colour change must never be held behind it. */
+    transition-delay: var(--stagger, 0ms), var(--stagger, 0ms), 0s, 0s;
+  }
+
+  /* Same signal as the desktop row, minus the reticle: a stack of full-width
+     rows has no word to frame, and the sheet is short enough that colour
+     alone finds the current page. */
+  .nav-sheet-item[aria-current="page"] {
+    color: var(--color-blue);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .nav-sheet-item:not([aria-current="page"]):hover {
+      color: var(--color-black);
+    }
+  }
+
+  .nav-sheet[data-open="false"] .nav-sheet-item {
+    opacity: 0;
+    transform: translateY(-4px);
+    /* Closing is one movement, not four — the per-item stagger set inline
+       is for the entrance only. */
+    transition-duration: var(--dur-fast);
+    transition-delay: 0ms !important;
+  }
+
+  /* --------------------------------------------------------------------
+     Account menu. Anchored to the avatar, so it scales out of its own
+     trigger rather than out of its centre.
+     -------------------------------------------------------------------- */
+  .nav-account-menu {
+    transform-origin: top right;
+    transition:
+      opacity var(--dur-fast) var(--ease-out-quart),
+      transform var(--dur-fast) var(--ease-out-quart),
+      visibility 0s linear 0s;
+  }
+
+  .nav-account-menu[data-open="false"] {
+    visibility: hidden;
+    opacity: 0;
+    transform: scale(0.96) translateY(-4px);
+    transition-delay: 0s, 0s, var(--dur-fast);
+  }
+}
+
+/* Reduced motion is fewer and gentler, not none: the colour and opacity
+   transitions still explain what changed, only the movement goes. */
+@media (prefers-reduced-motion: reduce) {
+  .nav-link:active,
+  .nav-logo:active,
+  .nav-sheet[data-open="false"],
+  .nav-sheet-item,
+  .nav-icon[data-state="hidden"],
+  .nav-account-menu[data-open="false"] {
+    transform: none !important;
+  }
+
+  /* The reticle keeps its position — that is what it is for — but stops
+     travelling between links and stops closing in on them. It cuts to the
+     new word and fades, which still answers "what am I pointing at". */
+  .focus-reticle {
+    transition: none !important;
+  }
+
+  .focus-reticle-corner {
+    transform: none !important;
+    transition: opacity var(--dur-fast) ease !important;
+  }
+
+  /* A stagger with the motion removed is just latency. */
+  .nav-sheet-item {
+    transition-delay: 0ms !important;
   }
 }

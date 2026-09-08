@@ -1,0 +1,20 @@
+/**
+ * The VEST shield mark, inlined so it can be tinted with `currentColor`
+ * (navy in the nav pill, white over the blue footer) from a single source.
+ */
+export function VestMark({ className }: { className?: string }) {
+  return (
+    <svg
+      viewBox="0 0 2000 2000"
+      className={className}
+      fill="currentColor"
+      aria-hidden="true"
+      focusable="false"
+    >
+      <polygon points="1344.88 302.34 991.26 1170.56 991.26 788.77 1207.2 262.93 1344.88 302.34" />
+      <path d="M1011.09,1252.39l379.01-937.1,86.52,24.77c-66.75,469.15,98.62,623.24,98.62,623.24v566.97c-345.57,175-583.99,222.16-583.99,222.16,0,0,6.89-1.79,19.83-5.98v-494.06Z" />
+      <polygon points="637.64 302.34 991.26 1170.56 991.26 788.77 775.32 262.93 637.64 302.34" />
+      <path d="M971.43,1252.39l-379.01-937.1-86.52,24.77c66.75,469.15-98.62,623.24-98.62,623.24v566.97c345.57,175,583.99,222.16,583.99,222.16,0,0-6.89-1.79-19.83-5.98v-494.06Z" />
+    </svg>
+  );
+}
