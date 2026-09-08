@@ -428,6 +428,17 @@
     }
   }
 
+  /* Event carousel track: a native snap scroller with the bar hidden, since
+     the dots and arrows below it are the visible position indicator. */
+  .carousel-track {
+    scrollbar-width: none;
+    overscroll-behavior-x: contain;
+    -webkit-overflow-scrolling: touch;
+  }
+  .carousel-track::-webkit-scrollbar {
+    display: none;
+  }
+
   /* One-shot scroll reveal, driven by the FadeIn IntersectionObserver. */
   .fade-up {
     opacity: 0;

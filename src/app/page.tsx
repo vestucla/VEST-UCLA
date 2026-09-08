@@ -6,6 +6,7 @@ import Hero from "@/components/home/Hero";
 import { LogoMarquee } from "@/components/home/LogoMarquee";
 import { CompanyGrid } from "@/components/home/CompanyGrid";
 import { EventCard } from "@/components/events/EventCard";
+import { TechWeekCard } from "@/components/events/TechWeekCard";
 import { FadeIn } from "@/components/ui/FadeIn";
 import { partnerLogos } from "@/data/logos";
 import { eventsByDate } from "@/data/events";
@@ -39,6 +40,8 @@ export default function Home() {
           gap={84}
         />
       </section>
+
+      <TechWeekCard />
 
       {/* Cultivating UCLA's startup ecosystem */}
       <section className="section-block bg-haze">

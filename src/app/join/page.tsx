@@ -31,12 +31,27 @@ const timelineSteps = [
   { step: 4, title: "Decision", desc: "Final decisions are sent out." },
 ];
 
+const banner = siteConfig.applicationsOpen
+  ? {
+      heading: "Applications are open.",
+      body: "We are currently accepting applications for this cohort.",
+    }
+  : siteConfig.applicationsOpenAt
+    ? {
+        heading: "Applications opening soon.",
+        body: `Applications open ${siteConfig.applicationsOpenAt}.`,
+      }
+    : {
+        heading: "Applications are closed.",
+        body: "Check back next quarter or join our newsletter to stay updated.",
+      };
+
 export default function Join() {
   return (
     <>
       <PageHeader
         title="Join Us"
-        description="We recruit builders, engineers, and designers every Fall and Spring. See our process below."
+        description="We recruit builders, engineers, and designers every Fall and Winter. See our process below."
       />
       
       {/* Applications Banner */}
@@ -44,13 +59,9 @@ export default function Join() {
         <div className="container-content flex flex-col md:flex-row items-center justify-between gap-6">
           <div className="flex flex-col gap-2">
             <h2 className="font-display text-display-sm text-black">
-              {siteConfig.applicationsOpen ? "Applications are open." : "Applications are closed."}
+              {banner.heading}
             </h2>
-            <p className="text-black-80 text-lg">
-              {siteConfig.applicationsOpen 
-                ? "We are currently accepting applications for this cohort." 
-                : "Check back next quarter or join our newsletter to stay updated."}
-            </p>
+            <p className="text-black-80 text-lg">{banner.body}</p>
           </div>
           {siteConfig.applicationsOpen && (
             <a href={siteConfig.applicationUrl} target="_blank" rel="noopener noreferrer" className="btn btn-primary whitespace-nowrap">

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { eventsByDate } from "@/data/events";
-import { EventCard } from "@/components/events/EventCard";
+import { EventCarousel } from "@/components/events/EventCarousel";
+import { TechWeekSection } from "@/components/events/TechWeekSection";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { FadeIn } from "@/components/ui/FadeIn";
 
@@ -17,17 +18,26 @@ export default function Events() {
         title="Events"
         description="Join us for speaker sessions, founder chats, workshops and community socials. Catch up on what we've been doing below."
       />
-      <section className="section bg-white">
-        <div className="container-content">
-          <ul className="grid grid-cols-1 gap-6 md:grid-cols-2 md:gap-8 lg:grid-cols-3">
-            {eventsByDate.map((event, i) => (
-              <li key={event.id}>
-                <FadeIn delay={i * 50} className="h-full">
-                  <EventCard event={event} />
-                </FadeIn>
-              </li>
-            ))}
-          </ul>
+
+      <TechWeekSection />
+
+      {/* Past events */}
+      <section
+        aria-labelledby="past-events-heading"
+        className="section bg-haze"
+      >
+        <div className="container-content flex flex-col gap-12">
+          <FadeIn>
+            <h2
+              id="past-events-heading"
+              className="font-display text-display-sm text-blue"
+            >
+              Past events
+            </h2>
+          </FadeIn>
+          <FadeIn delay={80}>
+            <EventCarousel events={eventsByDate} label="Past events" />
+          </FadeIn>
         </div>
       </section>
     </>

@@ -11,7 +11,6 @@ const NAV_ITEMS = [
   { href: "/about", label: "About" },
   { href: "/events", label: "Events" },
   { href: "/team", label: "Team" },
-  { href: "/members", label: "Members" },
 ];
 
 /** True for the page itself and, for /events, its detail pages. */
