@@ -482,3 +482,189 @@
     scroll-behavior: auto !important;
   }
 }
+
+/* ======================================================================
+   Nav
+   ====================================================================== */
+
+@layer components {
+  /* --------------------------------------------------------------------
+     The pill. `outline` rather than `border`, as the design draws it: the
+     2px hairline sits outside the box, so the 16px inner padding lands
+     exactly instead of being eaten into. Deliberately not `overflow-clip`
+     — the account menu is a child and has to escape the rounded corners.
+     -------------------------------------------------------------------- */
+  .nav-pill {
+    border-radius: var(--radius-card);
+    background-color: color-mix(in srgb, #ffffff 90%, transparent);
+    outline: 2px solid var(--color-haze-50);
+    box-shadow: 0 4px 40px var(--color-haze-50);
+    -webkit-backdrop-filter: blur(4px);
+    backdrop-filter: blur(4px);
+  }
+
+  /* --------------------------------------------------------------------
+     Nav link. The design separates the current page from the rest by
+     colour alone — #10103D against #10103DCC, at one shared weight — so
+     hover simply walks a link up to the current-page colour. No second
+     vocabulary to learn, and no reflow from swapping weight on the
+     current item. `aria-current` carries the state for screen readers,
+     which an alpha step cannot.
+     -------------------------------------------------------------------- */
+  .nav-link {
+    /* Transform does not apply to a bare inline <a>. */
+    display: inline-block;
+    color: var(--color-black-80);
+    /* A colour swap is a state change, not an entrance: `ease`, and quick
+       enough to stay under a pointer sweeping the row. */
+    transition:
+      color var(--dur-fast) ease,
+      transform 100ms var(--ease-out-quart);
+  }
+
+  .nav-link[aria-current="page"] {
+    color: var(--color-black);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .nav-link:hover {
+      color: var(--color-black);
+    }
+  }
+
+  /* Navigating leaves a dead beat between the press and the next paint.
+     This scale is the only thing acknowledging the press inside it. */
+  .nav-link:active {
+    transform: scale(0.97);
+  }
+
+  .nav-logo {
+    display: inline-flex;
+    transition:
+      opacity var(--dur-fast) ease,
+      transform 100ms var(--ease-out-quart);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .nav-logo:hover {
+      opacity: 0.7;
+    }
+  }
+
+  .nav-logo:active {
+    transform: scale(0.94);
+  }
+
+  /* --------------------------------------------------------------------
+     Menu icon. The two glyphs are stacked and cross-faded through a
+     quarter turn, in opposite directions, so the swap reads as one
+     control turning rather than two icons trading places.
+     -------------------------------------------------------------------- */
+  .nav-icon {
+    position: absolute;
+    display: grid;
+    place-items: center;
+    inset: 0;
+    transition:
+      opacity var(--dur-fast) var(--ease-out-quart),
+      transform var(--dur-base) var(--ease-out-quart);
+  }
+
+  .nav-icon[data-state="hidden"] {
+    opacity: 0;
+    transform: rotate(var(--nav-icon-turn, 90deg)) scale(0.9);
+  }
+
+  /* --------------------------------------------------------------------
+     Mobile sheet. Grows from the pill's bottom edge, so `transform-origin:
+     top`. `visibility` is transitioned rather than dropped, so the closed
+     sheet leaves the tab order the moment it is gone — never before.
+     -------------------------------------------------------------------- */
+  .nav-sheet {
+    transform-origin: top center;
+    transition:
+      opacity var(--dur-base) var(--ease-out-quart),
+      transform var(--dur-base) var(--ease-out-quart),
+      visibility 0s linear 0s;
+  }
+
+  .nav-sheet[data-open="false"] {
+    visibility: hidden;
+    opacity: 0;
+    transform: translateY(-8px) scale(0.98);
+    /* Opening is the user deciding; closing is the system responding. Run
+       the exit faster, and hold visibility until the fade is actually
+       finished. */
+    transition-duration: var(--dur-fast), var(--dur-fast), 0s;
+    transition-delay: 0s, 0s, var(--dur-fast);
+  }
+
+  .nav-sheet-item {
+    color: var(--color-black-80);
+    transition:
+      opacity var(--dur-base) var(--ease-out-quart),
+      transform var(--dur-base) var(--ease-out-quart),
+      color var(--dur-fast) ease,
+      background-color var(--dur-fast) ease;
+    /* The stagger is set per item as `--stagger`, and applied to the
+       entrance only: a colour change must never be held behind it. */
+    transition-delay: var(--stagger, 0ms), var(--stagger, 0ms), 0s, 0s;
+  }
+
+  .nav-sheet-item[aria-current="page"] {
+    color: var(--color-black);
+    background-color: var(--color-haze);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .nav-sheet-item:hover {
+      color: var(--color-black);
+    }
+  }
+
+  .nav-sheet[data-open="false"] .nav-sheet-item {
+    opacity: 0;
+    transform: translateY(-4px);
+    /* Closing is one movement, not four — the per-item stagger set inline
+       is for the entrance only. */
+    transition-duration: var(--dur-fast);
+    transition-delay: 0ms !important;
+  }
+
+  /* --------------------------------------------------------------------
+     Account menu. Anchored to the avatar, so it scales out of its own
+     trigger rather than out of its centre.
+     -------------------------------------------------------------------- */
+  .nav-account-menu {
+    transform-origin: top right;
+    transition:
+      opacity var(--dur-fast) var(--ease-out-quart),
+      transform var(--dur-fast) var(--ease-out-quart),
+      visibility 0s linear 0s;
+  }
+
+  .nav-account-menu[data-open="false"] {
+    visibility: hidden;
+    opacity: 0;
+    transform: scale(0.96) translateY(-4px);
+    transition-delay: 0s, 0s, var(--dur-fast);
+  }
+}
+
+/* Reduced motion is fewer and gentler, not none: the colour and opacity
+   transitions still explain what changed, only the movement goes. */
+@media (prefers-reduced-motion: reduce) {
+  .nav-link:active,
+  .nav-logo:active,
+  .nav-sheet[data-open="false"],
+  .nav-sheet-item,
+  .nav-icon[data-state="hidden"],
+  .nav-account-menu[data-open="false"] {
+    transform: none !important;
+  }
+
+  /* A stagger with the motion removed is just latency. */
+  .nav-sheet-item {
+    transition-delay: 0ms !important;
+  }
+}

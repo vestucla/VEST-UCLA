@@ -23,6 +23,18 @@ const SKY_SCROLL = -40;
 const JET_SCROLL = -130;
 
 /**
+ * Hard bounds on the jet's excursion, in px, applied after scroll and pointer
+ * are summed. The sum already peaks just inside these, so they never stall the
+ * motion — they exist so that tuning the constants above can't push the layer
+ * somewhere the composition was never checked at.
+ */
+const JET_RISE_MAX = 156;
+const JET_DRIFT_MAX = 88;
+
+const clamp = (v: number, min: number, max: number) =>
+  Math.min(max, Math.max(min, v));
+
+/**
  * Hero: a 1-bit dithered sky with a jet climbing out of the cloud deck.
  *
  * The design ships the sky and the jet as two separate full-bleed layers,
@@ -48,6 +60,11 @@ export default function Hero() {
   const jetScrollY = useTransform(scrollYProgress, [0, 1], [0, JET_SCROLL]);
   const jetScrollX = useTransform(scrollYProgress, [0, 1], [0, 44]);
 
+  // The cue has done its job the moment the page moves, so it fades out over
+  // the first sliver of the hero's exit rather than riding along at full
+  // strength and having to be scrolled past twice.
+  const cueOpacity = useTransform(scrollYProgress, [0, 0.12], [1, 0]);
+
   // Pointer position as -1..1 from the hero's centre.
   const pointerX = useMotionValue(0);
   const pointerY = useMotionValue(0);
@@ -66,11 +83,19 @@ export default function Hero() {
   const skyY = useTransform(
     () => skyScrollY.get() + smoothY.get() * -SKY_POINTER * 0.6,
   );
-  const jetX = useTransform(
-    () => jetScrollX.get() + smoothX.get() * JET_POINTER,
+  const jetX = useTransform(() =>
+    clamp(
+      jetScrollX.get() + smoothX.get() * JET_POINTER,
+      -JET_DRIFT_MAX,
+      JET_DRIFT_MAX,
+    ),
   );
-  const jetY = useTransform(
-    () => jetScrollY.get() + smoothY.get() * JET_POINTER * 0.6,
+  const jetY = useTransform(() =>
+    clamp(
+      jetScrollY.get() + smoothY.get() * JET_POINTER * 0.6,
+      -JET_RISE_MAX,
+      JET_RISE_MAX,
+    ),
   );
 
   useEffect(() => {
@@ -110,11 +135,12 @@ export default function Hero() {
     <section
       ref={ref}
       aria-labelledby="hero-heading"
-      // 840px at the design width, and never shorter than a phone viewport.
-      className="relative isolate overflow-hidden bg-hero-sky max-md:min-h-[560px] md:h-[840px]"
+      // 800px on desktop, and never shorter than a phone viewport.
+      className="relative isolate overflow-hidden bg-hero-sky max-md:min-h-[560px] md:h-[800px]"
     >
-      {/* Both layers are inset past the section on both axes so no amount of
-          parallax can drag an edge into view. */}
+      {/* The sky is inset 56px past the section on every side, which its 47px
+          of peak travel clears outright, so no amount of parallax can drag an
+          edge into view. */}
       <motion.div
         aria-hidden="true"
         style={reduceMotion ? undefined : { x: skyX, y: skyY }}
@@ -133,10 +159,16 @@ export default function Hero() {
         />
       </motion.div>
 
+      {/* Given an explicit size at the PNG's own 12:7 ratio rather than being
+          stretched to a full-bleed box, so the jet holds one size and one
+          height up the frame at every viewport width instead of ballooning on
+          wide monitors the way an `object-cover` layer does. Placed left of
+          centre so the trail crosses the frame; the empty right third of the
+          PNG hangs off past the hero and costs nothing. */}
       <motion.div
         aria-hidden="true"
         style={reduceMotion ? undefined : { x: jetX, y: jetY }}
-        className="pointer-events-none absolute -inset-x-8 -top-14 -bottom-14 -z-10 will-change-transform"
+        className="pointer-events-none absolute bottom-7 -left-[340px] -z-10 h-[560px] w-[960px] will-change-transform md:bottom-0 md:left-0 md:h-[800px] md:w-[1371px]"
       >
         <Image
           src="/images/hero-plane.png"
@@ -145,7 +177,7 @@ export default function Hero() {
           priority
           unoptimized
           sizes="100vw"
-          className="object-cover object-center"
+          className="object-fill"
         />
       </motion.div>
 
@@ -159,6 +191,41 @@ export default function Hero() {
           VEST is building the future in Los Angeles.
         </h1>
       </div>
+
+      {/* Scroll cue. Decorative rather than a control: it points at the page
+          below, which a keyboard or screen-reader user reaches by moving on
+          through the document anyway, so announcing it would only add a stop
+          that leads nowhere new. */}
+      <motion.div
+        aria-hidden="true"
+        style={{ opacity: cueOpacity }}
+        className="pointer-events-none absolute bottom-6 left-1/2 -translate-x-1/2 md:bottom-9"
+      >
+        <motion.svg
+          width="28"
+          height="28"
+          viewBox="0 0 24 24"
+          fill="none"
+          // A drop of just under the chevron's own height, eased so it hangs a
+          // beat at the bottom of the fall — a linear bob reads as a metronome.
+          animate={reduceMotion ? undefined : { y: [0, 9, 0] }}
+          transition={{
+            duration: 1.9,
+            ease: "easeInOut",
+            repeat: Infinity,
+            repeatDelay: 0.35,
+          }}
+          className="text-white drop-shadow-[0_2px_10px_rgba(16,16,61,0.45)]"
+        >
+          <path
+            d="m5 9 7 7 7-7"
+            stroke="currentColor"
+            strokeWidth="2.25"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+        </motion.svg>
+      </motion.div>
     </section>
   );
 }

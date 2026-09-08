@@ -13,15 +13,15 @@ export function EventCard({ event }: { event: Event }) {
             alt=""
             fill
             sizes="(min-width: 1024px) 380px, (min-width: 768px) 50vw, 100vw"
-            className="object-cover transition-transform duration-500 ease-out-quart motion-reduce:transition-none md:group-hover:scale-[1.03]"
+            className="object-cover transition-transform duration-500 ease-out-quart motion-reduce:transition-none md:group-hover:scale-[1.01]"
           />
         </div>
         <div className="flex flex-1 flex-col gap-4 px-6 py-4">
           <div className="flex flex-col">
-            <h3 className="text-[1.75rem] leading-[1.2] text-black md:text-[2.25rem]">
+            <h3 className="text-xl leading-tight text-black md:text-2xl mb-2">
               {event.title}
             </h3>
-            <p className="text-black-80">{formatEventDate(event.date)}</p>
+            <p className="text-sm text-black-80">{formatEventDate(event.date)}</p>
           </div>
           <p className="line-clamp-3 text-black">{event.description}</p>
         </div>

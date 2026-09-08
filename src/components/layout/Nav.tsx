@@ -3,16 +3,15 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { List, SignOut, X } from "@phosphor-icons/react/dist/ssr";
+import { List, SignOut, X, ArrowRight } from "@phosphor-icons/react/dist/ssr";
 import { useAuth } from "@/lib/auth";
 import { VestMark } from "@/components/ui/VestMark";
 
+/** The whole nav: three pages, then Join Us as the button. Nothing else. */
 const NAV_ITEMS = [
   { href: "/about", label: "About" },
-  { href: "/events", label: "Events" },
   { href: "/team", label: "Team" },
-  { href: "/members", label: "Members" },
-  { href: "/leaderboard", label: "Leaderboard" },
+  { href: "/events", label: "Events" },
 ];
 
 /** True for the page itself and, for /events, its detail pages. */
@@ -82,111 +81,101 @@ export default function Nav() {
       {/* 1380 of the design's 1440, i.e. a 30px margin either side — the pill
           is nearly full-bleed rather than a centred capsule. */}
       <div className="mx-auto w-full max-w-[1380px] px-4 md:px-[30px]">
-        <div className="border-haze-50 flex items-center justify-between gap-4 rounded-card border-2 bg-white/90 py-2 pl-3 pr-2 shadow-[0_4px_40px] shadow-haze-50 backdrop-blur-[4px] md:gap-9 md:px-4">
+        {/* The design holds the links and the Join Us button in one 36px
+            row, so the pill's own gap has to be that same 36px — the
+            button is the last item in the row, not a separate cluster. */}
+        <div className="nav-pill flex items-center justify-between gap-4 px-3 py-2 md:gap-9 md:px-4">
           <Link
             href="/"
             aria-label="VEST at UCLA — home"
-            className="shrink-0 rounded-full p-1 text-blue transition-opacity duration-200 hover:opacity-70"
+            className="nav-logo shrink-0 rounded-full text-blue"
           >
-            <VestMark className="h-7 w-7 md:h-8 md:w-8" />
+            {/* The mark's own artboard carries the design's 20%/13% inset, so
+                a plain 36px box reproduces the drawn geometry. */}
+            <VestMark className="h-8 w-8 md:h-9 md:w-9" />
           </Link>
 
           <nav
             aria-label="Primary"
             className="ml-auto hidden md:flex md:items-center md:gap-9"
           >
-            {NAV_ITEMS.map((item) => {
-              const current = isCurrent(pathname, item.href);
-              return (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  aria-current={current ? "page" : undefined}
-                  className={`transition-colors duration-200 ${
-                    current
-                      ? "font-semibold text-black"
-                      : "font-medium text-black-80 hover:text-black"
-                  }`}
-                >
-                  {item.label}
-                </Link>
-              );
-            })}
+            {NAV_ITEMS.map((item) => (
+              <Link
+                key={item.href}
+                href={item.href}
+                aria-current={isCurrent(pathname, item.href) ? "page" : undefined}
+                className="nav-link text-body"
+              >
+                {item.label}
+              </Link>
+            ))}
           </nav>
 
           <div className="flex items-center gap-2">
-            {/* Auth slot — reserves width while loading so the pill never jumps. */}
-            <div ref={accountRef} className="relative hidden md:block">
-              {loading ? (
-                <div className="h-9 w-9" aria-hidden="true" />
-              ) : user ? (
-                <>
-                  <button
-                    type="button"
-                    onClick={() => setAccountOpen((open) => !open)}
-                    aria-expanded={accountOpen}
-                    aria-haspopup="menu"
-                    aria-label="Account menu"
-                    className="flex h-9 w-9 items-center justify-center rounded-full border-2 border-blue-50 bg-blue text-xs font-semibold uppercase text-white transition-colors duration-200 hover:bg-blue-80"
-                  >
-                    {user.firstName?.[0]}
-                    {user.lastName?.[0]}
-                  </button>
-
-                  <div
-                    role="menu"
-                    inert={!accountOpen}
-                    className={`absolute right-0 top-full z-10 mt-3 w-64 origin-top-right rounded-card border-2 border-black-10 bg-white p-2 shadow-[0_16px_40px_-20px] shadow-black-30 transition-[opacity,transform,visibility] duration-[var(--dur-fast)] ease-out-quart ${
-                      accountOpen
-                        ? "visible scale-100 opacity-100"
-                        : "invisible scale-[0.96] opacity-0"
-                    }`}
-                  >
-                    <div className="border-b-2 border-black-10 px-3 pb-3 pt-2">
-                      <p className="truncate text-sm font-semibold text-black">
-                        {user.firstName} {user.lastName}
-                      </p>
-                      <p className="truncate text-xs text-black-80">
-                        {user.email}
-                      </p>
-                      {isAdmin && (
-                        <span className="chip mt-2 text-blue">Admin</span>
-                      )}
-                    </div>
-                    <div className="pt-2">
-                      {userSlug && (
-                        <MenuLink href={`/members/edit/${userSlug}`}>
-                          Edit profile
-                        </MenuLink>
-                      )}
-                      <MenuLink href="/members">Member directory</MenuLink>
-                      {isAdmin && (
-                        <MenuLink href="/members/admin">Manage users</MenuLink>
-                      )}
-                      <button
-                        type="button"
-                        role="menuitem"
-                        onClick={handleSignOut}
-                        className="flex w-full items-center gap-2 rounded-btn px-3 py-2 text-left text-sm text-black-80 transition-colors duration-200 hover:bg-haze hover:text-black"
-                      >
-                        <SignOut size={16} />
-                        Sign out
-                      </button>
-                    </div>
-                  </div>
-                </>
-              ) : (
-                <Link
-                  href="/members/login"
-                  className="btn btn-ghost px-3 text-sm"
+            {/* Account slot. Rendered only for a signed-in member, so the
+                public nav is exactly the five elements the design draws.
+                No reserved width while Firebase resolves: holding 36px open
+                would put a permanent gap in the design for the signed-out
+                majority to spare signed-in members one shift on hard load. */}
+            {!loading && user && (
+              <div ref={accountRef} className="relative hidden md:block">
+                <button
+                  type="button"
+                  onClick={() => setAccountOpen((open) => !open)}
+                  aria-expanded={accountOpen}
+                  aria-haspopup="menu"
+                  aria-label="Account menu"
+                  className="flex h-9 w-9 items-center justify-center rounded-full border-2 border-blue-50 bg-blue text-xs font-semibold uppercase text-white transition-[background-color,transform] duration-[var(--dur-fast)] ease-out-quart hover:bg-blue-80 active:scale-[0.94]"
                 >
-                  Sign in
-                </Link>
-              )}
-            </div>
+                  {user.firstName?.[0]}
+                  {user.lastName?.[0]}
+                </button>
 
-            <Link href="/join" className="btn btn-primary px-3 py-1">
-              Join Us
+                <div
+                  role="menu"
+                  data-open={accountOpen}
+                  inert={!accountOpen}
+                  className="nav-account-menu absolute right-0 top-full z-10 mt-3 w-64 rounded-card border-2 border-black-10 bg-white p-2 shadow-[0_16px_40px_-20px] shadow-black-30"
+                >
+                  <div className="border-b-2 border-black-10 px-3 pb-3 pt-2">
+                    <p className="truncate text-sm font-semibold text-black">
+                      {user.firstName} {user.lastName}
+                    </p>
+                    <p className="truncate text-xs text-black-80">
+                      {user.email}
+                    </p>
+                    {isAdmin && <span className="chip mt-2 text-blue">Admin</span>}
+                  </div>
+                  <div className="pt-2">
+                    {userSlug && (
+                      <MenuLink href={`/members/edit/${userSlug}`}>
+                        Edit profile
+                      </MenuLink>
+                    )}
+                    <MenuLink href="/members">Member directory</MenuLink>
+                    {isAdmin && (
+                      <MenuLink href="/members/admin">Manage users</MenuLink>
+                    )}
+                    <button
+                      type="button"
+                      role="menuitem"
+                      onClick={handleSignOut}
+                      className="flex w-full items-center gap-2 rounded-btn px-3 py-2 text-left text-sm text-black-80 transition-colors duration-[var(--dur-fast)] hover:bg-haze hover:text-black"
+                    >
+                      <SignOut size={16} />
+                      Sign out
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            <Link
+              href="/events"
+              aria-current={isCurrent(pathname, "/join") ? "page" : undefined}
+              className="btn btn-primary px-3 py-1 leading-[1.4]"
+            >
+              Apply Now for LA Tech Week <ArrowRight size={16} />
             </Link>
 
             <button
@@ -195,9 +184,26 @@ export default function Nav() {
               aria-expanded={menuOpen}
               aria-controls="mobile-menu"
               aria-label={menuOpen ? "Close menu" : "Open menu"}
-              className="flex h-9 w-9 items-center justify-center rounded-full text-black transition-colors duration-200 hover:bg-black-10 md:hidden"
+              className="relative flex h-9 w-9 items-center justify-center rounded-full text-black transition-colors duration-[var(--dur-fast)] hover:bg-black-10 md:hidden"
             >
-              {menuOpen ? <X size={20} /> : <List size={20} />}
+              {/* Both glyphs stay mounted and cross-fade through opposing
+                  quarter turns, so the control reads as turning rather than
+                  as two icons swapping places. */}
+              <span
+                className="nav-icon"
+                data-state={menuOpen ? "hidden" : "shown"}
+                aria-hidden="true"
+              >
+                <List size={20} />
+              </span>
+              <span
+                className="nav-icon"
+                data-state={menuOpen ? "shown" : "hidden"}
+                style={{ "--nav-icon-turn": "-90deg" } as React.CSSProperties}
+                aria-hidden="true"
+              >
+                <X size={20} />
+              </span>
             </button>
           </div>
         </div>
@@ -205,77 +211,76 @@ export default function Nav() {
         {/* Mobile sheet — drops out of the pill, origin top */}
         <div
           id="mobile-menu"
+          data-open={menuOpen}
           inert={!menuOpen}
-          className={`mt-2 origin-top rounded-card border-2 border-haze-50 bg-white/95 p-2 shadow-[0_16px_40px_-20px] shadow-black-30 backdrop-blur-md transition-[opacity,transform,visibility] duration-[var(--dur-base)] ease-out-quart md:hidden ${
-            menuOpen
-              ? "visible translate-y-0 opacity-100"
-              : "invisible -translate-y-2 opacity-0"
-          }`}
+          className="nav-sheet mt-2 rounded-card border-2 border-haze-50 bg-white/95 p-2 shadow-[0_16px_40px_-20px] shadow-black-30 backdrop-blur-md md:hidden"
         >
           <nav aria-label="Primary (mobile)" className="flex flex-col">
-            {NAV_ITEMS.map((item) => {
-              const current = isCurrent(pathname, item.href);
-              return (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  aria-current={current ? "page" : undefined}
-                  className={`rounded-btn px-3 py-2.5 text-base transition-colors duration-200 ${
-                    current
-                      ? "bg-haze font-semibold text-black"
-                      : "font-medium text-black-80 hover:text-black"
-                  }`}
-                >
-                  {item.label}
-                </Link>
-              );
-            })}
+            {NAV_ITEMS.map((item, i) => (
+              <Link
+                key={item.href}
+                href={item.href}
+                aria-current={isCurrent(pathname, item.href) ? "page" : undefined}
+                // 30ms apart: enough to cascade, short enough that the
+                // last item is still inside the sheet's own 220ms.
+                style={{ "--stagger": `${i * 30}ms` } as React.CSSProperties}
+                className="nav-sheet-item rounded-btn px-3 py-2.5 text-base"
+              >
+                {item.label}
+              </Link>
+            ))}
           </nav>
 
           {/* Rendered only once auth has resolved — an empty divider while
               Firebase initialises reads as a broken menu. */}
-          {!loading && (
+          {!loading && user && (
             <div className="mt-2 border-t-2 border-black-10 pt-2">
-              {!user && (
-                <Link
-                  href="/members/login"
-                  className="block rounded-btn px-3 py-2.5 text-base font-medium text-black-80 transition-colors duration-200 hover:text-black"
-                >
-                  Sign in
-                </Link>
+              {userSlug && (
+                <SheetLink href={`/members/edit/${userSlug}`} index={3}>
+                  Edit profile
+                </SheetLink>
               )}
-              {user && (
-                <>
-                  {userSlug && (
-                    <Link
-                      href={`/members/edit/${userSlug}`}
-                      className="block rounded-btn px-3 py-2.5 text-base font-medium text-black-80 transition-colors duration-200 hover:text-black"
-                    >
-                      Edit profile
-                    </Link>
-                  )}
-                  {isAdmin && (
-                    <Link
-                      href="/members/admin"
-                      className="block rounded-btn px-3 py-2.5 text-base font-medium text-black-80 transition-colors duration-200 hover:text-black"
-                    >
-                      Manage users
-                    </Link>
-                  )}
-                  <button
-                    type="button"
-                    onClick={handleSignOut}
-                    className="block w-full rounded-btn px-3 py-2.5 text-left text-base font-medium text-black-80 transition-colors duration-200 hover:text-black"
-                  >
-                    Sign out
-                  </button>
-                </>
+              <SheetLink href="/members" index={4}>
+                Member directory
+              </SheetLink>
+              {isAdmin && (
+                <SheetLink href="/members/admin" index={5}>
+                  Manage users
+                </SheetLink>
               )}
+              <button
+                type="button"
+                onClick={handleSignOut}
+                style={{ "--stagger": "180ms" } as React.CSSProperties}
+                className="nav-sheet-item block w-full cursor-pointer rounded-btn px-3 py-2.5 text-left text-base"
+              >
+                Sign out
+              </button>
             </div>
           )}
         </div>
       </div>
     </header>
+  );
+}
+
+function SheetLink({
+  href,
+  index,
+  children,
+}: {
+  href: string;
+  index: number;
+  children: React.ReactNode;
+}) {
+  return (
+    <Link
+      href={href}
+      style={{ "--stagger": `${index * 30}ms` } as React.CSSProperties}
+      className="nav-sheet-item block rounded-btn px-3 py-2.5 text-base"
+    >
+      {children}
+    </Link>
   );
 }
 
@@ -290,7 +295,7 @@ function MenuLink({
     <Link
       href={href}
       role="menuitem"
-      className="block rounded-btn px-3 py-2 text-sm text-black-80 transition-colors duration-200 hover:bg-haze hover:text-black"
+      className="block rounded-btn px-3 py-2 text-sm text-black-80 transition-colors duration-[var(--dur-fast)] hover:bg-haze hover:text-black"
     >
       {children}
     </Link>
