@@ -16,8 +16,6 @@ const NAVIGATE = [
   { href: "/about", label: "About" },
   { href: "/events", label: "Events" },
   { href: "/team", label: "Team" },
-  { href: "/members", label: "Members" },
-  { href: "/leaderboard", label: "Leaderboard" },
   { href: "/join", label: "Join Us" },
 ];
 
