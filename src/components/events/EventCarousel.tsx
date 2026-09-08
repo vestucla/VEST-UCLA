@@ -28,7 +28,8 @@ export function EventCarousel({
   const reduceMotion = useReducedMotion();
   const [index, setIndex] = useState(0);
   const [pageCount, setPageCount] = useState(1);
-  const [paused, setPaused] = useState(false);
+  const [hovered, setHovered] = useState(false);
+  const [focused, setFocused] = useState(false);
   const [inView, setInView] = useState(true);
   const [dragging, setDragging] = useState(false);
 
@@ -103,7 +104,8 @@ export function EventCarousel({
   }, []);
 
   const canScroll = pageCount > 1;
-  const autoplay = canScroll && !reduceMotion && !paused && inView && !dragging;
+  const autoplay =
+    canScroll && !reduceMotion && !hovered && !focused && inView && !dragging;
 
   useEffect(() => {
     if (!autoplay) return;
@@ -118,11 +120,11 @@ export function EventCarousel({
   return (
     <div
       className="flex flex-col gap-8"
-      onMouseEnter={() => setPaused(true)}
-      onMouseLeave={() => setPaused(false)}
-      onFocus={() => setPaused(true)}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      onFocus={() => setFocused(true)}
       onBlur={(e) => {
-        if (!e.currentTarget.contains(e.relatedTarget)) setPaused(false);
+        if (!e.currentTarget.contains(e.relatedTarget)) setFocused(false);
       }}
     >
       <section

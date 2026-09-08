@@ -151,7 +151,7 @@ export default function Hero() {
 
       {/* The headline sits far left, flush with the nav pill's inner edge
           rather than the 120px body gutter the rest of the page uses. */}
-      <div className="relative h-full pl-6 pr-6 md:pl-[50px]">
+      <div className="absolute inset-0 pl-6 pr-6 md:pl-[50px]">
         <h1
           id="hero-heading"
           className="font-display text-display-lg absolute bottom-24 max-w-[10em] text-white [text-shadow:0_2px_24px_rgba(16,16,61,0.28)] md:bottom-auto md:top-[46%] md:max-w-[470px]"
