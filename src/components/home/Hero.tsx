@@ -188,11 +188,7 @@ export default function Hero() {
           id="hero-heading"
           className="font-display text-display-lg absolute bottom-24 max-w-[10em] text-white [text-shadow:0_2px_24px_rgba(16,16,61,0.28)] md:bottom-auto md:top-[46%] md:max-w-[470px]"
         >
-          VEST is{" "}
-          <span className="underline decoration-2 underline-offset-8">
-            building the future
-          </span>{" "}
-          in Los Angeles.
+          VEST is building the future in Los Angeles.
         </h1>
       </div>
 

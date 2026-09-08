@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import { CardArrow } from "@/components/ui/CardArrow";
 import { type Event, formatEventDate } from "@/data/events";
 
 /** Shared by the homepage "Recent events" row and the full /events grid. */
@@ -13,15 +14,19 @@ export function EventCard({ event }: { event: Event }) {
             alt=""
             fill
             sizes="(min-width: 1024px) 380px, (min-width: 768px) 50vw, 100vw"
-            className="object-cover transition-transform duration-500 ease-out-quart motion-reduce:transition-none md:group-hover:scale-[1.01]"
+            className="object-cover"
           />
         </div>
         <div className="flex flex-1 flex-col gap-4 px-6 py-4">
-          <div className="flex flex-col">
-            <h3 className="text-xl leading-tight text-black md:text-2xl mb-2">
-              {event.title}
-            </h3>
-            <p className="text-sm text-black-80">{formatEventDate(event.date)}</p>
+          <div className="flex items-start justify-between gap-4">
+            <div className="flex flex-col">
+              <h3 className="text-xl leading-tight text-black md:text-2xl mb-2">
+                {event.title}
+              </h3>
+              <p className="text-sm text-black-80">{formatEventDate(event.date)}</p>
+            </div>
+            {/* Nudged down to sit on the title's first line, not its box. */}
+            <CardArrow className="mt-0.5 md:mt-1" />
           </div>
           <p className="line-clamp-3 text-black">{event.description}</p>
         </div>

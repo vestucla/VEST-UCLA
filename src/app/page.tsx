@@ -1,12 +1,12 @@
 import Image from "next/image";
-import Link from "next/link";
 import type { Metadata } from "next";
-import { ArrowUpRight } from "@phosphor-icons/react/dist/ssr";
 import Hero from "@/components/home/Hero";
 import { LogoMarquee } from "@/components/home/LogoMarquee";
 import { CompanyGrid } from "@/components/home/CompanyGrid";
 import { EventCard } from "@/components/events/EventCard";
 import { FadeIn } from "@/components/ui/FadeIn";
+import { Highlight } from "@/components/ui/Highlight";
+import { ArrowLink } from "@/components/ui/ArrowLink";
 import { partnerLogos } from "@/data/logos";
 import { eventsByDate } from "@/data/events";
 
@@ -44,9 +44,12 @@ export default function Home() {
       <section className="section-block bg-haze">
         <div className="container-content flex flex-col gap-12">
           <FadeIn className="section-header">
-            <h2 className="font-display text-display-sm text-blue">
-              Cultivating UCLA’s startup ecosystem.
-            </h2>
+            <div className="flex flex-col items-start gap-4">
+              <h2 className="font-display text-display-sm text-blue">
+                Cultivating UCLA’s startup ecosystem.
+              </h2>
+              <ArrowLink href="/about">Learn more about VEST</ArrowLink>
+            </div>
             <div className="text-black-80 flex flex-col gap-4">
               <p>
                 VEST connects ambitious UCLA students with venture capital firms
@@ -55,8 +58,11 @@ export default function Home() {
               </p>
               <p>
                 We accelerate builders that want to start or join the next
-                Unicorn company. We’re hands on and love to do things rather
-                than just plan things.
+                Unicorn company.{" "}
+                <Highlight>
+                  We’re hands on and love to do things rather than just plan
+                  things.
+                </Highlight>
               </p>
             </div>
           </FadeIn>
@@ -79,13 +85,18 @@ export default function Home() {
       <section className="section-block bg-white">
         <div className="container-content flex flex-col gap-12">
           <FadeIn className="section-header">
-            <h2 className="font-display text-display-sm text-blue">
-              Working at the best companies in tech.
-            </h2>
+            <div className="flex flex-col items-start gap-4">
+              <h2 className="font-display text-display-sm text-blue">
+                Working at the best companies in tech.
+              </h2>
+              <ArrowLink href="/team">Meet the team</ArrowLink>
+            </div>
             <div className="text-black-80 flex flex-col gap-4">
               <p>
-                VEST connects our members with leading companies across the tech
-                industry.
+                <Highlight>
+                  VEST connects our members with leading companies across the
+                  tech industry.
+                </Highlight>
               </p>
               <p>
                 Our alumni have gone on to launch their own successful startups,
@@ -126,10 +137,7 @@ export default function Home() {
           </ul>
 
           <FadeIn className="flex justify-center">
-            <Link href="/events" className="btn btn-primary">
-              View all events
-              <ArrowUpRight size={16} weight="bold" />
-            </Link>
+            <ArrowLink href="/events">View all events</ArrowLink>
           </FadeIn>
         </div>
       </section>

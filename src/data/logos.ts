@@ -76,9 +76,9 @@ export interface CompanyLogo extends Logo {
  * from height, so a single shared row height would make the square marks read
  * as tiny. `width`/`height` are therefore per-logo, straight from the design.
  *
- * The row/col are kept so desktop can reproduce the exact arrangement,
- * including the four empty slots the design leaves. Narrow screens ignore them
- * and let the logos flow.
+ * The row/col are kept so desktop can reproduce the exact arrangement — the
+ * design fills all 42 slots. Narrow screens ignore them and let the logos
+ * flow.
  */
 export const companyLogos: CompanyLogo[] = [
   {
@@ -237,6 +237,14 @@ export const companyLogos: CompanyLogo[] = [
     row: 2,
   },
   {
+    name: "Paradigm",
+    src: "/images/logos/companies/paradigm.png",
+    width: 144,
+    height: 27,
+    col: 5,
+    row: 2,
+  },
+  {
     name: "Paramount",
     src: "/images/logos/companies/paramount.png",
     width: 94,
@@ -291,6 +299,14 @@ export const companyLogos: CompanyLogo[] = [
     width: 133,
     height: 38,
     col: 5,
+    row: 3,
+  },
+  {
+    name: "Etched",
+    src: "/images/logos/companies/etched.png",
+    width: 130,
+    height: 26,
+    col: 6,
     row: 3,
   },
 
@@ -368,11 +384,27 @@ export const companyLogos: CompanyLogo[] = [
     row: 5,
   },
   {
+    name: "Kleiner Perkins",
+    src: "/images/logos/companies/kleiner-perkins.png",
+    width: 114,
+    height: 29,
+    col: 2,
+    row: 5,
+  },
+  {
     name: "Prod",
     src: "/images/logos/companies/prod.png",
     width: 124,
     height: 46,
     col: 3,
+    row: 5,
+  },
+  {
+    name: "Founders Inc",
+    src: "/images/logos/companies/founders-inc.png",
+    width: 136,
+    height: 23,
+    col: 4,
     row: 5,
   },
   {

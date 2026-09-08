@@ -6,9 +6,11 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { List, SignOut, X, ArrowRight } from "@phosphor-icons/react/dist/ssr";
 import { useAuth } from "@/lib/auth";
 import { VestMark } from "@/components/ui/VestMark";
+import { FocusReticle } from "@/components/ui/FocusReticle";
 
-/** The whole nav: three pages, then Join Us as the button. Nothing else. */
+/** The whole nav: four pages, then Join Us as the button. Nothing else. */
 const NAV_ITEMS = [
+  { href: "/", label: "Home" },
   { href: "/about", label: "About" },
   { href: "/team", label: "Team" },
   { href: "/events", label: "Events" },
@@ -16,6 +18,9 @@ const NAV_ITEMS = [
 
 /** True for the page itself and, for /events, its detail pages. */
 function isCurrent(pathname: string, href: string) {
+  // Every path begins with "/", so the landing page has to match exactly —
+  // the prefix test below would otherwise mark Home current site-wide.
+  if (href === "/") return pathname === "/";
   return pathname === href || pathname.startsWith(`${href}/`);
 }
 
@@ -97,8 +102,10 @@ export default function Nav() {
 
           <nav
             aria-label="Primary"
-            className="ml-auto hidden md:flex md:items-center md:gap-9"
+            className="reticle-row ml-auto hidden md:flex md:items-center md:gap-9"
           >
+            <FocusReticle />
+
             {NAV_ITEMS.map((item) => (
               <Link
                 key={item.href}
@@ -175,7 +182,7 @@ export default function Nav() {
               aria-current={isCurrent(pathname, "/join") ? "page" : undefined}
               className="btn btn-primary px-3 py-1 leading-[1.4]"
             >
-              Apply Now for LA Tech Week <ArrowRight size={16} />
+              Apply or RSVP for LA Tech Week <ArrowRight size={16} />
             </Link>
 
             <button
@@ -235,23 +242,32 @@ export default function Nav() {
               Firebase initialises reads as a broken menu. */}
           {!loading && user && (
             <div className="mt-2 border-t-2 border-black-10 pt-2">
+              {/* Counted on from the nav list rather than written out, so
+                  adding a page cannot land two rows on the same beat. */}
               {userSlug && (
-                <SheetLink href={`/members/edit/${userSlug}`} index={3}>
+                <SheetLink
+                  href={`/members/edit/${userSlug}`}
+                  index={NAV_ITEMS.length}
+                >
                   Edit profile
                 </SheetLink>
               )}
-              <SheetLink href="/members" index={4}>
+              <SheetLink href="/members" index={NAV_ITEMS.length + 1}>
                 Member directory
               </SheetLink>
               {isAdmin && (
-                <SheetLink href="/members/admin" index={5}>
+                <SheetLink href="/members/admin" index={NAV_ITEMS.length + 2}>
                   Manage users
                 </SheetLink>
               )}
               <button
                 type="button"
                 onClick={handleSignOut}
-                style={{ "--stagger": "180ms" } as React.CSSProperties}
+                style={
+                  {
+                    "--stagger": `${(NAV_ITEMS.length + 3) * 30}ms`,
+                  } as React.CSSProperties
+                }
                 className="nav-sheet-item block w-full cursor-pointer rounded-btn px-3 py-2.5 text-left text-base"
               >
                 Sign out

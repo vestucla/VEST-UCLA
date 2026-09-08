@@ -162,7 +162,7 @@ export default function MemberProfile({ member }: Props) {
               <h3 className="font-display text-2xl text-black">Experience</h3>
               <div className="flex flex-col gap-4">
                 {member.experiences.map((e, idx) => (
-                  <Card key={`${e.company}-${idx}`} className="p-5 md:p-6 bg-white border border-black-10 transition-transform duration-200 hover:-translate-y-1 hover:shadow-md">
+                  <Card key={`${e.company}-${idx}`} className="p-5 md:p-6 bg-white border border-black-10">
                     <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-2 mb-1">
                       <h4 className="font-bold text-lg text-black">{e.company}</h4>
                       <span className="text-xs font-mono text-black-50 uppercase tracking-wider">

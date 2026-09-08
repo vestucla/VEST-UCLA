@@ -9,10 +9,10 @@ export default function About() {
         description={
           <div className="flex flex-col gap-4">
             <p>
-              VEST was founded with a singular mission: to bring together the most driven builders at UCLA. We are a community of engineers, designers, and founders who are passionate about building things that matter.
+              VEST was founded with a singular mission: to bring together the most driven builders at UCLA. We&apos;re a community of engineers, designers, and founders who are passionate about building things that matter.
             </p>
             <p>
-              Our members have gone on to build companies backed by Y Combinator, Thiel Fellowship, and top VC firms. We also have members working at industry-leading companies like Stripe, Figma, Apple, and more.
+              Our members have gone on to build companies backed by Y Combinator and top VC firms. We also have members working at industry-leading companies like Stripe, Figma, Apple, and more.
             </p>
             <p>
               Whether you are looking for co-founders, early teammates, or just a group of friends who share your ambition, VEST is the place for you.

@@ -1,7 +1,6 @@
 import Link from "next/link";
 import {
   ArrowUpRight,
-  DiscordLogo,
   EnvelopeSimple,
   InstagramLogo,
   LinkedinLogo,
@@ -9,6 +8,7 @@ import {
 } from "@phosphor-icons/react/dist/ssr";
 import { siteConfig } from "@/data/site";
 import { VestMark } from "@/components/ui/VestMark";
+import { FocusReticle } from "@/components/ui/FocusReticle";
 
 /**
  * The design lists Join Us here rather than in the Connect column.
@@ -31,7 +31,6 @@ const SOCIALS = [
   { href: siteConfig.links.linkedin, label: "LinkedIn", Icon: LinkedinLogo },
   { href: siteConfig.links.instagram, label: "Instagram", Icon: InstagramLogo },
   { href: siteConfig.links.x, label: "X", Icon: XLogo },
-  { href: siteConfig.links.discord, label: "Discord", Icon: DiscordLogo },
   { href: siteConfig.links.email, label: "Email", Icon: EnvelopeSimple },
 ];
 
@@ -66,7 +65,7 @@ export default function Footer() {
             </p>
 
             <div className="grid grid-cols-2 gap-9">
-              <FooterColumn title="Navigate">
+              <FooterColumn title="Navigate" reticle>
                 {NAVIGATE.map((link) => (
                   <li key={link.href}>
                     <Link href={link.href} className="footer-link">
@@ -124,17 +123,28 @@ export default function Footer() {
   );
 }
 
+/**
+ * `reticle` opts a column into the corner brackets. The reticle is a sibling
+ * of the <ul> rather than a child of it, because a list may only contain list
+ * items — so the row it measures and listens on is the wrapper, which sits on
+ * exactly the list's own box.
+ */
 function FooterColumn({
   title,
+  reticle = false,
   children,
 }: {
   title: string;
+  reticle?: boolean;
   children: React.ReactNode;
 }) {
   return (
     <div>
       <h2 className="footer-heading">{title}</h2>
-      <ul className="mt-4 flex flex-col gap-4">{children}</ul>
+      <div className={reticle ? "reticle-row mt-4" : "mt-4"}>
+        {reticle && <FocusReticle />}
+        <ul className="flex flex-col gap-4">{children}</ul>
+      </div>
     </div>
   );
 }

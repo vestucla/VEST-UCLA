@@ -3,10 +3,10 @@ import { COMPANY_GRID, companyLogos } from "@/data/logos";
 /**
  * The "Working at the best companies in tech" block.
  *
- * The design hand-places 38 logos on a strict 7-column grid at a ~166 × ~105px
+ * The design hand-places 42 logos on a strict 7-column grid at a ~166 × ~105px
  * pitch, so this is a real CSS grid with each logo pinned to its own slot —
- * that reproduces the arrangement exactly at desktop width, including the four
- * slots the design leaves empty, while still being able to reflow.
+ * that reproduces the arrangement exactly at desktop width, while still being
+ * able to reflow.
  *
  * Below the desktop breakpoint the explicit placement is dropped and the logos
  * simply flow, because holding 7 columns on a phone would render every mark at
