@@ -15,9 +15,9 @@ export const siteConfig = {
   techWeek: {
     title: "We’re hosting for LA Tech Week",
     description:
-      "VEST is bringing founders, builders and investors together for a live product showcase during LA Tech Week. Apply to demo what you’re building, or RSVP to come watch.",
-    demoApplicationUrl: "https://vestucla.typeform.com/to/placeholder", // TODO: real demo form URL
-    rsvpUrl: "https://vestucla.typeform.com/to/placeholder", // TODO: real RSVP URL
+      "VEST is bringing founders, builders and investors together for a live product showcase during LA Tech Week October 16th with a Jazz Matcha Bar. Apply to demo what you’re building, or RSVP to come watch.",
+    demoApplicationUrl: "https://forms.gle/Ap7h3yVXWzDV7eSA6", // TODO: real demo form URL
+    rsvpUrl: "https://partiful.com/e/MgJzE7z90rQQUWn1rILY?c=O6vWLwpM", // TODO: real RSVP URL
   },
 
   links: {

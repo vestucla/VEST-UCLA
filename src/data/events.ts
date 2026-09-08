@@ -44,6 +44,24 @@ export const events: Event[] = [
     subtitle: "Learning from YC23",
     description: "On April 20, 2025, Bowen Xue, a founder from Y Combinator’s Summer 2023 batch, spoke with us about his startup experience, navigating YC, and key takeaways from building his company DisputeNinja.",
     imageSrc: "/images/Events/VEST-BowenXue.webp"
+  },
+  {
+    id: 5,
+    title: "VEST X Sundays in LA X Nexus X Happenstance AI",
+    slug: "happenstance",
+    date: "05/28/2026",
+    subtitle: "Curated Socal Networking Night",
+    description: "On May 28th, 2026, we helped organize a curated networking night for students from across socal to meet each other in pairs made from Happenstance's custom platform for the event.",
+    imageSrc: "/images/Events/VEST-Happenstance.jpg"
+  },
+  {
+    id: 6,
+    title: "VEST X Julius AI",
+    slug: "julius",
+    date: "07/24/2026",
+    subtitle: "UCLA Alumni in Tech Mixer",
+    description: "On July 24th, 2026, we partnered with Julius AI to bring together UCLA Alumni in San Francisco and VEST members interning in the bay to share experiences and connect.",
+    imageSrc: "/images/Events/VEST-Julius.JPG"
   }
 ]; 
 /** `MM/DD/YYYY` -> epoch ms, parsed as UTC so the ordering never shifts by zone. */

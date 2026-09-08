@@ -3,6 +3,7 @@
 import { use, useEffect, useState } from "react";
 import { notFound } from "next/navigation";
 import Link from "next/link";
+import { ArrowLeft } from "@phosphor-icons/react/dist/ssr";
 import PortalShell from "@/components/Members/PortalShell";
 import MemberProfile from "@/components/Members/MemberProfile";
 import { getMember, type Member } from "@/lib/members";
@@ -47,15 +48,16 @@ export default function MemberProfilePage({ params }: Params) {
             {member.firstName} <span className="italic">{member.lastName}</span>
           </>
         }
-        subtitle={
-          <Link
-            href={member.status === "alumni" ? "/members/alumni" : "/members"}
-            style={{ color: "rgba(173, 206, 255, 0.9)", textDecoration: "none" }}
-          >
-            ← Back to {member.status === "alumni" ? "alumni" : "directory"}
-          </Link>
-        }
       >
+        <div className="mb-6 md:mb-8">
+          <Link
+            href={member.status === "alumni" ? "/members/alumni" : "/team"}
+            className="inline-flex items-center gap-2 text-sm font-medium text-blue transition-colors hover:text-blue-80"
+          >
+            <ArrowLeft size={16} weight="bold" />
+            Back to {member.status === "alumni" ? "alumni" : "directory"}
+          </Link>
+        </div>
         <MemberProfile member={member} />
       </PortalShell>
     </main>

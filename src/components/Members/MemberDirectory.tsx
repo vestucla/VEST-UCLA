@@ -4,11 +4,90 @@ import { useEffect, useMemo, useState } from "react";
 import MemberCard from "./MemberCard";
 import type { Member, MemberStatus } from "@/lib/members";
 import { searchMembers, getAllCompanies, getAllInterests } from "@/lib/members";
-import { MagnifyingGlass, X } from "@phosphor-icons/react/dist/ssr";
+import { CaretDown, MagnifyingGlass, X } from "@phosphor-icons/react/dist/ssr";
 
 interface Props {
   status: MemberStatus;
   emptyHint?: string;
+}
+
+interface MultiSelectDropdownProps {
+  label: string;
+  options: string[];
+  selected: string[];
+  onToggle: (value: string) => void;
+}
+
+function MultiSelectDropdown({
+  label,
+  options,
+  selected,
+  onToggle,
+}: MultiSelectDropdownProps) {
+  const buttonLabel =
+    selected.length === 0
+      ? `All ${label.toLowerCase()}`
+      : selected.length <= 2
+        ? selected.join(", ")
+        : `${selected.length} selected`;
+
+  return (
+    <div className="flex flex-col gap-2">
+      <span className="eyebrow text-black-80">{label}</span>
+      <details className="group relative [&_summary::-webkit-details-marker]:hidden">
+        <summary className="input flex cursor-pointer list-none items-center justify-between gap-3 bg-white select-none">
+          <span className="truncate text-black">{buttonLabel}</span>
+          <CaretDown
+            size={18}
+            className="shrink-0 text-black-50 transition-transform duration-200 group-open:rotate-180"
+          />
+        </summary>
+        <div className="absolute left-0 right-0 top-full z-20 mt-2 max-h-72 overflow-auto rounded-card border-2 border-black-10 bg-white p-2 shadow-[0_12px_40px_rgba(16,16,61,0.12)]">
+          {options.length === 0 ? (
+            <div className="px-3 py-2 text-sm text-black-50">
+              No options yet.
+            </div>
+          ) : (
+            <div className="flex flex-col">
+              {options.map((option) => {
+                const active = selected.includes(option);
+                return (
+                  <label
+                    key={option}
+                    className={`flex cursor-pointer items-center gap-3 rounded-btn px-3 py-2 text-sm transition-colors ${
+                      active ? "bg-haze text-black" : "text-black-80 hover:bg-haze"
+                    }`}
+                  >
+                    <input
+                      type="checkbox"
+                      checked={active}
+                      onChange={() => onToggle(option)}
+                      className="h-4 w-4 rounded border-black-20 text-blue focus:ring-blue"
+                    />
+                    <span className="min-w-0 flex-1 truncate">{option}</span>
+                  </label>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      </details>
+      {selected.length > 0 && (
+        <div className="flex flex-wrap gap-2">
+          {selected.map((value) => (
+            <button
+              key={value}
+              type="button"
+              onClick={() => onToggle(value)}
+              className="chip bg-blue text-white transition-colors hover:bg-blue-80"
+            >
+              {value}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
 }
 
 export default function MemberDirectory({ status, emptyHint }: Props) {
@@ -76,42 +155,19 @@ export default function MemberDirectory({ status, emptyHint }: Props) {
 
       {/* Filters */}
       <div className="flex flex-col gap-4">
-        <div className="flex flex-col gap-2">
-          <span className="eyebrow text-black-80">Companies</span>
-          <div className="flex flex-wrap gap-2">
-            {allCompanies.map((c) => {
-              const active = companies.includes(c);
-              return (
-                <button
-                  key={c}
-                  type="button"
-                  onClick={() => toggle(companies, setCompanies, c)}
-                  className={`chip transition-colors ${active ? "bg-blue text-white" : "hover:bg-blue hover:text-white"}`}
-                >
-                  {c}
-                </button>
-              );
-            })}
-          </div>
-        </div>
-
-        <div className="flex flex-col gap-2 mt-2">
-          <span className="eyebrow text-black-80">Interests</span>
-          <div className="flex flex-wrap gap-2">
-            {allInterests.map((i) => {
-              const active = interests.includes(i);
-              return (
-                <button
-                  key={i}
-                  type="button"
-                  onClick={() => toggle(interests, setInterests, i)}
-                  className={`chip transition-colors ${active ? "bg-blue text-white" : "hover:bg-blue hover:text-white"}`}
-                >
-                  {i}
-                </button>
-              );
-            })}
-          </div>
+        <div className="grid gap-4 md:grid-cols-2">
+          <MultiSelectDropdown
+            label="Companies"
+            options={allCompanies}
+            selected={companies}
+            onToggle={(value) => toggle(companies, setCompanies, value)}
+          />
+          <MultiSelectDropdown
+            label="Interests"
+            options={allInterests}
+            selected={interests}
+            onToggle={(value) => toggle(interests, setInterests, value)}
+          />
         </div>
 
         {activeFilterCount > 0 && (

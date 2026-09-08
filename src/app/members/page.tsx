@@ -12,7 +12,7 @@ export default function MembersPage() {
           Member <span className="italic font-sans font-normal text-blue">Portfolio</span>
         </>
       }
-      subtitle="Browse the current VEST class. Search by name, company, or interest — and click into anyone for their full background. VCs, founders, and recruiters welcome."
+      subtitle="Browse the current VEST class. Search by name, company, or interest — and click into anyone for their full background."
     >
       <MemberDirectory status={MemberStatus.Active} />
     </PortalShell>

@@ -89,10 +89,10 @@ export default function MemberProfile({ member }: Props) {
             </Link>
           )}
 
-          <Card className="mt-5 p-4 md:mt-6 md:p-5 bg-haze">
-            <h4 className="eyebrow text-black-80 mb-3">Contact</h4>
-            {member.email || member.phone ? (
-              isMember ? (
+          {isMember && (
+            <Card className="mt-5 p-4 md:mt-6 md:p-5 bg-haze">
+              <h4 className="eyebrow text-black-80 mb-3">Contact</h4>
+              {member.email || member.phone ? (
                 <ul className="flex flex-col gap-2">
                   {member.email && (
                     <li>
@@ -110,17 +110,10 @@ export default function MemberProfile({ member }: Props) {
                   )}
                 </ul>
               ) : (
-                <div className="flex flex-col gap-2">
-                  <p className="text-sm text-black-50">Email and phone are visible to logged-in VEST members.</p>
-                  <Link href="/members/login" className="text-sm font-medium text-blue hover:text-blue-80 transition-colors">
-                    Sign in →
-                  </Link>
-                </div>
-              )
-            ) : (
-              <p className="text-sm text-black-50">No contact info on file.</p>
-            )}
-          </Card>
+                <p className="text-sm text-black-50">No contact info on file.</p>
+              )}
+            </Card>
+          )}
         </FadeIn>
       </aside>
 

@@ -10,21 +10,29 @@ interface Props {
   title: React.ReactNode;
   subtitle?: React.ReactNode;
   children: React.ReactNode;
+  tabs?: Array<{
+    href: string;
+    label: string;
+  }>;
 }
 
 const BASE_TABS = [
   { href: "/members", label: "Members" },
   { href: "/members/alumni", label: "Alumni" },
-  { href: "/members/accolades", label: "Accolades" },
 ];
 
 const ADMIN_TAB = { href: "/members/admin", label: "Manage" };
 
-export default function PortalShell({ title, subtitle, children }: Props) {
+function isActiveTab(pathname: string, href: string) {
+  return pathname === href || pathname.startsWith(`${href}/`);
+}
+
+export default function PortalShell({ title, subtitle, children, tabs }: Props) {
   const pathname = usePathname();
-  const { user, isAdmin, signOut } = useAuth();
+  const { isAdmin } = useAuth();
   
-  const tabs = isAdmin ? [...BASE_TABS, ADMIN_TAB] : BASE_TABS;
+  const baseTabs = tabs ?? BASE_TABS;
+  const visibleTabs = isAdmin ? [...baseTabs, ADMIN_TAB] : baseTabs;
 
   return (
     <div className="bg-white min-h-screen">
@@ -36,10 +44,10 @@ export default function PortalShell({ title, subtitle, children }: Props) {
       <section className="section bg-white pt-8">
         <div className="container-content">
           <FadeIn>
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b-2 border-black-10 pb-4 mb-8">
+            <div className="border-b-2 border-black-10 pb-4 mb-8">
               <nav className="flex flex-wrap gap-2">
-                {tabs.map((t) => {
-                  const active = pathname === t.href;
+                {visibleTabs.map((t) => {
+                  const active = isActiveTab(pathname, t.href);
                   return (
                     <Link
                       key={t.href}
@@ -55,21 +63,6 @@ export default function PortalShell({ title, subtitle, children }: Props) {
                   );
                 })}
               </nav>
-
-              <div className="flex items-center gap-4 text-sm">
-                {user ? (
-                  <>
-                    <span className="text-black-80">{user.email}</span>
-                    <button onClick={() => signOut()} className="text-blue hover:text-blue-80 font-medium">
-                      Sign out
-                    </button>
-                  </>
-                ) : pathname !== "/members/login" ? (
-                  <Link href="/members/login" className="text-blue hover:text-blue-80 font-medium">
-                    Member login
-                  </Link>
-                ) : null}
-              </div>
             </div>
             
             <div className="w-full">
