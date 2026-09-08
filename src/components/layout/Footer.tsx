@@ -10,13 +10,21 @@ import {
 import { siteConfig } from "@/data/site";
 import { VestMark } from "@/components/ui/VestMark";
 
-/** The design lists Join Us here rather than in the Connect column. */
+/**
+ * The design lists Join Us here rather than in the Connect column.
+ *
+ * Sign in is the last entry because the footer is now the only place a
+ * signed-out visitor can reach the members portal from: the nav renders its
+ * account slot only once Firebase resolves a user, and every other link to
+ * /members/login lives inside the portal itself.
+ */
 const NAVIGATE = [
   { href: "/", label: "Home" },
   { href: "/about", label: "About" },
   { href: "/events", label: "Events" },
   { href: "/team", label: "Team" },
   { href: "/join", label: "Join Us" },
+  { href: "/members/login", label: "Sign in" },
 ];
 
 const SOCIALS = [
