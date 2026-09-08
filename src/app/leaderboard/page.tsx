@@ -44,24 +44,24 @@ export default async function LeaderboardPage() {
                 <table className="w-full text-left border-collapse">
                   <thead>
                     <tr className="bg-haze border-b-2 border-black-10">
-                      <th className="py-4 px-6 text-sm font-semibold uppercase tracking-wider text-black-80 w-16">Rank</th>
-                      <th className="py-4 px-6 text-sm font-semibold uppercase tracking-wider text-black-80">Username</th>
-                      <th className="py-4 px-6 text-sm font-semibold uppercase tracking-wider text-black-80 text-right w-24">Points</th>
+                      <th className="py-3 px-4 md:py-4 md:px-6 text-sm font-semibold uppercase tracking-wider text-black-80 w-16">Rank</th>
+                      <th className="py-3 px-4 md:py-4 md:px-6 text-sm font-semibold uppercase tracking-wider text-black-80">Username</th>
+                      <th className="py-3 px-4 md:py-4 md:px-6 text-sm font-semibold uppercase tracking-wider text-black-80 text-right w-24">Points</th>
                     </tr>
                   </thead>
                   <tbody>
                     {leaderboard.length === 0 ? (
                       <tr>
-                        <td colSpan={3} className="py-8 px-6 text-center text-black-80">
+                        <td colSpan={3} className="py-8 px-4 md:px-6 text-center text-black-80">
                           No leaderboard data available yet.
                         </td>
                       </tr>
                     ) : (
                       leaderboard.map((entry, index) => (
                         <tr key={`${entry.username}-${index}`} className="border-b border-black-10 last:border-0 hover:bg-haze/50 transition-colors">
-                          <td className="py-4 px-6 text-black-80 font-mono">#{index + 1}</td>
-                          <td className="py-4 px-6 font-bold text-black">{entry.username}</td>
-                          <td className="py-4 px-6 text-right font-bold text-blue">{entry.points}</td>
+                          <td className="py-3 px-4 md:py-4 md:px-6 text-black-80 font-mono">#{index + 1}</td>
+                          <td className="py-3 px-4 md:py-4 md:px-6 font-bold text-black">{entry.username}</td>
+                          <td className="py-3 px-4 md:py-4 md:px-6 text-right font-bold text-blue">{entry.points}</td>
                         </tr>
                       ))
                     )}

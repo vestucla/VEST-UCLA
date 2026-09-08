@@ -26,7 +26,7 @@ export default function Events() {
         aria-labelledby="past-events-heading"
         className="section bg-haze"
       >
-        <div className="container-content flex flex-col gap-12">
+        <div className="container-content flex flex-col gap-7 md:gap-12">
           <FadeIn>
             <h2
               id="past-events-heading"
@@ -35,7 +35,7 @@ export default function Events() {
               Past events
             </h2>
           </FadeIn>
-          <FadeIn delay={80}>
+          <FadeIn delay={80} className="reveal-media">
             <EventCarousel events={eventsByDate} label="Past events" />
           </FadeIn>
         </div>

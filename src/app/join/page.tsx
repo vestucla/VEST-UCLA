@@ -55,13 +55,13 @@ export default function Join() {
       />
       
       {/* Applications Banner */}
-      <section className="py-12 bg-white border-b border-black-10">
-        <div className="container-content flex flex-col md:flex-row items-center justify-between gap-6">
+      <section className="py-8 md:py-12 bg-white border-b border-black-10">
+        <div className="container-content flex flex-col md:flex-row items-start md:items-center justify-between gap-5 md:gap-6">
           <div className="flex flex-col gap-2">
             <h2 className="font-display text-display-sm text-black">
               {banner.heading}
             </h2>
-            <p className="text-black-80 text-lg">{banner.body}</p>
+            <p className="text-black-80 text-base md:text-lg">{banner.body}</p>
           </div>
           {siteConfig.applicationsOpen && (
             <a href={siteConfig.applicationUrl} target="_blank" rel="noopener noreferrer" className="btn btn-primary whitespace-nowrap">
@@ -72,10 +72,10 @@ export default function Join() {
       </section>
 
       {/* Horizontal Photo Strip */}
-      <section className="py-12 overflow-hidden bg-white">
-        <div className="flex gap-4 px-6 md:px-8 overflow-x-auto snap-x snap-mandatory hide-scrollbar" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+      <section className="py-8 md:py-12 overflow-hidden bg-white">
+        <div className="flex gap-3 px-6 md:gap-4 md:px-8 overflow-x-auto snap-x snap-mandatory hide-scrollbar" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
           {["MatchaGroupPic.webp", "Pickleball.webp", "PokerNight.webp", "TacoNight.webp", "a16zOutside.webp"].map((img, i) => (
-            <div key={i} className="relative flex-none w-[300px] md:w-[400px] aspect-[4/3] rounded-card overflow-hidden snap-center border-2 border-black-10">
+            <div key={i} className="relative flex-none w-[260px] md:w-[400px] aspect-[4/3] rounded-card overflow-hidden snap-center border-2 border-black-10">
               <img src={`/images/JoinUs/${img}`} alt="VEST Event" className="w-full h-full object-cover" />
             </div>
           ))}
@@ -87,12 +87,12 @@ export default function Join() {
 
       {/* Timeline */}
       <section id="timeline" className="section bg-haze">
-        <div className="container-content flex flex-col gap-12">
+        <div className="container-content flex flex-col gap-7 md:gap-12">
           <FadeIn>
             <h2 className="font-display text-display-sm text-blue">Application Timeline</h2>
           </FadeIn>
           
-          <div className="flex flex-col md:flex-row gap-8 relative">
+          <div className="flex flex-col md:flex-row gap-6 md:gap-8 relative">
             {/* Connecting line */}
             <div className="hidden md:block absolute top-[28px] left-8 right-8 h-[2px] bg-black-10 -z-10" />
             
@@ -115,22 +115,22 @@ export default function Join() {
 
       {/* FAQ */}
       <section id="faq" className="section bg-white">
-        <div className="container-content flex flex-col gap-12 max-w-[800px] mx-auto">
+        <div className="container-content flex flex-col gap-7 md:gap-12 max-w-[800px] mx-auto">
           <FadeIn>
             <h2 className="font-display text-display-sm text-blue text-center">Frequently asked questions</h2>
           </FadeIn>
           
-          <div className="flex flex-col gap-4">
+          <div className="flex flex-col gap-3 md:gap-4">
             {faqData.map((faq, i) => (
               <FadeIn key={i} delay={i * 50}>
                 <details className="group border-2 border-black-10 rounded-card bg-white overflow-hidden [&_summary::-webkit-details-marker]:hidden">
-                  <summary className="flex items-center justify-between p-6 cursor-pointer font-bold text-lg text-black select-none hover:bg-haze transition-colors">
+                  <summary className="flex items-center justify-between gap-4 p-4 md:p-6 cursor-pointer font-bold text-base md:text-lg text-black select-none hover:bg-haze transition-colors">
                     {faq.question}
-                    <span className="transition-transform duration-200 group-open:rotate-180">
-                      <CaretDown size={24} className="text-blue" />
+                    <span className="shrink-0 transition-transform duration-200 group-open:rotate-180">
+                      <CaretDown size={24} className="text-blue shrink-0" />
                     </span>
                   </summary>
-                  <div className="px-6 pb-6 pt-2 text-black-80 text-lg border-t border-black-10">
+                  <div className="px-4 pb-4 pt-2 text-black-80 text-base md:px-6 md:pb-6 md:text-lg border-t border-black-10">
                     {faq.answer}
                   </div>
                 </details>

@@ -36,7 +36,10 @@ export function FadeIn({ children, className, delay = 0 }: { children: React.Rea
     <div
       ref={ref}
       className={cn("fade-up", isVisible && "is-visible", className)}
-      style={{ transitionDelay: `${delay}ms` }}
+      // Handed to CSS as a custom property rather than as `transitionDelay`,
+      // so it inherits: a `.reveal-media` picture inside this wrapper waits
+      // out the same stagger as the frame around it.
+      style={{ "--fade-delay": `${delay}ms` } as React.CSSProperties}
     >
       {children}
     </div>

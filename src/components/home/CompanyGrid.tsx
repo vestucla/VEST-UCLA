@@ -8,9 +8,9 @@ import { COMPANY_GRID, companyLogos } from "@/data/logos";
  * that reproduces the arrangement exactly at desktop width, while still being
  * able to reflow.
  *
- * Below the desktop breakpoint the explicit placement is dropped and the logos
- * simply flow, because holding 7 columns on a phone would render every mark at
- * ~40px wide.
+ * Below the desktop breakpoint the explicit placement is dropped and the grid
+ * steps down to 5 then 4 columns, because holding seven on a phone would
+ * render every mark ~40px wide.
  */
 export function CompanyGrid() {
   return (
@@ -39,10 +39,16 @@ export function CompanyGrid() {
             height={logo.height}
             loading="lazy"
             decoding="async"
-            // The design's own drawn size, capped so a mark wider than its
-            // column never pushes the grid open.
-            style={{ width: logo.width, height: logo.height }}
-            className="h-auto max-w-full object-contain"
+            // Handed to CSS unitless rather than set as an inline width/height,
+            // so the stylesheet can scale the whole set down per breakpoint and
+            // — via `aspect-ratio` — a mark too wide for its column loses
+            // height with it instead of being squashed.
+            style={
+              {
+                "--logo-w": logo.width,
+                "--logo-h": logo.height,
+              } as React.CSSProperties
+            }
           />
         </li>
       ))}

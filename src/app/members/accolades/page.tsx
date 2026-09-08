@@ -35,11 +35,11 @@ export default function AccoladesPage() {
       title={<>VEST <span className="italic font-sans font-normal text-blue">Accolades</span></>}
       subtitle="Awards, milestones, and recognition. Most live on the main VEST site — jump straight to them below."
     >
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pb-16">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pb-10 md:gap-4 md:pb-16">
         {ACCOLADE_LINKS.map((l, i) => (
           <FadeIn key={l.href} delay={i * 100}>
             <Link href={l.href} className="block group h-full">
-              <Card className="card-interactive h-full p-6 bg-haze flex flex-col gap-2">
+              <Card className="card-interactive h-full p-5 md:p-6 bg-haze flex flex-col gap-2">
                 <div className="flex items-start justify-between gap-4">
                   <h3 className="font-bold text-xl text-black">{l.label}</h3>
                   <CardArrow className="mt-0.5" />

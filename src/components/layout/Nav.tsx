@@ -180,9 +180,13 @@ export default function Nav() {
             <Link
               href="/events"
               aria-current={isCurrent(pathname, "/join") ? "page" : undefined}
-              className="btn btn-primary px-3 py-1 leading-[1.4]"
+              className="btn btn-primary px-2.5 py-1.5 text-sm leading-[1.4] md:px-3 md:py-1 md:text-base"
             >
-              Apply or RSVP for LA Tech Week <ArrowRight size={16} />
+              {/* The full sentence does not survive a 375px pill next to the
+                  mark and the menu button, and truncating it mid-phrase reads
+                  as a bug — so the verb is what goes, not the destination. */}
+              <span className="hidden md:inline">Apply or RSVP for</span>
+              LA Tech Week <ArrowRight size={16} className="shrink-0" />
             </Link>
 
             <button

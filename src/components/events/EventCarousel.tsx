@@ -119,7 +119,7 @@ export function EventCarousel({
 
   return (
     <div
-      className="flex flex-col gap-8"
+      className="flex flex-col gap-6 md:gap-8"
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
       onFocus={() => setFocused(true)}
@@ -155,7 +155,7 @@ export function EventCarousel({
       </section>
 
       {canScroll && (
-        <div className="flex items-center justify-center gap-6">
+        <div className="flex items-center justify-center gap-4 md:gap-6">
           <button
             type="button"
             onClick={() => scrollToIndex(index - 1)}

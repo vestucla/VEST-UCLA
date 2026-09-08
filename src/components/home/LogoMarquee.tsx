@@ -58,7 +58,9 @@ export function LogoMarquee({
     <li
       key={`${logo.name}-${i}`}
       className="flex shrink-0 items-center justify-center"
-      style={{ marginInlineEnd: gap }}
+      // Scaled rather than a fixed px gap, so the row tightens on a phone by
+      // the same factor the marks shrink by and the rhythm is preserved.
+      style={{ marginInlineEnd: "calc(var(--marquee-gap) * var(--marquee-scale))" }}
     >
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
@@ -76,16 +78,28 @@ export function LogoMarquee({
         className="w-auto max-w-none object-contain"
         // Scaled off the design's own height for this mark, so Pareto stays
         // optically smaller than the rest exactly as drawn.
-        style={{ height: (logo.height / 60) * height }}
+        style={{
+          height: `calc(${logo.height / 60} * var(--marquee-h) * var(--marquee-scale))`,
+        }}
       />
     </li>
   ));
+
+  // `--marquee-scale` is the one responsive knob, set in the stylesheet: a
+  // 60px logo row is a fifth of a phone's viewport height for decoration.
+  const vars = {
+    "--marquee-h": `${height}px`,
+    "--marquee-gap": `${gap}px`,
+  } as React.CSSProperties;
 
   // Reduced motion: no autoplay. The row becomes a plain horizontal scroller,
   // so every logo is still reachable — just under the reader's own control.
   if (reduceMotion) {
     return (
-      <div className={`overflow-x-auto ${className ?? ""}`}>
+      <div
+        style={vars}
+        className={`marquee-root overflow-x-auto ${className ?? ""}`}
+      >
         <ul aria-label={label} className="flex w-max items-center">
           {cells}
         </ul>
@@ -97,7 +111,8 @@ export function LogoMarquee({
     // Full-bleed by design: the edge mask has to land on the viewport edges,
     // so this must not be inset by the page gutter.
     <div
-      className={`marquee group relative overflow-hidden ${className ?? ""}`}
+      style={vars}
+      className={`marquee marquee-root group relative overflow-hidden ${className ?? ""}`}
     >
       <div
         ref={trackRef}

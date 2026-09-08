@@ -58,7 +58,7 @@ export default function MemberDirectory({ status, emptyHint }: Props) {
   }, [results.length, loading]);
 
   return (
-    <div className="flex flex-col gap-8">
+    <div className="flex flex-col gap-6 md:gap-8">
       {/* Search Bar */}
       <div className="flex flex-wrap items-center gap-4">
         <div className="relative flex-1 min-w-[260px] max-w-md">

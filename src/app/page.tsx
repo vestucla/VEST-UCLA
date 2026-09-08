@@ -27,9 +27,9 @@ export default function Home() {
           deliberately runs off both edges of the artboard. */}
       <section
         aria-label="Partners"
-        className="flex flex-col gap-6 bg-white pb-25 pt-20"
+        className="flex flex-col gap-4 bg-white pb-10 pt-9 md:gap-6 md:pb-25 md:pt-20"
       >
-        <p className="text-black-80 px-6 text-center">
+        <p className="text-black-80 px-6 text-center text-sm md:text-base">
           Trusted by Leading VCs, Startups, and Companies
         </p>
         <LogoMarquee
@@ -42,13 +42,15 @@ export default function Home() {
 
       {/* Cultivating UCLA's startup ecosystem */}
       <section className="section-block bg-haze">
-        <div className="container-content flex flex-col gap-12">
+        <div className="container-content flex flex-col gap-7 md:gap-12">
           <FadeIn className="section-header">
-            <div className="flex flex-col items-start gap-4">
+            <div className="section-lede flex flex-col items-start gap-4">
               <h2 className="font-display text-display-sm text-blue">
                 Cultivating UCLA’s startup ecosystem.
               </h2>
-              <ArrowLink href="/about">Learn more about VEST</ArrowLink>
+              <ArrowLink href="/about" className="section-lede-cta">
+                Learn more about VEST
+              </ArrowLink>
             </div>
             <div className="text-black-80 flex flex-col gap-4">
               <p>
@@ -67,7 +69,7 @@ export default function Home() {
             </div>
           </FadeIn>
 
-          <FadeIn delay={80}>
+          <FadeIn delay={80} className="reveal-media">
             <div className="border-black-30 relative aspect-[16/10] overflow-hidden rounded-card border-2 md:aspect-[1200/634]">
               <Image
                 src="/images/home-group.webp"
@@ -83,13 +85,15 @@ export default function Home() {
 
       {/* Working at the best companies in tech */}
       <section className="section-block bg-white">
-        <div className="container-content flex flex-col gap-12">
+        <div className="container-content flex flex-col gap-7 md:gap-12">
           <FadeIn className="section-header">
-            <div className="flex flex-col items-start gap-4">
+            <div className="section-lede flex flex-col items-start gap-4">
               <h2 className="font-display text-display-sm text-blue">
                 Working at the best companies in tech.
               </h2>
-              <ArrowLink href="/team">Meet the team</ArrowLink>
+              <ArrowLink href="/team" className="section-lede-cta">
+                Meet the team
+              </ArrowLink>
             </div>
             <div className="text-black-80 flex flex-col gap-4">
               <p>
@@ -106,10 +110,10 @@ export default function Home() {
             </div>
           </FadeIn>
 
-          <FadeIn delay={80} className="flex flex-col gap-3">
+          <FadeIn delay={80} className="reveal-media-soft flex flex-col gap-3">
             {/* A 2px ring rather than a border: the design's card has no
                 border box, and a ring does not take part in layout. */}
-            <div className="bg-haze shadow-black-10 rounded-card px-5 py-6 shadow-[0_0_0_2px]">
+            <div className="bg-haze shadow-black-10 rounded-card px-3 py-4 shadow-[0_0_0_2px] md:px-5 md:py-6">
               <CompanyGrid />
             </div>
             <p className="text-black px-2 text-right">…and more!</p>
@@ -119,17 +123,17 @@ export default function Home() {
 
       {/* Recent events */}
       <section className="section-block bg-haze">
-        <div className="container-content flex flex-col gap-12">
+        <div className="container-content flex flex-col gap-7 md:gap-12">
           <FadeIn>
             <h2 className="font-display text-display-sm text-blue text-center">
               Recent events
             </h2>
           </FadeIn>
 
-          <ul className="grid grid-cols-1 gap-6 md:grid-cols-3">
+          <ul className="grid grid-cols-1 gap-4 md:grid-cols-3 md:gap-6">
             {recentEvents.map((event, i) => (
               <li key={event.id}>
-                <FadeIn delay={i * 80} className="h-full">
+                <FadeIn delay={i * 80} className="reveal-media h-full">
                   <EventCard event={event} />
                 </FadeIn>
               </li>

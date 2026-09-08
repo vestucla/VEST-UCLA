@@ -70,14 +70,21 @@
   --dur-fast: 150ms;
   --dur-base: 220ms;
   --dur-slow: 320ms;
+  /* Reserved for a photograph settling into its frame. Long on purpose: the
+     same 320ms that reads as "arrived" on a line of text reads as a lurch on
+     a 1200px picture, because the eye is tracking the whole surface. */
+  --dur-media: 900ms;
 
   /* Shape */
   --radius-card: 12px;
   --radius-btn: 8px;
 
-  /* Rhythm — the design's own 120px block padding, 64px on small screens. */
+  /* Rhythm — the design's own 120px block padding, 44px on small screens.
+     A phone shows roughly a third of the content a 1440 artboard does, so
+     holding anything near the desktop figure turns every section break into
+     a screenful of nothing. */
   --spacing-section: 120px;
-  --spacing-section-sm: 64px;
+  --spacing-section-sm: 44px;
   /* Body gutter. 120px at 1440 leaves the 1200px content column. */
   --spacing-gutter: 120px;
 }
@@ -162,6 +169,32 @@
       grid-template-columns: minmax(0, 400px) minmax(0, 360px);
       justify-content: space-between;
       gap: 3rem;
+    }
+  }
+
+  /* --------------------------------------------------------------------
+     The header's lede column — heading over its text CTA. Two columns
+     side by side, that reads as "here is the claim, here is where to go
+     next", with the supporting copy alongside.
+
+     Stacked, the same markup puts the CTA between the heading and the
+     paragraph that explains it: an exit offered before the reader has been
+     told what they would be leaving for. So below the two-column
+     breakpoint the wrapper dissolves into the grid and the link is ordered
+     last, landing under the body copy where it answers it.
+     -------------------------------------------------------------------- */
+  @media (max-width: 899px) {
+    .section-lede {
+      display: contents;
+    }
+
+    .section-lede-cta {
+      /* Everything else defaults to 0, so this is the only item that moves. */
+      order: 1;
+      /* `display: contents` takes the wrapper's `items-start` with it, and a
+         grid item stretches by default — without this the link's box, and so
+         its hit target, would span the whole column. */
+      justify-self: start;
     }
   }
 
@@ -349,11 +382,15 @@
   }
 
   /* Mint marker-pen highlight. Painted as a background so it never depends on
-     a stacking context, and it follows the text across line breaks. */
+     a stacking context, and it follows the text across line breaks.
+     `--highlight-thickness` is the nib width, and it is the only place the
+     stroke height is written down — the sweep and the no-motion fallbacks all
+     read it, so the mark can be fattened or thinned from here alone. */
   .highlight {
+    --highlight-thickness: 0.62em;
     background-image: linear-gradient(var(--color-mint), var(--color-mint));
     background-repeat: no-repeat;
-    background-size: 100% 0.42em;
+    background-size: 100% var(--highlight-thickness);
     background-position: 0 76%;
     padding-inline: 0.05em;
   }
@@ -363,18 +400,18 @@
      default `box-decoration-break: slice` is what fills a wrapped phrase one
      line at a time, in reading order, the way a real marker pen would. */
   .highlight-sweep {
-    background-size: 0% 0.42em;
+    background-size: 0% var(--highlight-thickness);
     transition: background-size 620ms var(--ease-out-expo);
   }
 
   .highlight-sweep.is-visible {
-    background-size: 100% 0.42em;
+    background-size: 100% var(--highlight-thickness);
   }
 
   /* The stroke is JS-driven; without it the mark should simply be there. */
   @media (scripting: none) {
     .highlight-sweep {
-      background-size: 100% 0.42em;
+      background-size: 100% var(--highlight-thickness);
       transition: none;
     }
   }
@@ -409,28 +446,65 @@
     background-size: 100% auto;
   }
 
+  /* The plate is 2:1. Held at full width on a phone it is ~190px of cloud
+     under a ~500px footer, which reads as a stripe rather than as sky. Cover
+     scales it off the height instead and crops the sides — the top of the
+     plate is the flat colour the fill already is, so the content block above
+     the clouds is unaffected. */
+  @media (max-width: 767px) {
+    .footer-sky {
+      background-size: cover;
+    }
+  }
+
   /* --------------------------------------------------------------------
      Company logo grid. Explicit placement on desktop reproduces the
-     design's exact arrangement; below that the logos flow, because holding
-     seven columns on a phone renders every mark ~40px wide.
+     design's exact arrangement; below that the grid steps 4 -> 5 -> 7
+     columns, because holding seven on a phone renders every mark ~40px
+     wide.
+
+     `--logo-scale` shrinks the whole set together, so the design's relative
+     sizing — a wordmark earning its presence from width, a square mark from
+     height — survives at every width. Each logo carries its drawn size as
+     the unitless `--logo-w` / `--logo-h`.
      -------------------------------------------------------------------- */
   .company-grid {
+    --logo-scale: 0.46;
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
-    gap: 1.5rem 1rem;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 1.25rem 0.75rem;
     align-items: center;
     justify-items: center;
   }
 
+  .company-grid > li {
+    /* A grid item's `auto` minimum is its content, which a wide wordmark
+       would use to push its column — and the whole grid — open. */
+    min-width: 0;
+  }
+
   .company-grid > li > img {
-    /* The design's drawn width is the target, but it must yield to a narrow
-       column rather than force the grid open. */
-    max-width: 100%;
+    width: calc(var(--logo-w) * var(--logo-scale) * 1px);
+    /* The pair of these is what keeps a mark too wide for its column in
+       proportion: max-width takes the width, aspect-ratio takes the height
+       with it. A fixed height here would squash it instead. */
+    aspect-ratio: var(--logo-w) / var(--logo-h);
     height: auto;
+    max-width: 100%;
+    object-fit: contain;
+  }
+
+  @media (min-width: 640px) {
+    .company-grid {
+      --logo-scale: 0.68;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 1.5rem 1rem;
+    }
   }
 
   @media (min-width: 1024px) {
     .company-grid {
+      --logo-scale: 1;
       grid-template-columns: repeat(var(--cols), minmax(0, 1fr));
       grid-auto-rows: 100px;
       gap: 0;
@@ -483,6 +557,20 @@
      it exactly -50% of its own width puts copy B where copy A began — the
      wrap is invisible and needs no JS per frame.
      -------------------------------------------------------------------- */
+  /* The row's one responsive knob, shared by the animated and the
+     reduced-motion branch. Logos and the gap between them scale together, so
+     a phone gets the same rhythm at ~60% of the size rather than eight marks
+     at the design's 60px eating a fifth of the viewport. */
+  .marquee-root {
+    --marquee-scale: 0.5;
+  }
+
+  @media (min-width: 768px) {
+    .marquee-root {
+      --marquee-scale: 1;
+    }
+  }
+
   .marquee {
     /* Fade both ends so logos dissolve instead of being guillotined by the
        container edge. */
@@ -546,17 +634,57 @@
     display: none;
   }
 
-  /* One-shot scroll reveal, driven by the FadeIn IntersectionObserver. */
+  /* One-shot scroll reveal, driven by the FadeIn IntersectionObserver.
+     The stagger comes in as `--fade-delay` rather than an inline
+     `transition-delay`, because a custom property inherits — which is what
+     lets the picture inside a `.reveal-media` frame wait out the same beat
+     as the frame it sits in. */
   .fade-up {
     opacity: 0;
     transform: translateY(8px);
     transition:
       opacity var(--dur-slow) var(--ease-out-quart),
       transform var(--dur-slow) var(--ease-out-quart);
+    transition-delay: var(--fade-delay, 0ms);
   }
 
   .fade-up.is-visible {
     opacity: 1;
+    transform: none;
+  }
+
+  /* --------------------------------------------------------------------
+     Media reveal. A photograph carries the reveal differently from a
+     paragraph: it is a window, not a block of text, so instead of sliding
+     the frame further it holds the frame still and lets the picture settle
+     back into it from slightly oversized. The frame must clip
+     (`overflow-hidden`), which every photo box in the design already does.
+
+     The scale runs long against the fade's 320ms and on an expo curve, so
+     nearly all of the travel is spent before the picture is even fully
+     opaque and what is left is a slow drift to rest — a photo that is still
+     visibly zooming once you can read it reads as a slideshow effect.
+
+     `--reveal-scale` is the one knob. Over 1 for a clipped photograph, so
+     it eases *out* of a crop; under 1 for unclipped marks like the company
+     logos, which have no frame to be cropped by and instead grow into
+     place. Either way the picture ends at its true size, never past it.
+     -------------------------------------------------------------------- */
+  .reveal-media {
+    --reveal-scale: 1.06;
+  }
+
+  .reveal-media-soft {
+    --reveal-scale: 0.94;
+  }
+
+  :is(.reveal-media, .reveal-media-soft) :is(img, video) {
+    transform: scale(var(--reveal-scale));
+    transition: transform var(--dur-media) var(--ease-out-expo);
+    transition-delay: var(--fade-delay, 0ms);
+  }
+
+  :is(.reveal-media, .reveal-media-soft).is-visible :is(img, video) {
     transform: none;
   }
 
@@ -567,6 +695,18 @@
       opacity: 1;
       transform: none;
       transition: none;
+    }
+
+    :is(.reveal-media, .reveal-media-soft) :is(img, video) {
+      transform: none;
+      transition: none;
+    }
+
+    /* Same bargain for the hero art, which is held back by Motion until the
+       PNG has actually decoded. */
+    .hero-art {
+      opacity: 1 !important;
+      transform: none !important;
     }
   }
 }
@@ -587,11 +727,19 @@
     transition: none;
   }
 
+  /* A picture that grows is exactly the kind of full-surface movement this
+     preference is asking about, so the crop is dropped and the photograph is
+     painted at its true size from the first frame. */
+  :is(.reveal-media, .reveal-media-soft) :is(img, video) {
+    transform: none !important;
+    transition: none !important;
+  }
+
   /* The mint mark is the point of the effect, so it stays; only the stroke
      travel goes, painted in full from the start. */
   .highlight-sweep,
   .highlight-sweep.is-visible {
-    background-size: 100% 0.42em;
+    background-size: 100% var(--highlight-thickness);
     transition: none;
   }
   .btn:active {

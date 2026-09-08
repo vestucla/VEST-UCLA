@@ -29,7 +29,7 @@ export function Highlight({
           observer.unobserve(el);
         }
       },
-      { threshold: 0.6, rootMargin: "0px 0px -60px 0px" },
+      { threshold: 0.8, rootMargin: "0px 0px -60px 0px" },
     );
 
     observer.observe(el);

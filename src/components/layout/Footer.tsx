@@ -1,6 +1,5 @@
 import Link from "next/link";
 import {
-  ArrowUpRight,
   EnvelopeSimple,
   InstagramLogo,
   LinkedinLogo,
@@ -38,33 +37,36 @@ export default function Footer() {
   return (
     <footer className="footer-sky relative text-white">
       {/* 720px and 105px of top padding at the design width. The lower half is
-          cloud, so all content is held in the upper block. */}
-      <div className="container-content pb-14 pt-24 md:min-h-[720px] md:pt-[105px]">
-        <div className="grid gap-12 md:grid-cols-[minmax(0,1fr)_auto] md:gap-16">
+          cloud, so all content is held in the upper block — and since the
+          plate now covers on a phone too, the 720px floor has to hold there
+          as well: below it the cloud line climbs into the last links, and
+          white type over a lit cloud has nothing to hold against. */}
+      <div className="container-content min-h-[720px] pb-12 pt-14 md:pb-14 md:pt-[105px]">
+        <div className="grid gap-8 md:grid-cols-[minmax(0,1fr)_auto] md:gap-16">
           {/* Wordmark lockup: mark, then VEST stacked over "at UCLA".
               `self-start` so it hangs from the same top edge as the column
               beside it instead of centring against a taller neighbour. */}
           <Link
             href="/"
-            className="flex w-fit items-center gap-[23px] transition-opacity duration-200 hover:opacity-80 md:self-start"
+            className="flex w-fit items-center gap-4 transition-opacity duration-200 hover:opacity-80 md:gap-[23px] md:self-start"
           >
-            <VestMark className="h-16 w-16 text-white md:h-[100px] md:w-[100px]" />
+            <VestMark className="h-14 w-14 text-white md:h-[100px] md:w-[100px]" />
             <span className="flex flex-col items-center leading-none">
               <span className="font-display text-display-xl text-white">
                 VEST
               </span>
-              <span className="text-[1.5rem] text-white md:text-[2rem]">
+              <span className="text-[1.25rem] text-white md:text-[2rem]">
                 at UCLA
               </span>
             </span>
           </Link>
 
-          <div className="flex flex-col gap-9">
+          <div className="flex flex-col gap-6 md:gap-9">
             <p className="font-display text-display text-white">
               Let’s take flight.
             </p>
 
-            <div className="grid grid-cols-2 gap-9">
+            <div className="grid grid-cols-2 gap-6 md:gap-9">
               <FooterColumn title="Navigate" reticle>
                 {NAVIGATE.map((link) => (
                   <li key={link.href}>
@@ -75,10 +77,10 @@ export default function Footer() {
                 ))}
               </FooterColumn>
 
-              {/* Connect is icons plus the newsletter pill, not a link list. */}
+              {/* Connect is icon links, not a link list. */}
               <div>
                 <h2 className="footer-heading">Connect</h2>
-                <ul className="mt-4 flex flex-wrap items-center gap-[15px]">
+                <ul className="mt-3 flex flex-wrap items-center gap-3 md:mt-4 md:gap-[15px]">
                   {SOCIALS.map(({ href, label, Icon }) => (
                     <li key={label}>
                       <a
@@ -95,16 +97,6 @@ export default function Footer() {
                     </li>
                   ))}
                 </ul>
-
-                <a
-                  href={siteConfig.links.newsletter}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="btn btn-inverse mt-6 px-3 py-1"
-                >
-                  Newsletter
-                  <ArrowUpRight size={16} weight="bold" />
-                </a>
               </div>
             </div>
 
@@ -141,9 +133,9 @@ function FooterColumn({
   return (
     <div>
       <h2 className="footer-heading">{title}</h2>
-      <div className={reticle ? "reticle-row mt-4" : "mt-4"}>
+      <div className={reticle ? "reticle-row mt-3 md:mt-4" : "mt-3 md:mt-4"}>
         {reticle && <FocusReticle />}
-        <ul className="flex flex-col gap-4">{children}</ul>
+        <ul className="flex flex-col gap-3 md:gap-4">{children}</ul>
       </div>
     </div>
   );

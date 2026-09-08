@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   motion,
   useMotionValue,
@@ -35,6 +35,51 @@ const clamp = (v: number, min: number, max: number) =>
   Math.min(max, Math.max(min, v));
 
 /**
+ * Load-in. Each layer starts oversized and eases back to its true size as it
+ * fades up, so the art opens out of a crop rather than switching on at full
+ * size. The jet is given the deeper crop and the longer settle of the two,
+ * for the same reason it out-travels the sky under the pointer: the nearer
+ * plane has to move more, or the two read as one flat photograph being
+ * zoomed.
+ */
+const SKY_LOAD_SCALE = 1.05;
+const JET_LOAD_SCALE = 1.1;
+const SKY_LOAD_SECONDS = 1.1;
+const JET_LOAD_SECONDS = 1.5;
+/**
+ * Under `prefers-reduced-motion` both the crop and the fade are dropped
+ * outright rather than shortened, matching `.fade-up`: the art is simply
+ * there once it has decoded.
+ */
+/** Matches `--ease-out-expo` in globals.css. */
+const EASE_OUT_EXPO = [0.19, 1, 0.22, 1] as const;
+
+/**
+ * Tracks a single <img> from "requested" to "painted".
+ *
+ * The `complete` check is not belt-and-braces: on a warm cache the decode can
+ * finish before React has attached anything, and a layer waiting on a `load`
+ * event that already fired would sit at opacity 0 for good. An error is
+ * treated as loaded for the same reason — a broken URL should cost the art,
+ * not the whole hero.
+ */
+function useImageLoaded() {
+  const ref = useRef<HTMLImageElement>(null);
+  const [loaded, setLoaded] = useState(false);
+
+  useEffect(() => {
+    if (ref.current?.complete) setLoaded(true);
+  }, []);
+
+  return {
+    ref,
+    loaded,
+    onLoad: () => setLoaded(true),
+    onError: () => setLoaded(true),
+  };
+}
+
+/**
  * Hero: a 1-bit dithered sky with a jet climbing out of the cloud deck.
  *
  * The design ships the sky and the jet as two separate full-bleed layers,
@@ -50,6 +95,9 @@ const clamp = (v: number, min: number, max: number) =>
 export default function Hero() {
   const ref = useRef<HTMLElement>(null);
   const reduceMotion = useReducedMotion();
+
+  const sky = useImageLoaded();
+  const jet = useImageLoaded();
 
   const { scrollYProgress } = useScroll({
     target: ref,
@@ -144,9 +192,18 @@ export default function Hero() {
       <motion.div
         aria-hidden="true"
         style={reduceMotion ? undefined : { x: skyX, y: skyY }}
-        className="absolute -inset-x-8 -top-14 -bottom-14 -z-20 will-change-transform"
+        initial={{ opacity: 0, scale: reduceMotion ? 1 : SKY_LOAD_SCALE }}
+        animate={sky.loaded ? { opacity: 1, scale: 1 } : undefined}
+        transition={{
+          duration: reduceMotion ? 0 : SKY_LOAD_SECONDS,
+          ease: EASE_OUT_EXPO,
+        }}
+        className="hero-art absolute -inset-x-8 -top-14 -bottom-14 -z-20 will-change-transform"
       >
         <Image
+          ref={sky.ref}
+          onLoad={sky.onLoad}
+          onError={sky.onError}
           src="/images/hero-sky.png"
           alt=""
           fill
@@ -168,9 +225,18 @@ export default function Hero() {
       <motion.div
         aria-hidden="true"
         style={reduceMotion ? undefined : { x: jetX, y: jetY }}
-        className="pointer-events-none absolute bottom-7 -left-[340px] -z-10 h-[560px] w-[960px] will-change-transform md:bottom-0 md:left-0 md:h-[800px] md:w-[1371px]"
+        initial={{ opacity: 0, scale: reduceMotion ? 1 : JET_LOAD_SCALE }}
+        animate={jet.loaded ? { opacity: 1, scale: 1 } : undefined}
+        transition={{
+          duration: reduceMotion ? 0 : JET_LOAD_SECONDS,
+          ease: EASE_OUT_EXPO,
+        }}
+        className="hero-art pointer-events-none absolute bottom-7 -left-[340px] -z-10 h-[560px] w-[960px] will-change-transform md:bottom-0 md:left-0 md:h-[800px] md:w-[1371px]"
       >
         <Image
+          ref={jet.ref}
+          onLoad={jet.onLoad}
+          onError={jet.onError}
           src="/images/hero-plane.png"
           alt=""
           fill
@@ -186,7 +252,10 @@ export default function Hero() {
       <div className="absolute inset-0 pl-6 pr-6 md:pl-[50px]">
         <h1
           id="hero-heading"
-          className="font-display text-display-lg absolute bottom-24 max-w-[10em] text-white [text-shadow:0_2px_24px_rgba(16,16,61,0.28)] md:bottom-auto md:top-[46%] md:max-w-[470px]"
+          // Sits lower on a phone than the desktop's 46%: the mark is drawn
+          // near the top of the frame there, and the headline reads as
+          // captioning it rather than floating in the middle of the sky.
+          className="font-display text-display-lg absolute bottom-[4.5rem] max-w-[10em] text-white [text-shadow:0_2px_24px_rgba(16,16,61,0.28)] md:bottom-auto md:top-[46%] md:max-w-[470px]"
         >
           VEST is building the future in Los Angeles.
         </h1>
@@ -199,7 +268,7 @@ export default function Hero() {
       <motion.div
         aria-hidden="true"
         style={{ opacity: cueOpacity }}
-        className="pointer-events-none absolute bottom-6 left-1/2 -translate-x-1/2 md:bottom-9"
+        className="pointer-events-none absolute bottom-3 left-1/2 -translate-x-1/2 md:bottom-9"
       >
         <motion.svg
           width="28"

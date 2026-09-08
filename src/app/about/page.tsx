@@ -23,23 +23,23 @@ export default function About() {
       <section className="section bg-white">
         <div className="container-content">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
-            <FadeIn>
-              <div className="rounded-card border-2 border-black-10 overflow-hidden aspect-square md:aspect-[4/3]">
+            <FadeIn className="reveal-media">
+              <div className="rounded-card border-2 border-black-10 overflow-hidden aspect-[4/3]">
                 <img src="/images/About/AptGroupPic.webp" alt="VEST Community" className="w-full h-full object-cover" />
               </div>
             </FadeIn>
-            <FadeIn delay={100}>
-              <div className="rounded-card border-2 border-black-10 overflow-hidden aspect-square md:aspect-[4/3]">
+            <FadeIn delay={100} className="reveal-media">
+              <div className="rounded-card border-2 border-black-10 overflow-hidden aspect-[4/3]">
                 <img src="/images/About/BowenXueTalk.webp" alt="Guest Speaker Event" className="w-full h-full object-cover" />
               </div>
             </FadeIn>
-            <FadeIn delay={200}>
-              <div className="rounded-card border-2 border-black-10 overflow-hidden aspect-square md:aspect-[4/3]">
+            <FadeIn delay={200} className="reveal-media">
+              <div className="rounded-card border-2 border-black-10 overflow-hidden aspect-[4/3]">
                 <img src="/images/About/DrinkRobot.webp" alt="Project Building" className="w-full h-full object-cover" />
               </div>
             </FadeIn>
-            <FadeIn delay={300}>
-              <div className="rounded-card border-2 border-black-10 overflow-hidden aspect-square md:aspect-[4/3]">
+            <FadeIn delay={300} className="reveal-media">
+              <div className="rounded-card border-2 border-black-10 overflow-hidden aspect-[4/3]">
                 <img src="/images/About/GM1.webp" alt="General Meeting" className="w-full h-full object-cover" />
               </div>
             </FadeIn>

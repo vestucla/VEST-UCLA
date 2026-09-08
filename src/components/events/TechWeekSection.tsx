@@ -15,9 +15,9 @@ export function TechWeekSection() {
     >
       <div className="container-content">
         <FadeIn>
-          <div className="card bg-haze flex flex-col gap-8 p-6 md:p-10 lg:flex-row lg:items-end lg:justify-between lg:gap-16">
-            <div className="flex max-w-[640px] flex-col gap-5">
-              <TechWeekMark className="h-10 w-auto self-start text-black" />
+          <div className="card bg-haze flex flex-col gap-6 p-5 md:gap-8 md:p-10 lg:flex-row lg:items-end lg:justify-between lg:gap-16">
+            <div className="flex max-w-[640px] flex-col gap-4 md:gap-5">
+              <TechWeekMark className="h-8 w-auto self-start text-black md:h-10" />
               <div className="flex flex-col gap-3">
                 <h2
                   id="la-tech-week-heading"
@@ -25,7 +25,9 @@ export function TechWeekSection() {
                 >
                   {title}
                 </h2>
-                <p className="text-black-80 prose text-lg">{description}</p>
+                <p className="text-black-80 prose text-base md:text-lg">
+                  {description}
+                </p>
               </div>
             </div>
             <div className="flex flex-col gap-3 sm:flex-row lg:shrink-0">

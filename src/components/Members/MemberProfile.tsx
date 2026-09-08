@@ -17,10 +17,10 @@ export default function MemberProfile({ member }: Props) {
   const memberSlug = `${member.firstName.toLowerCase()}-${member.lastName.toLowerCase()}`;
 
   return (
-    <div className="flex flex-col md:flex-row gap-8 lg:gap-12 pb-16">
+    <div className="flex flex-col md:flex-row gap-6 md:gap-8 lg:gap-12 pb-10 md:pb-16">
       {/* Sidebar */}
-      <aside className="w-full md:w-[320px] flex-shrink-0 flex flex-col gap-6">
-        <FadeIn delay={0}>
+      <aside className="w-full md:w-[320px] flex-shrink-0 flex flex-col gap-5 md:gap-6">
+        <FadeIn delay={0} className="reveal-media">
           <div className="relative w-full aspect-square rounded-[24px] overflow-hidden bg-haze border border-black-10">
             {member.imageSrc ? (
               <img
@@ -89,7 +89,7 @@ export default function MemberProfile({ member }: Props) {
             </Link>
           )}
 
-          <Card className="mt-6 p-5 bg-haze">
+          <Card className="mt-5 p-4 md:mt-6 md:p-5 bg-haze">
             <h4 className="eyebrow text-black-80 mb-3">Contact</h4>
             {member.email || member.phone ? (
               isMember ? (
@@ -125,7 +125,7 @@ export default function MemberProfile({ member }: Props) {
       </aside>
 
       {/* Main Column */}
-      <div className="flex-1 flex flex-col gap-12">
+      <div className="flex-1 flex flex-col gap-8 md:gap-12">
         <FadeIn delay={200}>
           {member.bio && (
             <p className="text-lg text-black leading-relaxed whitespace-pre-wrap">

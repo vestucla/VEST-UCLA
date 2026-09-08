@@ -17,7 +17,7 @@ export function EventCard({ event }: { event: Event }) {
             className="object-cover"
           />
         </div>
-        <div className="flex flex-1 flex-col gap-4 px-6 py-4">
+        <div className="flex flex-1 flex-col gap-3 px-4 py-4 md:gap-4 md:px-6">
           <div className="flex items-start justify-between gap-4">
             <div className="flex flex-col">
               <h3 className="text-xl leading-tight text-black md:text-2xl mb-2">
