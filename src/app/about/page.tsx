@@ -36,12 +36,12 @@ export default function About() {
             </FadeIn>
             <FadeIn delay={100} className="reveal-media">
               <div className="rounded-card border-2 border-black-10 overflow-hidden aspect-[4/3]">
-                <img src="/images/About/jouyang_smile.jpg" alt="Members" className="w-full h-full object-cover" />
+                <img src="/images/About/jouyang_smile.JPG" alt="Members" className="w-full h-full object-cover" />
               </div>
             </FadeIn>
             <FadeIn delay={200} className="reveal-media">
               <div className="rounded-card border-2 border-black-10 overflow-hidden aspect-[4/3]">
-                <img src="/images/About/senior_star.jpg" alt="Project Building" className="w-full h-full object-cover" />
+                <img src="/images/About/senior_star.JPG" alt="Project Building" className="w-full h-full object-cover" />
               </div>
             </FadeIn>
             <FadeIn delay={300} className="reveal-media">
