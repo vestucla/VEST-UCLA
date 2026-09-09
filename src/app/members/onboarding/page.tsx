@@ -225,7 +225,7 @@ export default function OnboardingPage() {
                     label="End date"
                     value={exp.endDate ?? ""}
                     onChange={(v) => updateExperience(index, "endDate", v)}
-                    placeholder="2025-08 or blank"
+                    placeholder="Present"
                   />
                 </div>
                 <Field

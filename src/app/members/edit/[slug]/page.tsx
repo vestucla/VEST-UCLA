@@ -1,6 +1,6 @@
 "use client";
 
-import { use, useEffect, useState } from "react";
+import { use, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import PortalShell from "@/components/Members/PortalShell";
@@ -31,6 +31,64 @@ const emptyExperience: ExperienceItem = {
   endDate: "",
   description: "",
 };
+
+let experienceIdCounter = 0;
+function newExperienceId(): string {
+  experienceIdCounter += 1;
+  return `exp-${experienceIdCounter}-${Math.random().toString(36).slice(2, 8)}`;
+}
+
+const MONTH_NAMES: Record<string, number> = {
+  jan: 1, january: 1,
+  feb: 2, february: 2,
+  mar: 3, march: 3,
+  apr: 4, april: 4,
+  may: 5,
+  jun: 6, june: 6,
+  jul: 7, july: 7,
+  aug: 8, august: 8,
+  sep: 9, sept: 9, september: 9,
+  oct: 10, october: 10,
+  nov: 11, november: 11,
+  dec: 12, december: 12,
+  winter: 1,
+  spring: 4,
+  summer: 7,
+  fall: 10,
+  autumn: 10,
+};
+
+// Turns a free-text start date ("2024-06", "06/2024", "Summer 2024", "2024")
+// into a comparable "months since year 0" number so experience cards can be
+// sorted most-recent-first. Returns null when no date can be inferred, so
+// undated (e.g. freshly added, still-blank) entries can be kept out of the way.
+function getExperienceRank(exp: ExperienceItem): number | null {
+  const raw = exp.startDate?.trim();
+  if (!raw) return null;
+
+  const isoMatch = raw.match(/(\d{4})-(\d{1,2})(?:-\d{1,2})?/);
+  if (isoMatch) {
+    return parseInt(isoMatch[1], 10) * 12 + parseInt(isoMatch[2], 10);
+  }
+
+  const usMatch = raw.match(/(\d{1,2})\/(\d{4})/);
+  if (usMatch) {
+    return parseInt(usMatch[2], 10) * 12 + parseInt(usMatch[1], 10);
+  }
+
+  const yearMatch = raw.match(/\b(19|20)\d{2}\b/);
+  if (!yearMatch) return null;
+  const year = parseInt(yearMatch[0], 10);
+
+  const lower = raw.toLowerCase();
+  for (const [name, num] of Object.entries(MONTH_NAMES)) {
+    if (lower.includes(name)) {
+      return year * 12 + num;
+    }
+  }
+
+  return year * 12 + 6; // only a year is known - assume mid-year
+}
 
 type ApiResponse = {
   url?: unknown;
@@ -83,6 +141,7 @@ export default function EditProfilePage({ params }: Params) {
   const [role, setRole] = useState<MemberRole>(MemberRole.Member);
   const [status, setStatus] = useState<MemberStatus>(MemberStatus.Active);
   const [experiences, setExperiences] = useState<ExperienceItem[]>([{ ...emptyExperience }]);
+  const [experienceIds, setExperienceIds] = useState<string[]>(() => [newExperienceId()]);
   const [imageSrc, setImageSrc] = useState("");
   const [uploadingImage, setUploadingImage] = useState(false);
 
@@ -135,6 +194,7 @@ export default function EditProfilePage({ params }: Params) {
         setImageSrc(foundMember.imageSrc ?? "");
         if (foundMember.experiences && foundMember.experiences.length > 0) {
           setExperiences(foundMember.experiences);
+          setExperienceIds(foundMember.experiences.map(() => newExperienceId()));
         }
       } catch (err) {
         toast.error("Failed to load profile");
@@ -152,11 +212,37 @@ export default function EditProfilePage({ params }: Params) {
 
   const addExperience = () => {
     setExperiences((prev) => [...prev, { ...emptyExperience }]);
+    setExperienceIds((prev) => [...prev, newExperienceId()]);
   };
 
   const removeExperience = (index: number) => {
     setExperiences((prev) => prev.filter((_, i) => i !== index));
+    setExperienceIds((prev) => prev.filter((_, i) => i !== index));
   };
+
+  // Cards are shown most-recent-first, recomputed whenever an experience is
+  // added, removed, or edited. Current roles (blank end date, shown as
+  // "Present") are always kept above ones with an end date, even if their
+  // start date is earlier. Entries with no parseable start date yet (e.g. a
+  // card the user just added) stay put at the end of their group, in the
+  // order they were added, until enough is filled in to place them.
+  const sortedExperienceOrder = useMemo(() => {
+    return experiences
+      .map((exp, index) => ({
+        index,
+        rank: getExperienceRank(exp),
+        isPresent: !exp.endDate?.trim(),
+      }))
+      .sort((a, b) => {
+        if (a.isPresent !== b.isPresent) return a.isPresent ? -1 : 1;
+        if (a.rank === null && b.rank === null) return a.index - b.index;
+        if (a.rank === null) return 1;
+        if (b.rank === null) return -1;
+        if (b.rank !== a.rank) return b.rank - a.rank;
+        return a.index - b.index;
+      })
+      .map((item) => item.index);
+  }, [experiences]);
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -237,7 +323,9 @@ export default function EditProfilePage({ params }: Params) {
         joinedQuarter: joinedQuarter || undefined,
         phone,
         joinedYear,
-        experiences: experiences.filter((exp) => exp.company.trim() || exp.role.trim()),
+        experiences: sortedExperienceOrder
+          .map((index) => experiences[index])
+          .filter((exp) => exp.company.trim() || exp.role.trim()),
       };
 
       if (!imageSrc || imageSrc.startsWith("https://") || imageSrc.startsWith("http://")) {
@@ -423,22 +511,25 @@ export default function EditProfilePage({ params }: Params) {
         <Card className="p-6 md:p-8 flex flex-col gap-6">
           <h3 className="eyebrow text-black-80">Experience</h3>
           <div className="flex flex-col gap-6">
-            {experiences.map((exp, index) => (
-              <div key={index} className="flex flex-col gap-4 rounded-xl border border-black-10 bg-haze p-4 md:p-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <Field label="Company" value={exp.company ?? ""} onChange={(v) => updateExperience(index, "company", v)} />
-                  <Field label="Role" value={exp.role ?? ""} onChange={(v) => updateExperience(index, "role", v)} />
-                  <Field label="Start date" value={exp.startDate ?? ""} onChange={(v) => updateExperience(index, "startDate", v)} placeholder="2024-06" />
-                  <Field label="End date" value={exp.endDate ?? ""} onChange={(v) => updateExperience(index, "endDate", v)} placeholder="2025-08 or leave blank" />
+            {sortedExperienceOrder.map((index) => {
+              const exp = experiences[index];
+              return (
+                <div key={experienceIds[index]} className="flex flex-col gap-4 rounded-xl border border-black-10 bg-haze p-4 md:p-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <Field label="Company" value={exp.company ?? ""} onChange={(v) => updateExperience(index, "company", v)} />
+                    <Field label="Role" value={exp.role ?? ""} onChange={(v) => updateExperience(index, "role", v)} />
+                    <Field label="Start date" value={exp.startDate ?? ""} onChange={(v) => updateExperience(index, "startDate", v)} placeholder="2024-06" />
+                    <Field label="End date" value={exp.endDate ?? ""} onChange={(v) => updateExperience(index, "endDate", v)} placeholder="Present" />
+                  </div>
+                  <Field label="Description" value={exp.description ?? ""} onChange={(v) => updateExperience(index, "description", v)} textarea />
+                  {experiences.length > 1 && (
+                    <button type="button" onClick={() => removeExperience(index)} className="self-start text-sm text-black-50 hover:text-red-500 transition-colors">
+                      Remove experience
+                    </button>
+                  )}
                 </div>
-                <Field label="Description" value={exp.description ?? ""} onChange={(v) => updateExperience(index, "description", v)} textarea />
-                {experiences.length > 1 && (
-                  <button type="button" onClick={() => removeExperience(index)} className="self-start text-sm text-black-50 hover:text-red-500 transition-colors">
-                    Remove experience
-                  </button>
-                )}
-              </div>
-            ))}
+              );
+            })}
             <Button type="button" variant="inverse" onClick={addExperience} className="self-start">
               + Add experience
             </Button>

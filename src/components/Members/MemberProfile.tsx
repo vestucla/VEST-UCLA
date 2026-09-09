@@ -161,7 +161,7 @@ export default function MemberProfile({ member }: Props) {
                       <span className="text-xs font-mono text-black-50 uppercase tracking-wider">
                         {e.startDate ?? ""}
                         {e.startDate || e.endDate ? " — " : ""}
-                        {e.endDate ?? (e.startDate ? "Present" : "")}
+                        {e.endDate || (e.startDate ? "Present" : "")}
                       </span>
                     </div>
                     <p className="text-sm font-medium text-black-80 mb-3">{e.role}</p>
