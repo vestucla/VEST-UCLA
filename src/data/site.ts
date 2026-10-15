@@ -22,7 +22,7 @@ export const siteConfig = {
 
   links: {
     discord: "https://discord.gg/PTGgbFvm9t",
-    email: "mailto:vestucla@gmail.com",
+    email: "mailto:bruinventurelab@gmail.com",
     instagram: "https://www.instagram.com/vestucla/",
     linkedin: "https://www.linkedin.com/company/vest-ucla/",
     newsletter:
